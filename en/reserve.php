@@ -7,7 +7,7 @@ if (isset($_SESSION['user_id'])) {
     exit(); // Ensure no further code is executed
 }
 
-// Récupérer les variables depuis l'URL
+// Retrieve variables from the URL
 $idcar = $_GET['idcar'] ?? '';
 $depart = $_GET['depart'] ?? '';
 $arrive = $_GET['arrive'] ?? '';
@@ -16,7 +16,7 @@ $heureDebut = $_GET['heureDebut'] ?? '';
 $dateFin = $_GET['Date_fin'] ?? '';
 $heureFin = $_GET['heureFin'] ?? '';
 
-include("header_p.php");
+include("header_p.php"); // Include header
 ?>
 
 <!-- Header Start -->
@@ -39,6 +39,9 @@ include("header_p.php");
             <div class="col-xl-12 wow fadeInUp" data-wow-delay="0.1s">
                 <div class="bg-secondary p-5 rounded">
                     <h4 class="text-white mb-4">Your Info</h4>
+                    <?php if (isset($_GET['error'])): ?>
+                        <div class="alert alert-danger"><?= htmlspecialchars($_GET['error']) ?></div>
+                    <?php endif; ?>
                     <form action="confirm_reservation.php" method="POST" onsubmit="return validatePassword()">
                         <!-- Hidden fields for reservation information -->
                         <input type="hidden" name="idcar" value="<?= htmlspecialchars($idcar) ?>">
@@ -57,32 +60,32 @@ include("header_p.php");
                                     <label for="fullname">Fullname</label>
                                 </div>
                             </div>
-                            <div class="col-lg-12 col-xl-6">
+                            <div class="col-lg-12 col-xl-12">
                                 <div class="form-floating">
                                     <input type="email" class="form-control" id="email" name="email" placeholder="E-mail" required>
                                     <label for="email">E-mail</label>
                                 </div>
                             </div>
-                            <div class="col-lg-12 col-xl-6">
+                            <div class="col-lg-12 col-xl-12">
                                 <div class="form-floating">
                                     <input type="tel" class="form-control" id="phone" name="phone" placeholder="Phone">
                                     <label for="phone">Phone</label>
                                 </div>
                             </div>
-                            <div class="col-6">
+                            <div class="col-lg-12 col-xl-6">
                                 <div class="form-floating">
                                     <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
                                     <label for="password">Password</label>
                                 </div>
                             </div>
-                            <div class="col-6">
+                            <div class="col-lg-12 col-xl-6">
                                 <div class="form-floating">
                                     <input type="password" class="form-control" id="confirm_password" placeholder="Confirm Password" required>
                                     <label for="confirm_password">Confirm Password</label>
                                 </div>
                                 <small id="password_error" style="color: red; display: none;">Passwords do not match!</small>
                             </div>
-                            <div class="col-2">
+                            <div class="col-lg-12 col-xl-4">
                                 <button type="submit" class="btn btn-light w-100 py-3">Reserve</button>
                             </div>
                         </div>
@@ -105,10 +108,10 @@ include("header_p.php");
                     </script>
                 </div>
             </div>
-
         </div>
     </div>
 </div>
 <!-- Contact End -->
 <?php
-include("footer_p.php") ?>
+include("footer_p.php"); // Include footer
+?>

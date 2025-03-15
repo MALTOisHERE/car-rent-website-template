@@ -8,7 +8,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $name = trim(htmlspecialchars($_POST['name']));
     $email = trim(htmlspecialchars($_POST['email']));
     $phone = trim(htmlspecialchars($_POST['phone']));
-    $address = trim(htmlspecialchars($_POST['address']));
     $password = trim($_POST['password']);
     $confirmPassword = trim($_POST['confirm_password']);
 
@@ -35,7 +34,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 // Insérer l'utilisateur dans la base de données
                 $sql = "INSERT INTO user (fullname, email, password, phone, role) 
                         VALUES (:username, :email, :password, :phone, :role)";
-                
+
                 $stmt = $mysqlconnection->prepare($sql);
                 $stmt->execute([
                     ':username' => $name,
@@ -58,6 +57,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -139,10 +139,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     </style>
 </head>
+
 <body>
     <div class="signup-container">
         <h2>Create Account</h2>
-        
+
         <?php if (!empty($error)): ?>
             <div class="error-message"><?= $error ?></div>
         <?php endif; ?>
@@ -182,4 +183,5 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     </script>
 </body>
+
 </html>

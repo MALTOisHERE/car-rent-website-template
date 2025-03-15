@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 01, 2025 at 08:05 PM
+-- Generation Time: Mar 15, 2025 at 02:11 AM
 -- Server version: 10.4.27-MariaDB
 -- PHP Version: 8.2.0
 
@@ -79,8 +79,9 @@ CREATE TABLE `reservation` (
 --
 
 INSERT INTO `reservation` (`idres`, `depart`, `arrive`, `heureDebut`, `heureFin`, `Date_debut`, `Date_fin`, `idcar`, `iduser`, `confirm`) VALUES
-(14, 'agadir', 'marrakech', '15:00:00', '16:00:00', '2025-02-01', '2025-03-06', 6, 12, NULL),
-(15, 'agadir', '', '16:00:00', '17:00:00', '2025-02-27', '2025-03-05', 8, 13, NULL);
+(20, 'agadir', '', '13:00:00', '13:00:00', '2025-03-20', '2025-03-26', 11, 15, NULL),
+(22, 'agadir', '', '15:00:00', '13:00:00', '2025-03-14', '2025-03-27', 8, 15, 0),
+(24, 'marrakesh', '', '12:00:00', '14:00:00', '2025-03-14', '2025-03-21', 8, 18, NULL);
 
 -- --------------------------------------------------------
 
@@ -90,7 +91,6 @@ INSERT INTO `reservation` (`idres`, `depart`, `arrive`, `heureDebut`, `heureFin`
 
 CREATE TABLE `user` (
   `iduser` int(11) NOT NULL,
-  `name` varchar(45) DEFAULT NULL,
   `fullname` varchar(45) DEFAULT NULL,
   `email` varchar(45) DEFAULT NULL,
   `phone` varchar(45) DEFAULT NULL,
@@ -104,11 +104,12 @@ CREATE TABLE `user` (
 -- Dumping data for table `user`
 --
 
-INSERT INTO `user` (`iduser`, `name`, `fullname`, `email`, `phone`, `password`, `reset_token`, `reset_token_expiry`, `role`) VALUES
-(10, 'jamila', 'jamila', 'jamila@gmail.com', '123456789', '$2y$10$2yCbsfVqrEOUOeSuofTaieCy8Ea1oSJ510PonJxOqYoRwsx0qMTNm', NULL, NULL, 'admin'),
-(11, 'Mohamed', 'AIT OUAARAB', 'mohammed.ouaarab@gmail.com', '0696183942', '$2y$10$CQhoeKN0czhwXjJZ8hQpz.dQI32XP07uw2ACNofUB4aShSc1jOWO6', NULL, NULL, '0'),
-(12, 'Mohamed', 'AIT OUAARAB', 'mohammed.ouaarab@gmail.com', '0696183942', '$2y$10$ILt8ID4EkT3ijE.E1OMmRuiVx8vFiUdDEbtXKg.MSFzbXqzHvA5Ee', NULL, NULL, '0'),
-(13, 'Mohamed', 'AIT OUAARAB', 'mohammed.ouaarab@gmail.com', '0696183942', '$2y$10$pJwgRG8fLn3ec2poCStbF.OVL4/vXsd1pGoK4kXRvOFcciyQ2.gUi', NULL, NULL, '0');
+INSERT INTO `user` (`iduser`, `fullname`, `email`, `phone`, `password`, `reset_token`, `reset_token_expiry`, `role`) VALUES
+(10, 'jamila', 'jamila@gmail.com', '123456789', '$2y$10$2yCbsfVqrEOUOeSuofTaieCy8Ea1oSJ510PonJxOqYoRwsx0qMTNm', NULL, NULL, 'admin'),
+(15, 'abdo', 'abdo@gmail.com', '123456789', '$2y$10$xXbYpKRU/E/ZC/bCRZCchuBOo7677lHXpN9YOuHajNdhQkjxL46x2', NULL, NULL, '1'),
+(16, 'Fatima Zahra', 'fatima.aita@example.com', '12346789', '$2y$10$Yp0wtaQJC8PsoptAYHIm/.sindtZMsmj5SxAvM9F4aD4Mryap0ioW', NULL, NULL, '0'),
+(17, 'Mohamed AIT OUAARAB', 'mohammed.ouaarab@gmail.com', '0696183942', '$2y$10$MRZt/HKNEPYDw2eAxihSJ.FJNeiYheZ4Nc6z7J5rUs11.XB7OFMy2', NULL, NULL, '0'),
+(18, 'Mohamed AIT OUAARAB', 'mohammed.ouaarab@gmail.com', '0696183942', '$2y$10$kl6dUVoB2MbZ3.3hlrmbkOnDppX5lKWeDTqHbPgyRLu7afNDgLzl2', NULL, NULL, '0');
 
 --
 -- Indexes for dumped tables
@@ -151,13 +152,13 @@ ALTER TABLE `car`
 -- AUTO_INCREMENT for table `reservation`
 --
 ALTER TABLE `reservation`
-  MODIFY `idres` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `idres` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT for table `user`
 --
 ALTER TABLE `user`
-  MODIFY `iduser` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `iduser` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- Constraints for dumped tables

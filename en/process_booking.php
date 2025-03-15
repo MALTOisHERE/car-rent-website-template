@@ -48,7 +48,7 @@ if (isset($_SESSION['user_id'])) {
         // Insert reservation
         $sqlInsert = "INSERT INTO reservation 
                      (depart, arrive, heureDebut, heureFin, Date_debut, Date_fin, idcar, iduser, confirm)
-                     VALUES (:depart, :arrive, :heureDebut, :heureFin, :dateDebut,++++++++++++ :dateFin, :idcar, :iduser, 0)";
+                     VALUES (:depart, :arrive, :heureDebut, :heureFin, :dateDebut, :dateFin, :idcar, :iduser, 0)";
         $stmtInsert = $mysqlconnection->prepare($sqlInsert);
         $stmtInsert->execute([
             ':depart' => $depart,
@@ -61,8 +61,11 @@ if (isset($_SESSION['user_id'])) {
             ':iduser' => $_SESSION['user_id']
         ]);
 
-        // Redirect with success message
-        header("Location: index.php?message=Your+reservation+has+been+successfully+processed.");
+        // Get the reservation ID
+        $reservationId = $mysqlconnection->lastInsertId();
+
+        // Redirect with success message and reservation ID
+        header("Location: index.php?message=Your+reservation+has+been+successfully+processed.+Reservation+ID+:+$reservationId");
         exit();
     } catch (PDOException $e) {
         // Redirect with error message if there's a database error
@@ -75,3 +78,4 @@ if (isset($_SESSION['user_id'])) {
     header("Location: reserve.php?$params");
     exit();
 }
+?>

@@ -54,17 +54,77 @@ if (isset($_GET['message'])) {
                                                     <div class="d-flex align-items-center bg-light text-body rounded-start p-2">
                                                         <span class="fas fa-map-marker-alt"></span> <span class="ms-1">Pick Up</span>
                                                     </div>
-                                                    <input class="form-control" type="text" name="depart" placeholder="Enter a City or Airport" required>
+                                                    <select class="form-control" name="depart" required>
+                                                        <option value="" disabled selected>Select Pickup City</option>
+                                                        <option value="Casablanca">Casablanca</option>
+                                                        <option value="Rabat">Rabat</option>
+                                                        <option value="Marrakech">Marrakech</option>
+                                                        <option value="Fes">Fes</option>
+                                                        <option value="Tangier">Tangier</option>
+                                                        <option value="Agadir">Agadir</option>
+                                                        <option value="Meknes">Meknes</option>
+                                                        <option value="Oujda">Oujda</option>
+                                                        <option value="Kenitra">Kenitra</option>
+                                                        <option value="Tetouan">Tetouan</option>
+                                                        <option value="Safi">Safi</option>
+                                                        <option value="El Jadida">El Jadida</option>
+                                                        <option value="Nador">Nador</option>
+                                                        <option value="Beni Mellal">Beni Mellal</option>
+                                                        <option value="Taza">Taza</option>
+                                                        <option value="Khouribga">Khouribga</option>
+                                                        <option value="Al Hoceima">Al Hoceima</option>
+                                                        <option value="Settat">Settat</option>
+                                                        <option value="Mohammedia">Mohammedia</option>
+                                                        <option value="Larache">Larache</option>
+                                                        <option value="Khemisset">Khemisset</option>
+                                                        <option value="Errachidia">Errachidia</option>
+                                                        <option value="Taroudant">Taroudant</option>
+                                                        <option value="Ouarzazate">Ouarzazate</option>
+                                                        <option value="Sidi Kacem">Sidi Kacem</option>
+                                                        <option value="Tiznit">Tiznit</option>
+                                                        <option value="Guelmim">Guelmim</option>
+                                                        <option value="Dakhla">Dakhla</option>
+                                                    </select>
                                                 </div>
                                             </div>
                                             <div class="col-12">
-                                                <a href="javascript(0);" id="toggleDropOff" class="text-start text-white d-block mb-2">Need a different drop-off location?</a>
+                                                <a href="javascript:void(0);" id="toggleDropOff" class="text-start text-white d-block mb-2">Need a different drop-off location?</a>
                                                 <div class="input-group" id="dropOffInputGroup" style="display: none;">
                                                     <div class="d-flex align-items-center bg-light text-body rounded-start p-2">
                                                         <span class="fas fa-map-marker-alt"></span>
                                                         <span class="ms-1">Drop off</span>
                                                     </div>
-                                                    <input class="form-control" type="text" name="arrive" placeholder="Enter a City or Airport">
+                                                    <select class="form-control" name="arrive">
+                                                        <option value="" disabled selected>Select Drop-off City</option>
+                                                        <option value="Casablanca">Casablanca</option>
+                                                        <option value="Rabat">Rabat</option>
+                                                        <option value="Marrakech">Marrakech</option>
+                                                        <option value="Fes">Fes</option>
+                                                        <option value="Tangier">Tangier</option>
+                                                        <option value="Agadir">Agadir</option>
+                                                        <option value="Meknes">Meknes</option>
+                                                        <option value="Oujda">Oujda</option>
+                                                        <option value="Kenitra">Kenitra</option>
+                                                        <option value="Tetouan">Tetouan</option>
+                                                        <option value="Safi">Safi</option>
+                                                        <option value="El Jadida">El Jadida</option>
+                                                        <option value="Nador">Nador</option>
+                                                        <option value="Beni Mellal">Beni Mellal</option>
+                                                        <option value="Taza">Taza</option>
+                                                        <option value="Khouribga">Khouribga</option>
+                                                        <option value="Al Hoceima">Al Hoceima</option>
+                                                        <option value="Settat">Settat</option>
+                                                        <option value="Mohammedia">Mohammedia</option>
+                                                        <option value="Larache">Larache</option>
+                                                        <option value="Khemisset">Khemisset</option>
+                                                        <option value="Errachidia">Errachidia</option>
+                                                        <option value="Taroudant">Taroudant</option>
+                                                        <option value="Ouarzazate">Ouarzazate</option>
+                                                        <option value="Sidi Kacem">Sidi Kacem</option>
+                                                        <option value="Tiznit">Tiznit</option>
+                                                        <option value="Guelmim">Guelmim</option>
+                                                        <option value="Dakhla">Dakhla</option>
+                                                    </select>
                                                 </div>
                                             </div>
                                             <script>

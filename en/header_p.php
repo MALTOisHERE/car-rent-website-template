@@ -97,7 +97,7 @@ if (isset($_GET['lang'])) {
                 <a href="" class="navbar-brand p-0">
                     <img src="../img/logo.png" alt="Logo">
                 </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+                <button style="color: #011468;border: #011468" class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
                     <span class="fa fa-bars"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarCollapse">
@@ -137,14 +137,13 @@ if (isset($_GET['lang'])) {
                                 <a href="?lang=en" class="dropdown-item">
                                     <img src="https://flagcdn.com/us.svg" alt="English" width="20" style="vertical-align: middle; margin-right: 5px;"> English
                                 </a>
-                                <!--
+                                
                                 <a href="?lang=fr" class="dropdown-item">
                                     <img src="https://flagcdn.com/fr.svg" alt="Français" width="20" style="vertical-align: middle; margin-right: 5px;"> Français
                                 </a>
                                 <a href="?lang=ar" class="dropdown-item">
                                     <img src="https://flagcdn.com/sa.svg" alt="العربية" width="20" style="vertical-align: middle; margin-right: 5px;"> العربية
                                 </a>
-                        -->
                             </div>
                         </div>
                     </div>

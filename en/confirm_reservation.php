@@ -1,8 +1,8 @@
 <?php
-// Inclure le fichier de connexion à la base de données
+// Include the database connection file
 include("../assets/connectDB.php");
 
-// Récupérer les données du formulaire
+// Retrieve form data
 $idcar = $_POST['idcar'] ?? '';
 $depart = $_POST['depart'] ?? '';
 $arrive = $_POST['arrive'] ?? '';
@@ -15,14 +15,37 @@ $email = $_POST['email'] ?? '';
 $phone = $_POST['phone'] ?? '';
 $password = $_POST['password'] ?? '';
 
-// Hasher le mot de passe
-$hashedPassword = password_hash($password, PASSWORD_DEFAULT);
-
 try {
-    // Utiliser la connexion PDO définie dans connectDB.php
+    // Use the PDO connection from connectDB.php
     $pdo = $mysqlconnection;
 
-    // Insérer les données dans la table user avec le mot de passe haché
+    // Check if the email already exists
+    $checkEmailStmt = $pdo->prepare("SELECT email FROM user WHERE email = :email");
+    $checkEmailStmt->execute([':email' => $email]);
+    if ($checkEmailStmt->rowCount() > 0) {
+        // Redirect back to reservation form with error and data
+        $params = [
+            'error' => 'Email+already+exists',
+            'idcar' => $idcar,
+            'depart' => $depart,
+            'arrive' => $arrive,
+            'Date_debut' => $dateDebut,
+            'heureDebut' => $heureDebut,
+            'Date_fin' => $dateFin,
+            'heureFin' => $heureFin,
+            'fullname' => $fullname,
+            'email' => $email,
+            'phone' => $phone
+        ];
+        $queryString = http_build_query($params);
+        header("Location: reserve.php?$queryString");
+        exit();
+    }
+
+    // Hash the password (only if email is unique)
+    $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+
+    // Insert user into the `user` table
     $sqlUser = "INSERT INTO user (fullname, email, phone, password) 
                 VALUES (:fullname, :email, :phone, :password)";
     $stmtUser = $pdo->prepare($sqlUser);
@@ -33,10 +56,10 @@ try {
         ':password' => $hashedPassword,
     ]);
 
-    // Récupérer l'ID de l'utilisateur inséré
+    // Get the newly created user's ID
     $iduser = $pdo->lastInsertId();
 
-    // Insérer les données dans la table reservation
+    // Insert reservation into the `reservation` table
     $sqlReservation = "INSERT INTO reservation (depart, arrive, heureDebut, heureFin, Date_debut, Date_fin, idcar, iduser) 
                        VALUES (:depart, :arrive, :heureDebut, :heureFin, :Date_debut, :Date_fin, :idcar, :iduser)";
     $stmtReservation = $pdo->prepare($sqlReservation);
@@ -51,18 +74,19 @@ try {
         ':iduser' => $iduser
     ]);
 
-    // Récupérer l'ID de la réservation insérée
+    // Get the reservation ID
     $idReservation = $pdo->lastInsertId();
 
-    // Rediriger vers index.php avec un message de succès incluant l'ID de réservation
-    header("Location: index.php?message=Votre+réservation+a+été+enregistrée.+ID+de+réservation+:+$idReservation");
-    exit(); // Assurer l'arrêt du script après la redirection
+    // Redirect to success page with reservation ID
+    header("Location: index.php?message=Your+reservation+has+been+successfully+processed.+Reservation+ID+:+$idReservation");
+    exit();
 } catch (PDOException $e) {
-    // Gérer les erreurs PDO
+    // Handle database errors
     header("Location: index.php?message=Erreur+lors+de+la+réservation+:+" . urlencode($e->getMessage()));
     exit();
 } catch (Exception $e) {
-    // Gérer les autres erreurs
+    // Handle other errors
     header("Location: index.php?message=Erreur+:+" . urlencode($e->getMessage()));
     exit();
 }
+?>
