@@ -46,24 +46,20 @@ if (isset($_GET['message'])) {
                             <div class="col-lg-6 fadeInLeft animated" data-animation="fadeInLeft" data-delay="1s"
                                 style="animation-delay: 1s;">
                                 <div style="background-color: #011468;" class=" rounded p-5">
-
                                     <h4 class="text-white mb-4">CONTINUE CAR RESERVATION</h4>
                                     <form method="GET" action="selection.php">
                                         <div class="row g-3">
                                             <div class="col-12">
                                                 <div class="input-group">
-                                                    <div
-                                                        class="d-flex align-items-center bg-light text-body rounded-start p-2">
-                                                        <span class="fas fa-map-marker-alt"></span> <span
-                                                            class="ms-1">Pick Up</span>
+                                                    <div class="d-flex align-items-center bg-light text-body rounded-start p-2">
+                                                        <span class="fas fa-map-marker-alt"></span> <span class="ms-1">Pick Up</span>
                                                     </div>
-                                                    <input class="form-control" type="text" name="depart"
-                                                        placeholder="Enter a City or Airport" required>
+                                                    <input class="form-control" type="text" name="depart" placeholder="Enter a City or Airport" required>
                                                 </div>
                                             </div>
                                             <div class="col-12">
                                                 <a href="javascript(0);" id="toggleDropOff" class="text-start text-white d-block mb-2">Need a different drop-off location?</a>
-                                                <div class="input-group" id="dropOffInputGroup" style="display: none;"> <!-- Initially hidden -->
+                                                <div class="input-group" id="dropOffInputGroup" style="display: none;">
                                                     <div class="d-flex align-items-center bg-light text-body rounded-start p-2">
                                                         <span class="fas fa-map-marker-alt"></span>
                                                         <span class="ms-1">Drop off</span>
@@ -73,10 +69,10 @@ if (isset($_GET['message'])) {
                                             </div>
                                             <script>
                                                 document.getElementById('toggleDropOff').addEventListener('click', function(event) {
-                                                    event.preventDefault(); // Prevent the default link behavior
+                                                    event.preventDefault();
                                                     var inputGroup = document.getElementById('dropOffInputGroup');
                                                     if (inputGroup.style.display === 'none') {
-                                                        inputGroup.style.display = 'flex'; // or 'block' depending on your layout
+                                                        inputGroup.style.display = 'flex';
                                                     } else {
                                                         inputGroup.style.display = 'none';
                                                     }
@@ -84,12 +80,10 @@ if (isset($_GET['message'])) {
                                             </script>
                                             <div class="col-12">
                                                 <div class="input-group">
-                                                    <div
-                                                        class="d-flex align-items-center bg-light text-body rounded-start p-2">
-                                                        <span class="fas fa-calendar-alt"></span><span
-                                                            class="ms-1">Pick Up</span>
+                                                    <div class="d-flex align-items-center bg-light text-body rounded-start p-2">
+                                                        <span class="fas fa-calendar-alt"></span><span class="ms-1">Pick Up</span>
                                                     </div>
-                                                    <input class="form-control" type="date" name="Date_debut">
+                                                    <input class="form-control" type="date" name="Date_debut" required>
                                                     <select class="form-select ms-3" name="heureDebut" required>
                                                         <option value="00:00:00">00:00</option>
                                                         <option value="01:00:00">01:00</option>
@@ -120,12 +114,10 @@ if (isset($_GET['message'])) {
                                             </div>
                                             <div class="col-12">
                                                 <div class="input-group">
-                                                    <div
-                                                        class="d-flex align-items-center bg-light text-body rounded-start p-2">
-                                                        <span class="fas fa-calendar-alt"></span><span
-                                                            class="ms-1">Drop off</span>
+                                                    <div class="d-flex align-items-center bg-light text-body rounded-start p-2">
+                                                        <span class="fas fa-calendar-alt"></span><span class="ms-1">Drop off</span>
                                                     </div>
-                                                    <input class="form-control" type="date" name="Date_fin">
+                                                    <input class="form-control" type="date" name="Date_fin" required>
                                                     <select class="form-select ms-3" name="heureFin" required>
                                                         <option value="00:00:00">00:00</option>
                                                         <option value="01:00:00">01:00</option>
@@ -155,8 +147,7 @@ if (isset($_GET['message'])) {
                                                 </div>
                                             </div>
                                             <div class="col-12">
-                                                <button type="submit" class="btn btn-light w-100 py-2">Book
-                                                    Now</button>
+                                                <button type="submit" class="btn btn-light w-100 py-2">Book Now</button>
                                             </div>
                                         </div>
                                     </form>
@@ -176,17 +167,33 @@ if (isset($_GET['message'])) {
         </div>
     </div>
 </div>
+
+<!-- Date Validation Script -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector('form');
+        const pickUpDateInput = document.querySelector('input[name="Date_debut"]');
+        const dropOffDateInput = document.querySelector('input[name="Date_fin"]');
+
+        form.addEventListener('submit', function(event) {
+            const pickUpDate = new Date(pickUpDateInput.value);
+            const dropOffDate = new Date(dropOffDateInput.value);
+
+            if (pickUpDate > dropOffDate) {
+                event.preventDefault();
+                alert('Error: Pick Up Date must be before Drop Off Date.');
+            }
+        });
+    });
+</script>
 <!-- Carousel End -->
 
 <!-- Features Start -->
 <div class="container-fluid feature py-5">
     <div class="container py-5">
         <div class="text-center mx-auto pb-5 wow fadeInUp" data-wow-delay="0.1s" style="max-width: 800px;">
-            <h1 style="color:#011468;" class="display-5 text-capitalize mb-3">Cental Features</h1>
-            <p class="mb-0">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ut amet nemo expedita
-                asperiores commodi accusantium at cum harum, excepturi, quia tempora cupiditate! Adipisci facilis
-                modi quisquam quia distinctio,
-            </p>
+            <h1 style="color:#011468;" class="display-5 text-capitalize mb-3">REIMS Cars Features</h1>
+            <p class="mb-0">Discover the exceptional services and features that set us apart. We are committed to providing top-notch solutions tailored to meet your needs, ensuring a seamless and satisfying experience every time.</p>
         </div>
         <div class="row g-4 align-items-center">
             <div class="col-xl-4">
@@ -197,9 +204,8 @@ if (isset($_GET['message'])) {
                                 <span class="fa fa-trophy fa-2x"></span>
                             </div>
                             <div class="ms-4">
-                                <h5 class="mb-3">First Class services</h5>
-                                <p class="mb-0">Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                                    Consectetur, in illum aperiam ullam magni eligendi?</p>
+                                <h5 class="mb-3">First-Class Services</h5>
+                                <p class="mb-0">Experience unparalleled service with our dedicated team, ensuring your needs are met with professionalism and care.</p>
                             </div>
                         </div>
                     </div>
@@ -209,9 +215,8 @@ if (isset($_GET['message'])) {
                                 <span class="fa fa-road fa-2x"></span>
                             </div>
                             <div class="ms-4">
-                                <h5 class="mb-3">24/7 road assistance</h5>
-                                <p class="mb-0">Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                                    Consectetur, in illum aperiam ullam magni eligendi?</p>
+                                <h5 class="mb-3">24/7 Road Assistance</h5>
+                                <p class="mb-0">We’ve got you covered, day or night. Our round-the-clock road assistance ensures you’re never stranded.</p>
                             </div>
                         </div>
                     </div>
@@ -225,9 +230,8 @@ if (isset($_GET['message'])) {
                     <div class="col-12 wow fadeInUp" data-wow-delay="0.1s">
                         <div class="feature-item justify-content-end">
                             <div class="text-end me-4">
-                                <h5 class="mb-3">Quality at Minimum</h5>
-                                <p class="mb-0">Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                                    Consectetur, in illum aperiam ullam magni eligendi?</p>
+                                <h5 class="mb-3">Quality at Minimum Cost</h5>
+                                <p class="mb-0">Enjoy premium services without breaking the bank. We deliver exceptional value at competitive prices.</p>
                             </div>
                             <div class="feature-icon">
                                 <span class="fa fa-tag fa-2x"></span>
@@ -238,8 +242,7 @@ if (isset($_GET['message'])) {
                         <div class="feature-item justify-content-end">
                             <div class="text-end me-4">
                                 <h5 class="mb-3">Free Pick-Up & Drop-Off</h5>
-                                <p class="mb-0">Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                                    Consectetur, in illum aperiam ullam magni eligendi?</p>
+                                <p class="mb-0">Convenience at your fingertips. We offer free pick-up and drop-off services to make your life easier.</p>
                             </div>
                             <div class="feature-icon">
                                 <span class="fa fa-map-pin fa-2x"></span>
@@ -261,10 +264,7 @@ if (isset($_GET['message'])) {
                 <div class="about-item">
                     <div class="pb-5">
                         <h1 style="color: #011468;" class="display-5 text-capitalize">REIMS Cars About</h1>
-                        <p class="mb-0">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ut amet nemo
-                            expedita asperiores commodi accusantium at cum harum, excepturi, quia tempora
-                            cupiditate! Adipisci facilis modi quisquam quia distinctio,
-                        </p>
+                        <p class="mb-0">At REIMS Cars, we are passionate about delivering exceptional automotive experiences. With years of expertise, we provide top-quality vehicles and services tailored to meet your needs. Our commitment to excellence ensures that every customer drives away satisfied.</p>
                     </div>
                     <div class="row g-4">
                         <div class="col-lg-6">
@@ -273,7 +273,7 @@ if (isset($_GET['message'])) {
                                     <img src="../img/about-icon-1.png" class="img-fluid w-50 h-50" alt="Icon">
                                 </div>
                                 <h5 class="mb-3">Our Vision</h5>
-                                <p class="mb-0">Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
+                                <p class="mb-0">To revolutionize the automotive industry by offering innovative solutions and unparalleled customer service.</p>
                             </div>
                         </div>
                         <div class="col-lg-6">
@@ -281,15 +281,12 @@ if (isset($_GET['message'])) {
                                 <div class="about-icon mb-4">
                                     <img src="../img/about-icon-2.png" class="img-fluid h-50 w-50" alt="Icon">
                                 </div>
-                                <h5 class="mb-3">Our Mision</h5>
-                                <p class="mb-0">Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
+                                <h5 class="mb-3">Our Mission</h5>
+                                <p class="mb-0">To provide high-quality vehicles and services that exceed customer expectations while fostering long-term relationships.</p>
                             </div>
                         </div>
                     </div>
-                    <p class="text-item my-4">Lorem, ipsum dolor sit amet consectetur adipisicing elit. Beatae,
-                        aliquam ipsum. Sed suscipit dolorem libero sequi aut natus debitis reprehenderit facilis
-                        quaerat similique, est at in eum. Quo, obcaecati in!
-                    </p>
+                    <p class="text-item my-4">With a focus on innovation, reliability, and customer satisfaction, REIMS Cars has become a trusted name in the automotive industry. Our team of experts is dedicated to helping you find the perfect vehicle for your lifestyle and needs.</p>
                     <div class="row g-4">
                         <div class="col-lg-6">
                             <div class="text-center rounded bg-custom-secondary p-4">
@@ -299,14 +296,10 @@ if (isset($_GET['message'])) {
                         </div>
                         <div class="col-lg-6">
                             <div class="rounded">
-                                <p class="mb-2"><i class="fa fa-check-circle text-secondary me-1"></i> Morbi tristique
-                                    senectus</p>
-                                <p class="mb-2"><i class="fa fa-check-circle text-secondary me-1"></i> A scelerisque
-                                    purus</p>
-                                <p class="mb-2"><i class="fa fa-check-circle text-secondary me-1"></i> Dictumst
-                                    vestibulum</p>
-                                <p class="mb-0"><i class="fa fa-check-circle text-secondary me-1"></i> dio aenean sed
-                                    adipiscing</p>
+                                <p class="mb-2"><i class="fa fa-check-circle text-secondary me-1"></i> Wide selection of premium vehicles</p>
+                                <p class="mb-2"><i class="fa fa-check-circle text-secondary me-1"></i> Certified pre-owned options</p>
+                                <p class="mb-2"><i class="fa fa-check-circle text-secondary me-1"></i> Transparent pricing and financing</p>
+                                <p class="mb-0"><i class="fa fa-check-circle text-secondary me-1"></i> Exceptional after-sales support</p>
                             </div>
                         </div>
                         <div class="col-lg-5 d-flex align-items-center">
@@ -315,21 +308,15 @@ if (isset($_GET['message'])) {
                         <style>
                             .btn-secondary {
                                 background-color: #011468 !important;
-                                /* Default background color */
                                 border-color: white !important;
-                                /* Default border color */
                                 color: white !important;
-                                /* Default text color */
                                 transition: all 0.3s ease-in-out;
                             }
 
                             .btn-secondary:hover {
                                 background-color: white !important;
-                                /* Hover background color */
                                 border-color: #011468 !important;
-                                /* Hover border color */
                                 color: #011468 !important;
-                                /* Hover text color */
                             }
                         </style>
                         <div class="col-lg-7">
@@ -339,7 +326,7 @@ if (isset($_GET['message'])) {
                                     style="width: 100px; height: 100px;" alt="Image">
                                 <div class="ms-4">
                                     <h4>William Burgess</h4>
-                                    <p class="mb-0">Carveo Founder</p>
+                                    <p class="mb-0">REIMS Cars Founder</p>
                                 </div>
                             </div>
                         </div>
@@ -349,10 +336,10 @@ if (isset($_GET['message'])) {
             <div class="col-xl-6 wow fadeInRight" data-wow-delay="0.2s">
                 <div class="about-img">
                     <div class="img-1">
-                        <img src="../img/give-keys2.jpg" class="img-fluid rounded h-100 w-100" alt="">
+                        <img src="../img/give-keys2.jpg" class="img-fluid rounded h-100 w-100" alt="Customer receiving car keys">
                     </div>
                     <div class="img-2">
-                        <img src="../img/back5.jpeg" class="img-fluid rounded w-100" alt="">
+                        <img src="../img/back5.jpeg" class="img-fluid rounded w-100" alt="Luxury car showcase">
                     </div>
                 </div>
             </div>
@@ -428,11 +415,8 @@ if (isset($_GET['message'])) {
 <div class="container-fluid service py-5">
     <div class="container py-5">
         <div class="text-center mx-auto pb-5 wow fadeInUp" data-wow-delay="0.1s" style="max-width: 800px;">
-            <h1 style="color: #011468;" class="display-5 text-capitalize mb-3">Cental Services</h1>
-            <p class="mb-0">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ut amet nemo expedita
-                asperiores commodi accusantium at cum harum, excepturi, quia tempora cupiditate! Adipisci facilis
-                modi quisquam quia distinctio,
-            </p>
+            <h1 style="color: #011468;" class="display-5 text-capitalize mb-3">Central Services</h1>
+            <p class="mb-0">At REIMS Cars, we offer a wide range of services designed to make your car rental experience seamless and enjoyable. From convenient reservations to flexible rental options, we’ve got you covered every step of the way.</p>
         </div>
         <div class="row g-4">
             <div class="col-md-6 col-lg-4 wow fadeInUp" data-wow-delay="0.1s">
@@ -441,8 +425,7 @@ if (isset($_GET['message'])) {
                         <i class="fa fa-phone-alt fa-2x"></i>
                     </div>
                     <h5 class="mb-3">Phone Reservation</h5>
-                    <p class="mb-0">Lorem ipsum dolor sit amet consectetur adipisicing elit. Reprehenderit ipsam
-                        quasi quibusdam ipsa perferendis iusto?</p>
+                    <p class="mb-0">Book your car effortlessly over the phone. Our friendly team is available 24/7 to assist with your reservations and answer any questions.</p>
                 </div>
             </div>
             <div class="col-md-6 col-lg-4 wow fadeInUp" data-wow-delay="0.3s">
@@ -451,8 +434,7 @@ if (isset($_GET['message'])) {
                         <i class="fa fa-money-bill-alt fa-2x"></i>
                     </div>
                     <h5 class="mb-3">Special Rates</h5>
-                    <p class="mb-0">Lorem ipsum dolor sit amet consectetur adipisicing elit. Reprehenderit ipsam
-                        quasi quibusdam ipsa perferendis iusto?</p>
+                    <p class="mb-0">Enjoy exclusive discounts and special rates tailored for long-term rentals, corporate clients, and frequent travelers.</p>
                 </div>
             </div>
             <div class="col-md-6 col-lg-4 wow fadeInUp" data-wow-delay="0.5s">
@@ -460,9 +442,8 @@ if (isset($_GET['message'])) {
                     <div class="service-icon mb-4">
                         <i class="fa fa-road fa-2x"></i>
                     </div>
-                    <h5 class="mb-3">One Way Rental</h5>
-                    <p class="mb-0">Lorem ipsum dolor sit amet consectetur adipisicing elit. Reprehenderit ipsam
-                        quasi quibusdam ipsa perferendis iusto?</p>
+                    <h5 class="mb-3">One-Way Rental</h5>
+                    <p class="mb-0">Need to drop off your rental car at a different location? Our one-way rental service offers flexibility and convenience.</p>
                 </div>
             </div>
             <div class="col-md-6 col-lg-4 wow fadeInUp" data-wow-delay="0.1s">
@@ -470,9 +451,8 @@ if (isset($_GET['message'])) {
                     <div class="service-icon mb-4">
                         <i class="fa fa-umbrella fa-2x"></i>
                     </div>
-                    <h5 class="mb-3">Life Insurance</h5>
-                    <p class="mb-0">Lorem ipsum dolor sit amet consectetur adipisicing elit. Reprehenderit ipsam
-                        quasi quibusdam ipsa perferendis iusto?</p>
+                    <h5 class="mb-3">Comprehensive Insurance</h5>
+                    <p class="mb-0">Drive with peace of mind. Our insurance plans cover all your needs, ensuring you’re protected on every journey.</p>
                 </div>
             </div>
             <div class="col-md-6 col-lg-4 wow fadeInUp" data-wow-delay="0.3s">
@@ -480,9 +460,8 @@ if (isset($_GET['message'])) {
                     <div class="service-icon mb-4">
                         <i class="fa fa-building fa-2x"></i>
                     </div>
-                    <h5 class="mb-3">City to City</h5>
-                    <p class="mb-0">Lorem ipsum dolor sit amet consectetur adipisicing elit. Reprehenderit ipsam
-                        quasi quibusdam ipsa perferendis iusto?</p>
+                    <h5 class="mb-3">City-to-City Transfers</h5>
+                    <p class="mb-0">Travel between cities with ease. Our city-to-city transfer service ensures a smooth and hassle-free experience.</p>
                 </div>
             </div>
             <div class="col-md-6 col-lg-4 wow fadeInUp" data-wow-delay="0.5s">
@@ -490,9 +469,8 @@ if (isset($_GET['message'])) {
                     <div class="service-icon mb-4">
                         <i class="fa fa-car-alt fa-2x"></i>
                     </div>
-                    <h5 class="mb-3">Free Rides</h5>
-                    <p class="mb-0">Lorem ipsum dolor sit amet consectetur adipisicing elit. Reprehenderit ipsam
-                        quasi quibusdam ipsa perferendis iusto?</p>
+                    <h5 class="mb-3">Free Pick-Up & Drop-Off</h5>
+                    <p class="mb-0">We offer free pick-up and drop-off services to make your rental experience as convenient as possible.</p>
                 </div>
             </div>
         </div>
@@ -504,37 +482,35 @@ if (isset($_GET['message'])) {
 <div class="container-fluid steps py-5">
     <div class="container py-5">
         <div class="text-center mx-auto pb-5 wow fadeInUp" data-wow-delay="0.1s" style="max-width: 800px;">
-            <h1 class="display-5 text-capitalize text-white mb-3">Cental Process</h1>
-            <p class="mb-0 text-white">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ut amet nemo
-                expedita asperiores commodi accusantium at cum harum, excepturi, quia tempora cupiditate! Adipisci
-                facilis modi quisquam quia distinctio,
-            </p>
+            <h1 class="display-5 text-capitalize text-white mb-3">Central Process</h1>
+            <p class="mb-0 text-white">At REIMS Cars, we’ve streamlined the car rental process to make it simple, fast, and hassle-free. Follow these easy steps to get behind the wheel of your dream car in no time.</p>
         </div>
         <div class="row g-4">
             <div class="col-lg-4 wow fadeInUp" data-wow-delay="0.1s">
                 <div class="steps-item p-4 mb-4">
-                    <h4>Come In Contact</h4>
-                    <p class="mb-0">Lorem ipsum dolor sit amet consectetur adipisicing elit. Ad, dolorem!</p>
+                    <h4>Get In Touch</h4>
+                    <p class="mb-0">Contact us via phone, email, or visit our website to start your car rental journey. Our team is ready to assist you with any inquiries.</p>
                     <div class="setps-number">01.</div>
                 </div>
             </div>
             <div class="col-lg-4 wow fadeInUp" data-wow-delay="0.3s">
                 <div class="steps-item p-4 mb-4">
-                    <h4>Choose A Car</h4>
-                    <p class="mb-0">Lorem ipsum dolor sit amet consectetur adipisicing elit. Ad, dolorem!</p>
+                    <h4>Choose Your Car</h4>
+                    <p class="mb-0">Browse our wide selection of vehicles and pick the one that suits your needs. From compact cars to luxury SUVs, we have it all.</p>
                     <div class="setps-number">02.</div>
                 </div>
             </div>
             <div class="col-lg-4 wow fadeInUp" data-wow-delay="0.5s">
                 <div class="steps-item p-4 mb-4">
-                    <h4>Enjoy Driving</h4>
-                    <p class="mb-0">Lorem ipsum dolor sit amet consectetur adipisicing elit. Ad, dolorem!</p>
+                    <h4>Hit the Road</h4>
+                    <p class="mb-0">Once you’ve completed the booking process, it’s time to enjoy your ride. Drive with confidence and make unforgettable memories.</p>
                     <div class="setps-number">03.</div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+<!-- Car Steps End -->
 <!-- Car Steps End -->
 
 <!-- Team Start -->

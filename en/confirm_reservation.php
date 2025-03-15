@@ -1,6 +1,6 @@
 <?php
 // Inclure le fichier de connexion à la base de données
-include("connectDB.php");
+include("../assets/connectDB.php");
 
 // Récupérer les données du formulaire
 $idcar = $_POST['idcar'] ?? '';
@@ -10,13 +10,12 @@ $dateDebut = $_POST['Date_debut'] ?? '';
 $heureDebut = $_POST['heureDebut'] ?? '';
 $dateFin = $_POST['Date_fin'] ?? '';
 $heureFin = $_POST['heureFin'] ?? '';
-$name = $_POST['name'] ?? '';
 $fullname = $_POST['fullname'] ?? '';
 $email = $_POST['email'] ?? '';
 $phone = $_POST['phone'] ?? '';
 $password = $_POST['password'] ?? '';
 
-// Hash the password using password_hash()
+// Hasher le mot de passe
 $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
 try {
@@ -24,11 +23,10 @@ try {
     $pdo = $mysqlconnection;
 
     // Insérer les données dans la table user avec le mot de passe haché
-    $sqlUser = "INSERT INTO user (name, fullname, email, phone, password) 
-                VALUES (:name, :fullname, :email, :phone, :password)";
+    $sqlUser = "INSERT INTO user (fullname, email, phone, password) 
+                VALUES (:fullname, :email, :phone, :password)";
     $stmtUser = $pdo->prepare($sqlUser);
     $stmtUser->execute([
-        ':name' => $name,
         ':fullname' => $fullname,
         ':email' => $email,
         ':phone' => $phone,
@@ -53,15 +51,18 @@ try {
         ':iduser' => $iduser
     ]);
 
-    // Redirect to index.php with a message indicating that the confirmation is being processed
-    header("Location: index.php?message=Your+reservation+is+being+processed");
-    exit(); // Ensure script termination after redirection
+    // Récupérer l'ID de la réservation insérée
+    $idReservation = $pdo->lastInsertId();
+
+    // Rediriger vers index.php avec un message de succès incluant l'ID de réservation
+    header("Location: index.php?message=Votre+réservation+a+été+enregistrée.+ID+de+réservation+:+$idReservation");
+    exit(); // Assurer l'arrêt du script après la redirection
 } catch (PDOException $e) {
-    // Handle PDO errors
-    header("Location: index.php?message=Error+during+reservation+:+" . urlencode($e->getMessage()));
+    // Gérer les erreurs PDO
+    header("Location: index.php?message=Erreur+lors+de+la+réservation+:+" . urlencode($e->getMessage()));
     exit();
 } catch (Exception $e) {
-    // Handle other errors
-    header("Location: index.php?message=Error+:+" . urlencode($e->getMessage()));
+    // Gérer les autres erreurs
+    header("Location: index.php?message=Erreur+:+" . urlencode($e->getMessage()));
     exit();
 }

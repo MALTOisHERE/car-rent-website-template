@@ -1,6 +1,6 @@
 <?php
 session_start();
-include("connectDB.php");
+include("../assets/connectDB.php");
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST['email'];

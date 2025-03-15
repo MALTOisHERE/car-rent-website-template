@@ -16,7 +16,7 @@ if (isset($_SESSION['lang'])) {
 }
 
 // If no language is set in the session, redirect to English by default
-header("Location: fr/");
+header("Location: en/");
 exit();
 ?>
 

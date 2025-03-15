@@ -1,6 +1,6 @@
 <?php
 $active = "cars";
-include("connectDB.php");
+include("../assets/connectDB.php");
 include("header_p.php");
 
 try {

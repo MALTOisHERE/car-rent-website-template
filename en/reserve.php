@@ -1,4 +1,12 @@
 <?php
+
+// Check if the user is logged in
+if (isset($_SESSION['user_id'])) {
+    // Redirect to index.php if the user is logged in
+    header("Location: index.php");
+    exit(); // Ensure no further code is executed
+}
+
 // Récupérer les variables depuis l'URL
 $idcar = $_GET['idcar'] ?? '';
 $depart = $_GET['depart'] ?? '';
@@ -43,13 +51,7 @@ include("header_p.php");
 
                         <!-- User input fields -->
                         <div class="row g-4">
-                            <div class="col-lg-12 col-xl-6">
-                                <div class="form-floating">
-                                    <input type="text" class="form-control" id="name" name="name" placeholder="Your Name" required>
-                                    <label for="name">Your Name</label>
-                                </div>
-                            </div>
-                            <div class="col-lg-12 col-xl-6">
+                            <div class="col-lg-12 col-xl-12">
                                 <div class="form-floating">
                                     <input type="text" class="form-control" id="fullname" name="fullname" placeholder="Fullname" required>
                                     <label for="fullname">Fullname</label>
@@ -101,7 +103,6 @@ include("header_p.php");
                             }
                         }
                     </script>
-
                 </div>
             </div>
 

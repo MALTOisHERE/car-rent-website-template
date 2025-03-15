@@ -1,6 +1,17 @@
+<?php 
+session_start();
+
+// Check if the user is logged in and has the admin role (role != 0)
+if (!isset($_SESSION['role']) || $_SESSION['role'] == 0) {
+    // Redirect to login page or show an error
+    header('Location: ../index.php');
+    exit();
+}
+?>
+
 <?php
 // Include the database connection file
-include("connectDB.php");
+include("../assets/connectDB.php");
 
 // Check if the reservation ID is provided
 if (isset($_POST['idres'])) {

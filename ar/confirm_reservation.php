@@ -1,6 +1,6 @@
 <?php
 // Inclure le fichier de connexion à la base de données
-include("connectDB.php");
+include("../assets/connectDB.php");
 
 // Récupérer les données du formulaire
 $idcar = $_POST['idcar'] ?? '';

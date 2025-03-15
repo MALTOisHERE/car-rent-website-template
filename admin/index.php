@@ -1,7 +1,21 @@
-﻿<?php
-// Include the database connection file
-include("connectDB.php");
+﻿<?php 
+
 $active = "2";
+
+include("admin_header.php");
+
+// Check if the user is logged in and has the admin role (role != 0)
+if (!isset($_SESSION['role']) || $_SESSION['role'] == 0) {
+    // Redirect to login page or show an error
+    header('Location: ../index.php');
+    exit();
+}
+?>
+
+<?php
+// Include the database connection file
+include("../assets/connectDB.php");
+
 try {
     // Retrieve data from the reservation table with joins
     $sql = "
@@ -32,7 +46,7 @@ try {
 } catch (PDOException $e) {
     die("Error retrieving data: " . $e->getMessage());
 }
-include("admin_header.php");
+
 ?>
 
 </section>

@@ -1,6 +1,6 @@
 <?php
 session_start();
-include("connectDB.php");
+include("../assets/connectDB.php");
 
 if (isset($_GET['token'])) {
     $token = $_GET['token'];

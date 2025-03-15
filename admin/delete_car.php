@@ -1,8 +1,20 @@
+<?php 
+session_start();
+
+// Check if the user is logged in and has the admin role (role != 0)
+if (!isset($_SESSION['role']) || $_SESSION['role'] == 0) {
+    // Redirect to login page or show an error
+    header('Location: ../index.php');
+    exit();
+}
+?>
+
 <?php
+
 // delete_car.php
 
 // Include the database connection
-require 'connectDB.php'; // Make sure this file contains your PDO connection code
+require '../assets/connectDB.php'; // Make sure this file contains your PDO connection code
 
 try {
     // Get the car ID from the query string

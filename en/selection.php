@@ -1,6 +1,6 @@
 <?php
 // Include the database connection file
-include("connectDB.php");
+include("../assets/connectDB.php");
 include("header_p.php");
 
 try {
@@ -130,23 +130,36 @@ $heureFin = $_GET['heureFin'] ?? '';
                                         }
                                     </style>
                                     <?php
-                                    // Query to fetch reservation end date and time for the car
-                                    $sqlReservation = "SELECT Date_fin, heureFin FROM reservation WHERE idcar = :idcar AND confirm = 1";
-                                    $stmtReservation = $mysqlconnection->prepare($sqlReservation);
-                                    $stmtReservation->execute([':idcar' => $car['idcar']]);
-                                    $reservation = $stmtReservation->fetch(PDO::FETCH_ASSOC);
+                                    // ... existing code ...
 
-                                    // Check if the car is reserved
-                                    if ($reservation) {
-                                        $availableAt = "This car will be free on " . $reservation['Date_fin'] . " at " . $reservation['heureFin'];
-                                        $isDisabled = 'disabled-style'; // Grayed-out appearance
-                                        $onclick = "alert('$availableAt'); return false;"; // Show alert and prevent navigation
+                                    // Inside the car loop
+                                    $sqlReservation = "SELECT COUNT(*) FROM reservation 
+                   WHERE idcar = :idcar 
+                   AND confirm = 1 
+                   AND (
+                       STR_TO_DATE(CONCAT(Date_debut, ' ', heureDebut), '%Y-%m-%d %H:%i') < STR_TO_DATE(:dateFinHeureFin, '%Y-%m-%d %H:%i')
+                       AND
+                       STR_TO_DATE(CONCAT(Date_fin, ' ', heureFin), '%Y-%m-%d %H:%i') > STR_TO_DATE(:dateDebutHeureDebut, '%Y-%m-%d %H:%i')
+                   )";
+                                    $stmtReservation = $mysqlconnection->prepare($sqlReservation);
+                                    $stmtReservation->execute([
+                                        ':idcar' => $car['idcar'],
+                                        ':dateFinHeureFin' => "$dateFin $heureFin",
+                                        ':dateDebutHeureDebut' => "$dateDebut $heureDebut"
+                                    ]);
+                                    $count = $stmtReservation->fetchColumn();
+
+                                    if ($count > 0) {
+                                        $availableAt = "This car is already booked for the selected period.";
+                                        $isDisabled = 'disabled-style';
+                                        $onclick = "alert('$availableAt'); return false;";
                                     } else {
-                                        $isDisabled = ''; // Normal style
-                                        $onclick = ""; // No special behavior
+                                        $isDisabled = '';
+                                        $onclick = "";
                                     }
                                     ?>
-                                    <a href="reserve.php?idcar=<?= $car['idcar'] ?>&depart=<?= urlencode($depart) ?>&arrive=<?= urlencode($arrive) ?>&Date_debut=<?= urlencode($dateDebut) ?>&heureDebut=<?= urlencode($heureDebut) ?>&Date_fin=<?= urlencode($dateFin) ?>&heureFin=<?= urlencode($heureFin) ?>"
+
+                                    <a href="process_booking.php?idcar=<?= $car['idcar'] ?>&depart=<?= urlencode($depart) ?>&arrive=<?= urlencode($arrive) ?>&Date_debut=<?= urlencode($dateDebut) ?>&heureDebut=<?= urlencode($heureDebut) ?>&Date_fin=<?= urlencode($dateFin) ?>&heureFin=<?= urlencode($heureFin) ?>"
                                         class="btn btn-primary rounded-pill d-flex justify-content-center py-3 <?= $isDisabled ?>"
                                         onclick="<?= $onclick ?>">
                                         Book Now

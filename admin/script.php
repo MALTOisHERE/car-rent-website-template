@@ -1,4 +1,12 @@
+<?php 
 
+// Check if the user is logged in and has the admin role (role != 0)
+if (!isset($_SESSION['role']) || $_SESSION['role'] == 0) {
+    // Redirect to login page or show an error
+    header('Location: ../index.php');
+    exit();
+}
+?>
 <!-- Jquery Core Js -->
 <script src="plugins/jquery/jquery.min.js"></script>
 

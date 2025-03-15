@@ -1,6 +1,6 @@
 <?php
 session_start();
-include("connectDB.php"); // Fichier de configuration contenant la connexion à la base de données
+include("../assets/connectDB.php"); // Fichier de configuration contenant la connexion à la base de données
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Nettoyage des entrées pour éviter les attaques XSS
@@ -23,31 +23,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             // Vérification du mot de passe hashé
             if (password_verify($password, $user['password'])) {
+
+                session_regenerate_id(true);
+
                 // Connexion réussie
                 $_SESSION['user_id'] = $user['iduser'];
                 $_SESSION['email'] = $user['email'];
                 $_SESSION['role'] = $user['role'];  // Store the role in session
 
-                // Redirection en fonction du rôle
-                if ($_SESSION['role'] == '0') {
-                    // If role is 0, redirect to the home page
-                    header("Location: index.php");
-                } else {
-                    // If role is not 0 (complex char), redirect to the admin page
-                    header("Location: ../admin");
-                }
+                header("Location: index.php");
 
                 exit(); // Arrête l'exécution du script après la redirection
             } else {
-                echo "Mot de passe incorrect.";
+                $_SESSION['error'] = "Mot de passe incorrect.";
             }
         } else {
-            echo "Aucun utilisateur trouvé avec cet email.";
+            $_SESSION['error'] = "Aucun utilisateur trouvé avec cet email.";
         }
     } catch (PDOException $e) {
-        echo "Erreur de connexion à la base de données: " . $e->getMessage();
+        $_SESSION['error'] = "Erreur de connexion à la base de données: " . $e->getMessage();
     } catch (Exception $e) {
-        echo "Erreur: " . $e->getMessage();
+        $_SESSION['error'] = "Erreur: " . $e->getMessage();
     }
 }
 ?>
@@ -68,6 +64,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             align-items: center;
             height: 100vh;
             margin: 0;
+        }
+
+        .notification {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: #ff4444;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            font-size: 16px;
+            z-index: 1000;
+            display: none;
+            /* Hidden by default */
         }
 
         .login-container {
@@ -130,6 +141,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </head>
 
 <body>
+    <?php if (isset($_SESSION['error'])): ?>
+        <div class="notification" id="notification">
+            <?php echo $_SESSION['error'];
+            unset($_SESSION['error']); ?>
+        </div>
+        <script>
+            // Afficher la notification pendant 5 secondes
+            document.getElementById('notification').style.display = 'block';
+            setTimeout(function() {
+                document.getElementById('notification').style.display = 'none';
+            }, 5000);
+        </script>
+    <?php endif; ?>
+
     <div class="login-container">
         <h2>Login</h2>
         <form action="login.php" method="post">
@@ -139,7 +164,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </form>
         <div class="options">
             <a href="forgot_password.php">Forgot password ?</a>
-            <a href="index.php">Back to Home</a>
+            <a href="signup.php">Don't have account? Signup</a>
         </div>
     </div>
 </body>

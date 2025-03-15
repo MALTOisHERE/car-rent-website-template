@@ -146,9 +146,31 @@ if (isset($_GET['lang'])) {
                             </div>
                         </div>
                     </div>
-                    <a style="margin-right: 10px;" href="login.php" class="btn btn-primary rounded-pill py-2 px-4">
-                        <i class="fas fa-user me-2"></i> Login
-                    </a>
+                    <!-- Your existing HTML code -->
+
+                    <?php if (isset($_SESSION['user_id'])): ?>
+                        <!-- Display Logout button and user information if logged in -->
+                        <div style="margin-right: 10px;">
+                            <?php if ($_SESSION['role'] != 0): ?>
+                                <!-- Show Admin Dashboard button for admins -->
+                                <a href="../admin/" class="btn btn-warning rounded-pill py-2 px-4">
+                                    <i class="fas fa-tachometer-alt me-2"></i> Admin Dashboard
+                                </a>
+                            <?php endif; ?>
+
+                            <!-- Logout button for all logged-in users -->
+                            <a href="../logout.php" class="btn btn-danger rounded-pill py-2 px-4">
+                                <i class="fas fa-sign-out-alt me-2"></i> Logout
+                            </a>
+                        </div>
+                    <?php else: ?>
+                        <!-- Display Login button if not logged in -->
+                        <a style="margin-right: 10px;" href="login.php" class="btn btn-primary rounded-pill py-2 px-4">
+                            <i class="fas fa-user me-2"></i> Login
+                        </a>
+                    <?php endif; ?>
+
+                    <!-- Your existing HTML code -->
                 </div>
             </nav>
         </div>

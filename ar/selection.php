@@ -1,6 +1,6 @@
 <?php
 // Include the database connection file
-include("connectDB.php");
+include("../assets/connectDB.php");
 include("header_p.php");
 
 try {

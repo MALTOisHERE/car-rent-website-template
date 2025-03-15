@@ -1,6 +1,6 @@
 <?php
 $active = "cars";
-include("connectDB.php");
+include("../assets/connectDB.php");
 include("header_p.php");
 
 try {
@@ -48,7 +48,7 @@ try {
                         <div class="categories-item p-4">
                             <div class="categories-item-inner">
                                 <div class="categories-img rounded-top">
-                                    <img src="img/car-<?= $car['idcar'] ?>.png"
+                                    <img src="../img/<?= $car['image'] ?>"
                                         class="img-fluid w-100 rounded-top"
                                         alt="<?= htmlspecialchars($car['name']) ?>">
                                 </div>

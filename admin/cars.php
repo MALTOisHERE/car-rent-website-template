@@ -1,9 +1,22 @@
 ﻿<?php
-// Inclure le fichier de connexion à la base de données
-include("connectDB.php");
+
 $active = "1";
+
+include("admin_header.php");
+
+// Include the database connection file
+include("../assets/connectDB.php");
+
+// Check if the user is logged in and has the admin role (role != 0)
+if (!isset($_SESSION['role']) || $_SESSION['role'] == 0) {
+    // Redirect to login page or show an error
+    header('Location: ../index.php');
+    exit();
+}
+
+// Fetch car data from the database
+
 try {
-    // Récupérer les données de la table car
     $sql = "SELECT idcar, name, door, bag, seat, price, type, image FROM car";
     $stmt = $mysqlconnection->prepare($sql);
     $stmt->execute();
@@ -11,8 +24,11 @@ try {
 } catch (PDOException $e) {
     die("Erreur lors de la récupération des données : " . $e->getMessage());
 }
-include("admin_header.php")
+
+// Include the admin header
+
 ?>
+
 <section class="content">
     <div class="container-fluid">
         <!-- Hover Rows -->
@@ -89,7 +105,7 @@ include("admin_header.php")
                                     <th>Seats</th>
                                     <th>Price</th>
                                     <th>Type</th>
-                                    <th>Action</th> <!-- New column for the delete button -->
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -106,7 +122,6 @@ include("admin_header.php")
                                         <td><?= htmlspecialchars($car['price']) ?>$</td>
                                         <td><?= htmlspecialchars($car['type'] == 0 ? 'Manual' : 'Automatic') ?></td>
                                         <td>
-                                            <!-- Delete button with a link to a delete script -->
                                             <a href="delete_car.php?id=<?= htmlspecialchars($car['idcar']) ?>" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to delete this car?');">
                                                 Delete
                                             </a>
@@ -122,4 +137,5 @@ include("admin_header.php")
         <!-- #END# Hover Rows -->
     </div>
 </section>
+
 <?php include("script.php"); ?>

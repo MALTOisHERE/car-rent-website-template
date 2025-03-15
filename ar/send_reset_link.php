@@ -1,6 +1,6 @@
 <?php
 session_start();
-include("connectDB.php"); // Inclure votre fichier de connexion à la base de données
+include("../assets/connectDB.php"); // Inclure votre fichier de connexion à la base de données
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST['email'];
