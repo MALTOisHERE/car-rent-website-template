@@ -14,7 +14,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         // Requête sécurisée avec PDO
-        $stmt = $mysqlconnection->prepare("SELECT iduser, email, password, role FROM user WHERE email = :email LIMIT 1");
+        $stmt = $mysqlconnection->prepare("SELECT iduser, fullname, email, password, role FROM user WHERE email = :email LIMIT 1");
         $stmt->bindParam(':email', $email, PDO::PARAM_STR);
         $stmt->execute();
 
@@ -26,10 +26,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                 session_regenerate_id(true);
 
-                // Connexion réussie
                 $_SESSION['user_id'] = $user['iduser'];
+                $_SESSION['username'] = $user['fullname'];
                 $_SESSION['email'] = $user['email'];
-                $_SESSION['role'] = $user['role'];  // Store the role in session
+                $_SESSION['role'] = $user['role'];
 
                 header("Location: index.php");
 

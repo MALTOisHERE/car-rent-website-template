@@ -4,17 +4,15 @@ $active = "2";
 
 include("admin_header.php");
 
+include("../assets/connectDB.php");
+
 // Check if the user is logged in and has the admin role (role != 0)
 if (!isset($_SESSION['role']) || $_SESSION['role'] == 0) {
     // Redirect to login page or show an error
     header('Location: ../index.php');
     exit();
 }
-?>
-
-<?php
 // Include the database connection file
-include("../assets/connectDB.php");
 
 try {
     // Retrieve data from the reservation table with joins
@@ -28,7 +26,7 @@ try {
             reservation.heureDebut, 
             reservation.heureFin,
             reservation.confirm, 
-            user.name AS user_name, 
+            user.fullname AS user_name, 
             user.email AS user_email,
             user.phone AS user_phone, 
             car.name AS car_name, 

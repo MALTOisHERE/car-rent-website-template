@@ -137,12 +137,14 @@ if (isset($_GET['lang'])) {
                                 <a href="?lang=en" class="dropdown-item">
                                     <img src="https://flagcdn.com/us.svg" alt="English" width="20" style="vertical-align: middle; margin-right: 5px;"> English
                                 </a>
+                                <!--
                                 <a href="?lang=fr" class="dropdown-item">
                                     <img src="https://flagcdn.com/fr.svg" alt="Français" width="20" style="vertical-align: middle; margin-right: 5px;"> Français
                                 </a>
                                 <a href="?lang=ar" class="dropdown-item">
                                     <img src="https://flagcdn.com/sa.svg" alt="العربية" width="20" style="vertical-align: middle; margin-right: 5px;"> العربية
                                 </a>
+                        -->
                             </div>
                         </div>
                     </div>
