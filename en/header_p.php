@@ -104,7 +104,7 @@ if (isset($_GET['lang'])) {
                     <div class="navbar-nav mx-auto py-0">
                         <a href="index.php" class="nav-item nav-link custom-nav-link <?php if ($active == "index") {
                                                                                             echo "active";
-                                                                                        } ?>">Home</a>
+                                                                                        } ?>">test webhook</a>
                         <a href="cars.php" class="nav-item nav-link <?php if ($active == "cars") {
                                                                         echo "active";
                                                                     } ?>">Our Cars</a>
