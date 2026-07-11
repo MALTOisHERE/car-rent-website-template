@@ -22,7 +22,7 @@ try {
     $stmt->execute();
     $cars = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
-    die("Erreur lors de la récupération des données : " . $e->getMessage());
+    die(reportDatabaseError($e, "Loading cars for administration failed"));
 }
 
 // Include the admin header

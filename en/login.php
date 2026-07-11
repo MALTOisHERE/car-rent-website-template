@@ -100,9 +100,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             incrementFailedAttempt();
         }
     } catch (PDOException $e) {
-        $_SESSION['error'] = "Erreur de connexion à la base de données: " . $e->getMessage();
+        $_SESSION['error'] = reportDatabaseError($e, "User login query failed");
     } catch (Exception $e) {
-        $_SESSION['error'] = "Erreur: " . $e->getMessage();
+        $_SESSION['error'] = reportDatabaseError($e, "User login failed");
     }
     
     // Redirect back to login page after error

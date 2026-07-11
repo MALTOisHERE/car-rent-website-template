@@ -30,7 +30,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             echo "Aucun utilisateur trouvé avec cet email.";
         }
     } catch (PDOException $e) {
-        echo "Erreur de connexion à la base de données: " . $e->getMessage();
+        echo reportDatabaseError($e, "User login query failed");
     }
 }
 ?>

@@ -69,7 +69,8 @@ if (isset($_SESSION['user_id'])) {
         exit();
     } catch (PDOException $e) {
         // Redirect with error message if there's a database error
-        header("Location: index.php?message=Error+processing+reservation+:+" . urlencode($e->getMessage()));
+        $message = reportDatabaseError($e, "Creating a reservation failed");
+        header("Location: index.php?message=" . urlencode($message));
         exit();
     }
 } else {

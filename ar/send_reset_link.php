@@ -46,11 +46,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             exit();
         }
     } catch (PDOException $e) {
-        $_SESSION['error'] = "Erreur de base de données : " . $e->getMessage();
+        $_SESSION['error'] = reportDatabaseError($e, "Creating a password reset token failed");
         header("Location: forgot_password.php");
         exit();
     } catch (Exception $e) {
-        $_SESSION['error'] = $e->getMessage();
+        $_SESSION['error'] = reportDatabaseError($e, "Sending a password reset link failed");
         header("Location: forgot_password.php");
         exit();
     }

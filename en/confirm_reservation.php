@@ -82,11 +82,13 @@ try {
     exit();
 } catch (PDOException $e) {
     // Handle database errors
-    header("Location: index.php?message=Erreur+lors+de+la+réservation+:+" . urlencode($e->getMessage()));
+    $message = reportDatabaseError($e, "Creating a guest reservation failed");
+    header("Location: index.php?message=" . urlencode($message));
     exit();
 } catch (Exception $e) {
     // Handle other errors
-    header("Location: index.php?message=Erreur+:+" . urlencode($e->getMessage()));
+    $message = reportDatabaseError($e, "Creating a guest reservation failed");
+    header("Location: index.php?message=" . urlencode($message));
     exit();
 }
 ?>

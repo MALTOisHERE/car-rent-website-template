@@ -32,7 +32,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         header("Location: cars.php"); // Redirection après ajout
         exit();
     } catch (PDOException $e) {
-        die("Erreur lors de l'ajout de la voiture : " . $e->getMessage());
+        die(reportDatabaseError($e, "Adding a car failed"));
     }
 }
 ?>

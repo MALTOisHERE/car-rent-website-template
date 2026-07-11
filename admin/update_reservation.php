@@ -39,7 +39,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         header("Location: index.php?status=updated");
         exit();
     } catch (PDOException $e) {
-        echo "Erreur lors de la mise à jour : " . $e->getMessage();
+        echo reportDatabaseError($e, "Updating a reservation failed");
     }
 }
 ?>

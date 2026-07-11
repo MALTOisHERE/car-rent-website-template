@@ -16,7 +16,7 @@ try {
     $stmtreservation->execute();
     $reservations = $stmtreservation->fetchAll(PDO::FETCH_ASSOC);
 } catch (Exception $e) {
-    die('Error retrieving data: ' . $e->getMessage());
+    die(reportDatabaseError($e, "Loading vehicle availability failed"));
 }
 
 // Récupérer les paramètres de l'URL

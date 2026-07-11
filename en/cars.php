@@ -16,7 +16,7 @@ try {
     // Récupérer les résultats sous forme de tableau associatif
     $cars = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (Exception $e) {
-    die('Erreur lors de la récupération des données : ' . $e->getMessage());
+    die(reportDatabaseError($e, "Loading cars failed"));
 }
 ?>
 <!-- Header Start -->

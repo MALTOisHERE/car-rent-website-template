@@ -42,7 +42,7 @@ try {
     $stmt->execute();
     $reservations = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
-    die("Error retrieving data: " . $e->getMessage());
+    die(reportDatabaseError($e, "Loading reservations for administration failed"));
 }
 
 ?>

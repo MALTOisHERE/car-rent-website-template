@@ -49,7 +49,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 exit();
             }
         } catch (PDOException $e) {
-            $error = "Database error: " . $e->getMessage();
+            $error = reportDatabaseError($e, "Creating an account failed");
         }
     }
 }

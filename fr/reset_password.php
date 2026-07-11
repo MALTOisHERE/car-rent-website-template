@@ -35,7 +35,7 @@ if (isset($_GET['token'])) {
             exit();
         }
     } catch (PDOException $e) {
-        $_SESSION['error'] = "Erreur de base de données : " . $e->getMessage();
+        $_SESSION['error'] = reportDatabaseError($e, "Resetting a password failed");
         header("Location: forgot_password.php");
         exit();
     }

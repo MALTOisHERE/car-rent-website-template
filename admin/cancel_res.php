@@ -27,7 +27,7 @@ if (isset($_POST['idres'])) {
         header("Location: index.php");
         exit();
     } catch (PDOException $e) {
-        die("Error updating reservation: " . $e->getMessage());
+        die(reportDatabaseError($e, "Cancelling a reservation failed"));
     }
 } else {
     die("Invalid request.");

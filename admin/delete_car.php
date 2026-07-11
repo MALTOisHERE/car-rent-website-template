@@ -43,5 +43,5 @@ try {
     }
 } catch (PDOException $e) {
     // Handle PDO exceptions
-    die('Database error: ' . $e->getMessage());
+    die(reportDatabaseError($e, "Deleting a car failed"));
 }

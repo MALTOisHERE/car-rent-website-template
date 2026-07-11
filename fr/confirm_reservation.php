@@ -53,9 +53,9 @@ try {
     echo "Réservation confirmée avec succès !";
 } catch (PDOException $e) {
     // Gestion des erreurs PDO
-    echo "Erreur lors de la réservation : " . $e->getMessage();
+    echo reportDatabaseError($e, "Creating a guest reservation failed");
 } catch (Exception $e) {
     // Gestion des autres erreurs
-    echo "Erreur : " . $e->getMessage();
+    echo reportDatabaseError($e, "Creating a guest reservation failed");
 }
 ?>

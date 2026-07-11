@@ -1,0 +1,987 @@
+﻿==================================================
+PHASE 0 DATABASE SECURITY REVIEW
+Generated: 07/11/2026 22:16:23
+==================================================
+
+===== GIT STATUS =====
+
+ M admin/add_car.php
+ M admin/cancel_res.php
+ M admin/cars.php
+ M admin/confirm_res.php
+ M admin/delete_car.php
+ M admin/index.php
+ M admin/update_reservation.php
+ M ar/cars.php
+ M ar/confirm_reservation.php
+ M ar/connectDB.php
+ M ar/login.php
+ M ar/reset_password.php
+ M ar/selection.php
+ M ar/send_reset_link.php
+ M assets/connectDB.php
+ M en/cars.php
+ M en/confirm_reservation.php
+ M en/login.php
+ M en/process_booking.php
+ M en/reset_password.php
+ M en/selection.php
+ M en/send_reset_link.php
+ M en/signup.php
+ M fr/cars.php
+ M fr/confirm_reservation.php
+ M fr/connectDB.php
+ M fr/login.php
+ M fr/reset_password.php
+ M fr/selection.php
+ M fr/send_reset_link.php
+?? .env.example
+?? .gitignore
+?? phase0-database-review.txt
+
+===== GIT DIFF STAT =====
+
+ admin/add_car.php            |   2 +-
+ admin/cancel_res.php         |   4 +-
+ admin/cars.php               |   4 +-
+ admin/confirm_res.php        |   4 +-
+ admin/delete_car.php         |   4 +-
+ admin/index.php              |   4 +-
+ admin/update_reservation.php |   4 +-
+ ar/cars.php                  |   4 +-
+ ar/confirm_reservation.php   |   6 +--
+ ar/connectDB.php             |  14 ++----
+ ar/login.php                 |   4 +-
+ ar/reset_password.php        |   4 +-
+ ar/selection.php             |   4 +-
+ ar/send_reset_link.php       |   6 +--
+ assets/connectDB.php         | 115 +++++++++++++++++++++++++++++++++++++++----
+ en/cars.php                  |   4 +-
+ en/confirm_reservation.php   |   8 +--
+ en/login.php                 |   6 +--
+ en/process_booking.php       |   5 +-
+ en/reset_password.php        |   4 +-
+ en/selection.php             |   4 +-
+ en/send_reset_link.php       |   6 +--
+ en/signup.php                |   4 +-
+ fr/cars.php                  |   4 +-
+ fr/confirm_reservation.php   |   6 +--
+ fr/connectDB.php             |  14 ++----
+ fr/login.php                 |   4 +-
+ fr/reset_password.php        |   4 +-
+ fr/selection.php             |   4 +-
+ fr/send_reset_link.php       |   6 +--
+ 30 files changed, 174 insertions(+), 92 deletions(-)
+
+===== COMPLETE GIT DIFF =====
+
+diff --git a/admin/add_car.php b/admin/add_car.php
+index f3a5a4e..8ea55cf 100644
+--- a/admin/add_car.php
++++ b/admin/add_car.php
+@@ -32,7 +32,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
+         header("Location: cars.php"); // Redirection apr├¿s ajout
+         exit();
+     } catch (PDOException $e) {
+-        die("Erreur lors de l'ajout de la voiture : " . $e->getMessage());
++        die(reportDatabaseError($e, "Adding a car failed"));
+     }
+ }
+ ?>
+diff --git a/admin/cancel_res.php b/admin/cancel_res.php
+index 300cc0d..d29126f 100644
+--- a/admin/cancel_res.php
++++ b/admin/cancel_res.php
+@@ -27,9 +27,9 @@ if (isset($_POST['idres'])) {
+         header("Location: index.php");
+         exit();
+     } catch (PDOException $e) {
+-        die("Error updating reservation: " . $e->getMessage());
++        die(reportDatabaseError($e, "Cancelling a reservation failed"));
+     }
+ } else {
+     die("Invalid request.");
+ }
+-?>
+\ No newline at end of file
++?>
+diff --git a/admin/cars.php b/admin/cars.php
+index f5966f9..71e9833 100644
+--- a/admin/cars.php
++++ b/admin/cars.php
+@@ -22,7 +22,7 @@ try {
+     $stmt->execute();
+     $cars = $stmt->fetchAll(PDO::FETCH_ASSOC);
+ } catch (PDOException $e) {
+-    die("Erreur lors de la r├⌐cup├⌐ration des donn├⌐es : " . $e->getMessage());
++    die(reportDatabaseError($e, "Loading cars for administration failed"));
+ }
+ 
+ // Include the admin header
+@@ -138,4 +138,4 @@ try {
+     </div>
+ </section>
+ 
+-<?php include("script.php"); ?>
+\ No newline at end of file
++<?php include("script.php"); ?>
+diff --git a/admin/confirm_res.php b/admin/confirm_res.php
+index f7902bc..246f16b 100644
+--- a/admin/confirm_res.php
++++ b/admin/confirm_res.php
+@@ -27,9 +27,9 @@ if (isset($_POST['idres'])) {
+         header("Location: index.php");
+         exit();
+     } catch (PDOException $e) {
+-        die("Error updating reservation: " . $e->getMessage());
++        die(reportDatabaseError($e, "Confirming a reservation failed"));
+     }
+ } else {
+     die("Invalid request.");
+ }
+-?>
+\ No newline at end of file
++?>
+diff --git a/admin/delete_car.php b/admin/delete_car.php
+index fcf086c..4488f91 100644
+--- a/admin/delete_car.php
++++ b/admin/delete_car.php
+@@ -43,5 +43,5 @@ try {
+     }
+ } catch (PDOException $e) {
+     // Handle PDO exceptions
+-    die('Database error: ' . $e->getMessage());
+-}
+\ No newline at end of file
++    die(reportDatabaseError($e, "Deleting a car failed"));
++}
+diff --git a/admin/index.php b/admin/index.php
+index a1fd0cd..fd6dbdb 100644
+--- a/admin/index.php
++++ b/admin/index.php
+@@ -42,7 +42,7 @@ try {
+     $stmt->execute();
+     $reservations = $stmt->fetchAll(PDO::FETCH_ASSOC);
+ } catch (PDOException $e) {
+-    die("Error retrieving data: " . $e->getMessage());
++    die(reportDatabaseError($e, "Loading reservations for administration failed"));
+ }
+ 
+ ?>
+@@ -211,4 +211,4 @@ try {
+         <!-- #END# Hover Rows -->
+     </div>
+ </section>
+-<?php include("script.php") ?>
+\ No newline at end of file
++<?php include("script.php") ?>
+diff --git a/admin/update_reservation.php b/admin/update_reservation.php
+index f6e1c29..ac8afa2 100644
+--- a/admin/update_reservation.php
++++ b/admin/update_reservation.php
+@@ -39,7 +39,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
+         header("Location: index.php?status=updated");
+         exit();
+     } catch (PDOException $e) {
+-        echo "Erreur lors de la mise ├á jour : " . $e->getMessage();
++        echo reportDatabaseError($e, "Updating a reservation failed");
+     }
+ }
+-?>
+\ No newline at end of file
++?>
+diff --git a/ar/cars.php b/ar/cars.php
+index a14d344..8702d28 100644
+--- a/ar/cars.php
++++ b/ar/cars.php
+@@ -16,7 +16,7 @@ try {
+     // R├⌐cup├⌐rer les r├⌐sultats sous forme de tableau associatif
+     $cars = $stmt->fetchAll(PDO::FETCH_ASSOC);
+ } catch (Exception $e) {
+-    die('Erreur lors de la r├⌐cup├⌐ration des donn├⌐es : ' . $e->getMessage());
++    die(reportDatabaseError($e, "Loading cars failed"));
+ }
+ ?>
+ <!-- Header Start -->
+@@ -153,4 +153,4 @@ try {
+ </div>
+ <!-- Car Steps End -->
+ <?php
+-include("footer_p.php") ?>
+\ No newline at end of file
++include("footer_p.php") ?>
+diff --git a/ar/confirm_reservation.php b/ar/confirm_reservation.php
+index a01ed6a..1803cdb 100644
+--- a/ar/confirm_reservation.php
++++ b/ar/confirm_reservation.php
+@@ -53,9 +53,9 @@ try {
+     echo "R├⌐servation confirm├⌐e avec succ├¿s !";
+ } catch (PDOException $e) {
+     // Gestion des erreurs PDO
+-    echo "Erreur lors de la r├⌐servation : " . $e->getMessage();
++    echo reportDatabaseError($e, "Creating a guest reservation failed");
+ } catch (Exception $e) {
+     // Gestion des autres erreurs
+-    echo "Erreur : " . $e->getMessage();
++    echo reportDatabaseError($e, "Creating a guest reservation failed");
+ }
+-?>
+\ No newline at end of file
++?>
+diff --git a/ar/connectDB.php b/ar/connectDB.php
+index 4d12166..f25cd6f 100644
+--- a/ar/connectDB.php
++++ b/ar/connectDB.php
+@@ -1,12 +1,4 @@
+ <?php
+-try {
+-    $mysqlconnection = new PDO(
+-        'mysql:host=localhost;port=3306;dbname=rental_car;charset=utf8',
+-        'root', // Nom d'utilisateur
+-        ''     // Mot de passe
+-    );
+-    $mysqlconnection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION); // Activer les exceptions pour les erreurs PDO
+-} catch (Exception $e) {
+-    die('Erreur : ' . $e->getMessage());
+-}
+-?>
+\ No newline at end of file
++
++// Backward-compatible shim for legacy direct includes.
++require_once __DIR__ . '/../assets/connectDB.php';
+diff --git a/ar/login.php b/ar/login.php
+index 9574561..2c13a94 100644
+--- a/ar/login.php
++++ b/ar/login.php
+@@ -30,7 +30,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
+             echo "Aucun utilisateur trouv├⌐ avec cet email.";
+         }
+     } catch (PDOException $e) {
+-        echo "Erreur de connexion ├á la base de donn├⌐es: " . $e->getMessage();
++        echo reportDatabaseError($e, "User login query failed");
+     }
+ }
+ ?>
+@@ -127,4 +127,4 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
+ 
+ </body>
+ 
+-</html>
+\ No newline at end of file
++</html>
+diff --git a/ar/reset_password.php b/ar/reset_password.php
+index 696655d..99a3a0e 100644
+--- a/ar/reset_password.php
++++ b/ar/reset_password.php
+@@ -35,7 +35,7 @@ if (isset($_GET['token'])) {
+             exit();
+         }
+     } catch (PDOException $e) {
+-        $_SESSION['error'] = "Erreur de base de donn├⌐es : " . $e->getMessage();
++        $_SESSION['error'] = reportDatabaseError($e, "Resetting a password failed");
+         header("Location: forgot_password.php");
+         exit();
+     }
+@@ -102,4 +102,4 @@ if (isset($_GET['token'])) {
+         </form>
+     </div>
+ </body>
+-</html>
+\ No newline at end of file
++</html>
+diff --git a/ar/selection.php b/ar/selection.php
+index 0818c12..ecc2fd8 100644
+--- a/ar/selection.php
++++ b/ar/selection.php
+@@ -16,7 +16,7 @@ try {
+     $stmtreservation->execute();
+     $reservations = $stmtreservation->fetchAll(PDO::FETCH_ASSOC);
+ } catch (Exception $e) {
+-    die('Error retrieving data: ' . $e->getMessage());
++    die(reportDatabaseError($e, "Loading vehicle availability failed"));
+ }
+ 
+ // R├⌐cup├⌐rer les param├¿tres de l'URL
+@@ -163,4 +163,4 @@ $heureFin = $_GET['heureFin'] ?? '';
+ </div>
+ <!-- Car categories End -->
+ <?php
+-include("footer_p.php") ?>
+\ No newline at end of file
++include("footer_p.php") ?>
+diff --git a/ar/send_reset_link.php b/ar/send_reset_link.php
+index b526830..b426a57 100644
+--- a/ar/send_reset_link.php
++++ b/ar/send_reset_link.php
+@@ -46,11 +46,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
+             exit();
+         }
+     } catch (PDOException $e) {
+-        $_SESSION['error'] = "Erreur de base de donn├⌐es : " . $e->getMessage();
++        $_SESSION['error'] = reportDatabaseError($e, "Creating a password reset token failed");
+         header("Location: forgot_password.php");
+         exit();
+     } catch (Exception $e) {
+-        $_SESSION['error'] = $e->getMessage();
++        $_SESSION['error'] = reportDatabaseError($e, "Sending a password reset link failed");
+         header("Location: forgot_password.php");
+         exit();
+     }
+@@ -58,4 +58,4 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
+     header("Location: forgot_password.php");
+     exit();
+ }
+-?>
+\ No newline at end of file
++?>
+diff --git a/assets/connectDB.php b/assets/connectDB.php
+index 6b151eb..309db4a 100644
+--- a/assets/connectDB.php
++++ b/assets/connectDB.php
+@@ -1,12 +1,107 @@
+ <?php
++
++/**
++ * Central database bootstrap.
++ *
++ * Database credentials must be supplied by the process environment. This file
++ * intentionally preserves the legacy $mysqlconnection variable used by the
++ * existing procedural pages.
++ */
++
++// Prevent uncaught runtime details from reaching the browser on database-backed pages.
++ini_set('display_errors', '0');
++ini_set('log_errors', '1');
++
++if (!function_exists('reportDatabaseError')) {
++    /** Log technical details server-side and return a browser-safe message. */
++    function reportDatabaseError(Throwable $exception, $context = 'Database operation failed')
++    {
++        error_log(sprintf(
++            '[database] %s (%s): %s',
++            $context,
++            get_class($exception),
++            $exception->getMessage()
++        ));
++
++        return 'A database error occurred. Please try again later.';
++    }
++}
++
++if (!function_exists('databaseConfigurationError')) {
++    /** Stop startup without exposing configuration or connection details. */
++    function databaseConfigurationError($technicalMessage)
++    {
++        error_log('[database] Configuration error: ' . $technicalMessage);
++
++        if (!headers_sent()) {
++            http_response_code(500);
++        }
++
++        exit('The service is temporarily unavailable. Please try again later.');
++    }
++}
++
++$dbHost = getenv('DB_HOST');
++$dbPort = getenv('DB_PORT');
++$dbName = getenv('DB_NAME');
++$dbUser = getenv('DB_USER');
++$dbPassword = getenv('DB_PASSWORD');
++$dbCharset = getenv('DB_CHARSET');
++
++$dbPort = ($dbPort === false || $dbPort === '') ? '3306' : $dbPort;
++$dbCharset = ($dbCharset === false || $dbCharset === '') ? 'utf8mb4' : $dbCharset;
++
++$missingVariables = [];
++foreach ([
++    'DB_HOST' => $dbHost,
++    'DB_NAME' => $dbName,
++    'DB_USER' => $dbUser,
++    'DB_PASSWORD' => $dbPassword,
++] as $variableName => $value) {
++    if ($value === false || ($variableName !== 'DB_PASSWORD' && $value === '')) {
++        $missingVariables[] = $variableName;
++    }
++}
++
++if ($missingVariables !== []) {
++    databaseConfigurationError('Missing required environment variables: ' . implode(', ', $missingVariables));
++}
++
++if (!ctype_digit((string) $dbPort) || (int) $dbPort < 1 || (int) $dbPort > 65535) {
++    databaseConfigurationError('DB_PORT must be an integer between 1 and 65535.');
++}
++
++if (!preg_match('/^[A-Za-z0-9_]+$/', (string) $dbCharset)) {
++    databaseConfigurationError('DB_CHARSET contains unsupported characters.');
++}
++
++if (strtolower((string) $dbCharset) !== 'utf8mb4') {
++    databaseConfigurationError('DB_CHARSET must be utf8mb4.');
++}
++
++$dbCharset = 'utf8mb4';
++
++foreach (['DB_HOST' => $dbHost, 'DB_NAME' => $dbName] as $variableName => $value) {
++    if (preg_match('/[;\x00-\x1F\x7F]/', (string) $value)) {
++        databaseConfigurationError($variableName . ' contains unsupported characters.');
++    }
++}
++
++$dsn = sprintf(
++    'mysql:host=%s;port=%d;dbname=%s;charset=%s',
++    $dbHost,
++    (int) $dbPort,
++    $dbName,
++    $dbCharset
++);
++
+ try {
+-    $mysqlconnection = new PDO(
+-        'mysql:host=localhost;port=3306;dbname=u301125912_rental_car;charset=utf8',
+-        'u301125912_Kab4', // Nom d'utilisateur
+-        'X:q491o:mnt'     // Mot de passe
+-    );
+-    $mysqlconnection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION); // Activer les exceptions pour les erreurs PDO
+-} catch (Exception $e) {
+-    die('Erreur : ' . $e->getMessage());
+-}
+-?>
+\ No newline at end of file
++    $mysqlconnection = new PDO($dsn, $dbUser, $dbPassword, [
++        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
++        PDO::ATTR_EMULATE_PREPARES => false,
++        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
++    ]);
++} catch (Throwable $exception) {
++    reportDatabaseError($exception, 'Connection failed');
++    databaseConfigurationError('Unable to establish a database connection.');
++}
+diff --git a/en/cars.php b/en/cars.php
+index e05b0ce..1ba71a2 100644
+--- a/en/cars.php
++++ b/en/cars.php
+@@ -16,7 +16,7 @@ try {
+     // R├⌐cup├⌐rer les r├⌐sultats sous forme de tableau associatif
+     $cars = $stmt->fetchAll(PDO::FETCH_ASSOC);
+ } catch (Exception $e) {
+-    die('Erreur lors de la r├⌐cup├⌐ration des donn├⌐es : ' . $e->getMessage());
++    die(reportDatabaseError($e, "Loading cars failed"));
+ }
+ ?>
+ <!-- Header Start -->
+@@ -153,4 +153,4 @@ try {
+ </div>
+ <!-- Car Steps End -->
+ <?php
+-include("footer_p.php") ?>
+\ No newline at end of file
++include("footer_p.php") ?>
+diff --git a/en/confirm_reservation.php b/en/confirm_reservation.php
+index 217cb5e..db8faba 100644
+--- a/en/confirm_reservation.php
++++ b/en/confirm_reservation.php
+@@ -82,11 +82,13 @@ try {
+     exit();
+ } catch (PDOException $e) {
+     // Handle database errors
+-    header("Location: index.php?message=Erreur+lors+de+la+r├⌐servation+:+" . urlencode($e->getMessage()));
++    $message = reportDatabaseError($e, "Creating a guest reservation failed");
++    header("Location: index.php?message=" . urlencode($message));
+     exit();
+ } catch (Exception $e) {
+     // Handle other errors
+-    header("Location: index.php?message=Erreur+:+" . urlencode($e->getMessage()));
++    $message = reportDatabaseError($e, "Creating a guest reservation failed");
++    header("Location: index.php?message=" . urlencode($message));
+     exit();
+ }
+-?>
+\ No newline at end of file
++?>
+diff --git a/en/login.php b/en/login.php
+index dbac595..7d3a210 100644
+--- a/en/login.php
++++ b/en/login.php
+@@ -100,9 +100,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
+             incrementFailedAttempt();
+         }
+     } catch (PDOException $e) {
+-        $_SESSION['error'] = "Erreur de connexion ├á la base de donn├⌐es: " . $e->getMessage();
++        $_SESSION['error'] = reportDatabaseError($e, "User login query failed");
+     } catch (Exception $e) {
+-        $_SESSION['error'] = "Erreur: " . $e->getMessage();
++        $_SESSION['error'] = reportDatabaseError($e, "User login failed");
+     }
+     
+     // Redirect back to login page after error
+@@ -304,4 +304,4 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
+     </script>
+ </body>
+ 
+-</html>
+\ No newline at end of file
++</html>
+diff --git a/en/process_booking.php b/en/process_booking.php
+index 959b11b..770584a 100644
+--- a/en/process_booking.php
++++ b/en/process_booking.php
+@@ -69,7 +69,8 @@ if (isset($_SESSION['user_id'])) {
+         exit();
+     } catch (PDOException $e) {
+         // Redirect with error message if there's a database error
+-        header("Location: index.php?message=Error+processing+reservation+:+" . urlencode($e->getMessage()));
++        $message = reportDatabaseError($e, "Creating a reservation failed");
++        header("Location: index.php?message=" . urlencode($message));
+         exit();
+     }
+ } else {
+@@ -78,4 +79,4 @@ if (isset($_SESSION['user_id'])) {
+     header("Location: reserve.php?$params");
+     exit();
+ }
+-?>
+\ No newline at end of file
++?>
+diff --git a/en/reset_password.php b/en/reset_password.php
+index 696655d..99a3a0e 100644
+--- a/en/reset_password.php
++++ b/en/reset_password.php
+@@ -35,7 +35,7 @@ if (isset($_GET['token'])) {
+             exit();
+         }
+     } catch (PDOException $e) {
+-        $_SESSION['error'] = "Erreur de base de donn├⌐es : " . $e->getMessage();
++        $_SESSION['error'] = reportDatabaseError($e, "Resetting a password failed");
+         header("Location: forgot_password.php");
+         exit();
+     }
+@@ -102,4 +102,4 @@ if (isset($_GET['token'])) {
+         </form>
+     </div>
+ </body>
+-</html>
+\ No newline at end of file
++</html>
+diff --git a/en/selection.php b/en/selection.php
+index 3421ca7..d963aae 100644
+--- a/en/selection.php
++++ b/en/selection.php
+@@ -16,7 +16,7 @@ try {
+     $stmtreservation->execute();
+     $reservations = $stmtreservation->fetchAll(PDO::FETCH_ASSOC);
+ } catch (Exception $e) {
+-    die('Error retrieving data: ' . $e->getMessage());
++    die(reportDatabaseError($e, "Loading vehicle availability failed"));
+ }
+ 
+ // R├⌐cup├⌐rer les param├¿tres de l'URL
+@@ -176,4 +176,4 @@ $heureFin = $_GET['heureFin'] ?? '';
+ </div>
+ <!-- Car categories End -->
+ <?php
+-include("footer_p.php") ?>
+\ No newline at end of file
++include("footer_p.php") ?>
+diff --git a/en/send_reset_link.php b/en/send_reset_link.php
+index b526830..b426a57 100644
+--- a/en/send_reset_link.php
++++ b/en/send_reset_link.php
+@@ -46,11 +46,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
+             exit();
+         }
+     } catch (PDOException $e) {
+-        $_SESSION['error'] = "Erreur de base de donn├⌐es : " . $e->getMessage();
++        $_SESSION['error'] = reportDatabaseError($e, "Creating a password reset token failed");
+         header("Location: forgot_password.php");
+         exit();
+     } catch (Exception $e) {
+-        $_SESSION['error'] = $e->getMessage();
++        $_SESSION['error'] = reportDatabaseError($e, "Sending a password reset link failed");
+         header("Location: forgot_password.php");
+         exit();
+     }
+@@ -58,4 +58,4 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
+     header("Location: forgot_password.php");
+     exit();
+ }
+-?>
+\ No newline at end of file
++?>
+diff --git a/en/signup.php b/en/signup.php
+index 67ff86d..a131bf6 100644
+--- a/en/signup.php
++++ b/en/signup.php
+@@ -49,7 +49,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
+                 exit();
+             }
+         } catch (PDOException $e) {
+-            $error = "Database error: " . $e->getMessage();
++            $error = reportDatabaseError($e, "Creating an account failed");
+         }
+     }
+ }
+@@ -184,4 +184,4 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
+     </script>
+ </body>
+ 
+-</html>
+\ No newline at end of file
++</html>
+diff --git a/fr/cars.php b/fr/cars.php
+index edcb5c3..6069cab 100644
+--- a/fr/cars.php
++++ b/fr/cars.php
+@@ -16,7 +16,7 @@ try {
+     // R├⌐cup├⌐rer les r├⌐sultats sous forme de tableau associatif
+     $cars = $stmt->fetchAll(PDO::FETCH_ASSOC);
+ } catch (Exception $e) {
+-    die('Erreur lors de la r├⌐cup├⌐ration des donn├⌐es : ' . $e->getMessage());
++    die(reportDatabaseError($e, "Loading cars failed"));
+ }
+ ?>
+ <!-- Header Start -->
+@@ -153,4 +153,4 @@ try {
+ </div>
+ <!-- Car Steps End -->
+ <?php
+-include("footer_p.php") ?>
+\ No newline at end of file
++include("footer_p.php") ?>
+diff --git a/fr/confirm_reservation.php b/fr/confirm_reservation.php
+index a01ed6a..1803cdb 100644
+--- a/fr/confirm_reservation.php
++++ b/fr/confirm_reservation.php
+@@ -53,9 +53,9 @@ try {
+     echo "R├⌐servation confirm├⌐e avec succ├¿s !";
+ } catch (PDOException $e) {
+     // Gestion des erreurs PDO
+-    echo "Erreur lors de la r├⌐servation : " . $e->getMessage();
++    echo reportDatabaseError($e, "Creating a guest reservation failed");
+ } catch (Exception $e) {
+     // Gestion des autres erreurs
+-    echo "Erreur : " . $e->getMessage();
++    echo reportDatabaseError($e, "Creating a guest reservation failed");
+ }
+-?>
+\ No newline at end of file
++?>
+diff --git a/fr/connectDB.php b/fr/connectDB.php
+index 4d12166..f25cd6f 100644
+--- a/fr/connectDB.php
++++ b/fr/connectDB.php
+@@ -1,12 +1,4 @@
+ <?php
+-try {
+-    $mysqlconnection = new PDO(
+-        'mysql:host=localhost;port=3306;dbname=rental_car;charset=utf8',
+-        'root', // Nom d'utilisateur
+-        ''     // Mot de passe
+-    );
+-    $mysqlconnection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION); // Activer les exceptions pour les erreurs PDO
+-} catch (Exception $e) {
+-    die('Erreur : ' . $e->getMessage());
+-}
+-?>
+\ No newline at end of file
++
++// Backward-compatible shim for legacy direct includes.
++require_once __DIR__ . '/../assets/connectDB.php';
+diff --git a/fr/login.php b/fr/login.php
+index 3802a4c..f430085 100644
+--- a/fr/login.php
++++ b/fr/login.php
+@@ -30,7 +30,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
+             echo "Aucun utilisateur trouv├⌐ avec cet email.";
+         }
+     } catch (PDOException $e) {
+-        echo "Erreur de connexion ├á la base de donn├⌐es: " . $e->getMessage();
++        echo reportDatabaseError($e, "User login query failed");
+     }
+ }
+ ?>
+@@ -126,4 +126,4 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
+     </div>
+ </body>
+ 
+-</html>
+\ No newline at end of file
++</html>
+diff --git a/fr/reset_password.php b/fr/reset_password.php
+index 696655d..99a3a0e 100644
+--- a/fr/reset_password.php
++++ b/fr/reset_password.php
+@@ -35,7 +35,7 @@ if (isset($_GET['token'])) {
+             exit();
+         }
+     } catch (PDOException $e) {
+-        $_SESSION['error'] = "Erreur de base de donn├⌐es : " . $e->getMessage();
++        $_SESSION['error'] = reportDatabaseError($e, "Resetting a password failed");
+         header("Location: forgot_password.php");
+         exit();
+     }
+@@ -102,4 +102,4 @@ if (isset($_GET['token'])) {
+         </form>
+     </div>
+ </body>
+-</html>
+\ No newline at end of file
++</html>
+diff --git a/fr/selection.php b/fr/selection.php
+index 0818c12..ecc2fd8 100644
+--- a/fr/selection.php
++++ b/fr/selection.php
+@@ -16,7 +16,7 @@ try {
+     $stmtreservation->execute();
+     $reservations = $stmtreservation->fetchAll(PDO::FETCH_ASSOC);
+ } catch (Exception $e) {
+-    die('Error retrieving data: ' . $e->getMessage());
++    die(reportDatabaseError($e, "Loading vehicle availability failed"));
+ }
+ 
+ // R├⌐cup├⌐rer les param├¿tres de l'URL
+@@ -163,4 +163,4 @@ $heureFin = $_GET['heureFin'] ?? '';
+ </div>
+ <!-- Car categories End -->
+ <?php
+-include("footer_p.php") ?>
+\ No newline at end of file
++include("footer_p.php") ?>
+diff --git a/fr/send_reset_link.php b/fr/send_reset_link.php
+index b526830..b426a57 100644
+--- a/fr/send_reset_link.php
++++ b/fr/send_reset_link.php
+@@ -46,11 +46,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
+             exit();
+         }
+     } catch (PDOException $e) {
+-        $_SESSION['error'] = "Erreur de base de donn├⌐es : " . $e->getMessage();
++        $_SESSION['error'] = reportDatabaseError($e, "Creating a password reset token failed");
+         header("Location: forgot_password.php");
+         exit();
+     } catch (Exception $e) {
+-        $_SESSION['error'] = $e->getMessage();
++        $_SESSION['error'] = reportDatabaseError($e, "Sending a password reset link failed");
+         header("Location: forgot_password.php");
+         exit();
+     }
+@@ -58,4 +58,4 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
+     header("Location: forgot_password.php");
+     exit();
+ }
+-?>
+\ No newline at end of file
++?>
+
+===== CENTRAL DATABASE CONNECTION =====
+
+<?php
+
+/**
+ * Central database bootstrap.
+ *
+ * Database credentials must be supplied by the process environment. This file
+ * intentionally preserves the legacy $mysqlconnection variable used by the
+ * existing procedural pages.
+ */
+
+// Prevent uncaught runtime details from reaching the browser on database-backed pages.
+ini_set('display_errors', '0');
+ini_set('log_errors', '1');
+
+if (!function_exists('reportDatabaseError')) {
+    /** Log technical details server-side and return a browser-safe message. */
+    function reportDatabaseError(Throwable $exception, $context = 'Database operation failed')
+    {
+        error_log(sprintf(
+            '[database] %s (%s): %s',
+            $context,
+            get_class($exception),
+            $exception->getMessage()
+        ));
+
+        return 'A database error occurred. Please try again later.';
+    }
+}
+
+if (!function_exists('databaseConfigurationError')) {
+    /** Stop startup without exposing configuration or connection details. */
+    function databaseConfigurationError($technicalMessage)
+    {
+        error_log('[database] Configuration error: ' . $technicalMessage);
+
+        if (!headers_sent()) {
+            http_response_code(500);
+        }
+
+        exit('The service is temporarily unavailable. Please try again later.');
+    }
+}
+
+$dbHost = getenv('DB_HOST');
+$dbPort = getenv('DB_PORT');
+$dbName = getenv('DB_NAME');
+$dbUser = getenv('DB_USER');
+$dbPassword = getenv('DB_PASSWORD');
+$dbCharset = getenv('DB_CHARSET');
+
+$dbPort = ($dbPort === false || $dbPort === '') ? '3306' : $dbPort;
+$dbCharset = ($dbCharset === false || $dbCharset === '') ? 'utf8mb4' : $dbCharset;
+
+$missingVariables = [];
+foreach ([
+    'DB_HOST' => $dbHost,
+    'DB_NAME' => $dbName,
+    'DB_USER' => $dbUser,
+    'DB_PASSWORD' => $dbPassword,
+] as $variableName => $value) {
+    if ($value === false || ($variableName !== 'DB_PASSWORD' && $value === '')) {
+        $missingVariables[] = $variableName;
+    }
+}
+
+if ($missingVariables !== []) {
+    databaseConfigurationError('Missing required environment variables: ' . implode(', ', $missingVariables));
+}
+
+if (!ctype_digit((string) $dbPort) || (int) $dbPort < 1 || (int) $dbPort > 65535) {
+    databaseConfigurationError('DB_PORT must be an integer between 1 and 65535.');
+}
+
+if (!preg_match('/^[A-Za-z0-9_]+$/', (string) $dbCharset)) {
+    databaseConfigurationError('DB_CHARSET contains unsupported characters.');
+}
+
+if (strtolower((string) $dbCharset) !== 'utf8mb4') {
+    databaseConfigurationError('DB_CHARSET must be utf8mb4.');
+}
+
+$dbCharset = 'utf8mb4';
+
+foreach (['DB_HOST' => $dbHost, 'DB_NAME' => $dbName] as $variableName => $value) {
+    if (preg_match('/[;\x00-\x1F\x7F]/', (string) $value)) {
+        databaseConfigurationError($variableName . ' contains unsupported characters.');
+    }
+}
+
+$dsn = sprintf(
+    'mysql:host=%s;port=%d;dbname=%s;charset=%s',
+    $dbHost,
+    (int) $dbPort,
+    $dbName,
+    $dbCharset
+);
+
+try {
+    $mysqlconnection = new PDO($dsn, $dbUser, $dbPassword, [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_EMULATE_PREPARES => false,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+    ]);
+} catch (Throwable $exception) {
+    reportDatabaseError($exception, 'Connection failed');
+    databaseConfigurationError('Unable to establish a database connection.');
+}
+
+===== FRENCH CONNECTION SHIM =====
+
+<?php
+
+// Backward-compatible shim for legacy direct includes.
+require_once __DIR__ . '/../assets/connectDB.php';
+
+===== ARABIC CONNECTION SHIM =====
+
+<?php
+
+// Backward-compatible shim for legacy direct includes.
+require_once __DIR__ . '/../assets/connectDB.php';
+
+===== ENVIRONMENT EXAMPLE =====
+
+# Copy these placeholders into your web server or PHP process environment.
+# This project does not parse .env files directly.
+DB_HOST=your-database-host
+DB_PORT=3306
+DB_NAME=your-database-name
+DB_USER=your-database-user
+DB_PASSWORD=your-database-password
+DB_CHARSET=utf8mb4
+
+===== GITIGNORE =====
+
+.env
+.env.local
+
+===== SEARCH FOR DATABASE CONFIGURATION =====
+
+C:\Users\aaguezzoul\Documents\GitHub\car-rent-website-template\assets\connectDB.php:44: $dbHost = getenv('DB_HOST');
+C:\Users\aaguezzoul\Documents\GitHub\car-rent-website-template\assets\connectDB.php:45: $dbPort = getenv('DB_PORT');
+C:\Users\aaguezzoul\Documents\GitHub\car-rent-website-template\assets\connectDB.php:46: $dbName = getenv('DB_NAME');
+C:\Users\aaguezzoul\Documents\GitHub\car-rent-website-template\assets\connectDB.php:47: $dbUser = getenv('DB_USER');
+C:\Users\aaguezzoul\Documents\GitHub\car-rent-website-template\assets\connectDB.php:48: $dbPassword = getenv('DB_PASSWORD');
+C:\Users\aaguezzoul\Documents\GitHub\car-rent-website-template\assets\connectDB.php:49: $dbCharset = getenv('DB_CHARSET');
+C:\Users\aaguezzoul\Documents\GitHub\car-rent-website-template\assets\connectDB.php:56: 'DB_HOST' => $dbHost,
+C:\Users\aaguezzoul\Documents\GitHub\car-rent-website-template\assets\connectDB.php:57: 'DB_NAME' => $dbName,
+C:\Users\aaguezzoul\Documents\GitHub\car-rent-website-template\assets\connectDB.php:58: 'DB_USER' => $dbUser,
+C:\Users\aaguezzoul\Documents\GitHub\car-rent-website-template\assets\connectDB.php:59: 'DB_PASSWORD' => $dbPassword,
+C:\Users\aaguezzoul\Documents\GitHub\car-rent-website-template\assets\connectDB.php:61: if ($value === false || ($variableName !== 'DB_PASSWORD' && $value === '')) {
+C:\Users\aaguezzoul\Documents\GitHub\car-rent-website-template\assets\connectDB.php:84: foreach (['DB_HOST' => $dbHost, 'DB_NAME' => $dbName] as $variableName => $value) {
+C:\Users\aaguezzoul\Documents\GitHub\car-rent-website-template\assets\connectDB.php:91: 'mysql:host=%s;port=%d;dbname=%s;charset=%s',
+C:\Users\aaguezzoul\Documents\GitHub\car-rent-website-template\assets\connectDB.php:99: $mysqlconnection = new PDO($dsn, $dbUser, $dbPassword, [
+
+===== SEARCH FOR RAW EXCEPTION OUTPUT =====
+
+C:\Users\aaguezzoul\Documents\GitHub\car-rent-website-template\admin\add_car.php:34: } catch (PDOException $e) {
+C:\Users\aaguezzoul\Documents\GitHub\car-rent-website-template\admin\cancel_res.php:29: } catch (PDOException $e) {
+C:\Users\aaguezzoul\Documents\GitHub\car-rent-website-template\admin\cars.php:24: } catch (PDOException $e) {
+C:\Users\aaguezzoul\Documents\GitHub\car-rent-website-template\admin\confirm_res.php:29: } catch (PDOException $e) {
+C:\Users\aaguezzoul\Documents\GitHub\car-rent-website-template\admin\delete_car.php:44: } catch (PDOException $e) {
+C:\Users\aaguezzoul\Documents\GitHub\car-rent-website-template\admin\delete_res.php:36: } catch (PDOException $e) {
+C:\Users\aaguezzoul\Documents\GitHub\car-rent-website-template\admin\delete_res.php:38: error_log("Error deleting reservation: " . $e->getMessage());
+C:\Users\aaguezzoul\Documents\GitHub\car-rent-website-template\admin\index.php:44: } catch (PDOException $e) {
+C:\Users\aaguezzoul\Documents\GitHub\car-rent-website-template\admin\update_reservation.php:41: } catch (PDOException $e) {
+C:\Users\aaguezzoul\Documents\GitHub\car-rent-website-template\ar\confirm_reservation.php:54: } catch (PDOException $e) {
+C:\Users\aaguezzoul\Documents\GitHub\car-rent-website-template\ar\login.php:32: } catch (PDOException $e) {
+C:\Users\aaguezzoul\Documents\GitHub\car-rent-website-template\ar\reset_password.php:37: } catch (PDOException $e) {
+C:\Users\aaguezzoul\Documents\GitHub\car-rent-website-template\ar\send_reset_link.php:48: } catch (PDOException $e) {
+C:\Users\aaguezzoul\Documents\GitHub\car-rent-website-template\assets\connectDB.php:12: ini_set('display_errors', '0');
+C:\Users\aaguezzoul\Documents\GitHub\car-rent-website-template\assets\connectDB.php:19: error_log(sprintf(
+C:\Users\aaguezzoul\Documents\GitHub\car-rent-website-template\assets\connectDB.php:23: $exception->getMessage()
+C:\Users\aaguezzoul\Documents\GitHub\car-rent-website-template\assets\connectDB.php:34: error_log('[database] Configuration error: ' . $technicalMessage);
+C:\Users\aaguezzoul\Documents\GitHub\car-rent-website-template\en\confirm_reservation.php:83: } catch (PDOException $e) {
+C:\Users\aaguezzoul\Documents\GitHub\car-rent-website-template\en\login.php:102: } catch (PDOException $e) {
+C:\Users\aaguezzoul\Documents\GitHub\car-rent-website-template\en\process_booking.php:70: } catch (PDOException $e) {
+C:\Users\aaguezzoul\Documents\GitHub\car-rent-website-template\en\reset_password.php:37: } catch (PDOException $e) {
+C:\Users\aaguezzoul\Documents\GitHub\car-rent-website-template\en\send_reset_link.php:48: } catch (PDOException $e) {
+C:\Users\aaguezzoul\Documents\GitHub\car-rent-website-template\en\signup.php:51: } catch (PDOException $e) {
+C:\Users\aaguezzoul\Documents\GitHub\car-rent-website-template\fr\confirm_reservation.php:54: } catch (PDOException $e) {
+C:\Users\aaguezzoul\Documents\GitHub\car-rent-website-template\fr\login.php:32: } catch (PDOException $e) {
+C:\Users\aaguezzoul\Documents\GitHub\car-rent-website-template\fr\reset_password.php:37: } catch (PDOException $e) {
+C:\Users\aaguezzoul\Documents\GitHub\car-rent-website-template\fr\send_reset_link.php:48: } catch (PDOException $e) {
+
+===== SEARCH FOR POSSIBLE HARDCODED CREDENTIALS =====
+
+C:\Users\aaguezzoul\Documents\GitHub\car-rent-website-template\ar\confirm_reservation.php:17: $password = $_POST['password'] ?? '';
+C:\Users\aaguezzoul\Documents\GitHub\car-rent-website-template\ar\login.php:7: $password = $_POST['password'];
+C:\Users\aaguezzoul\Documents\GitHub\car-rent-website-template\ar\reset_password.php:20: $newPassword = password_hash($_POST['new_password'], PASSWORD_DEFAULT);
+C:\Users\aaguezzoul\Documents\GitHub\car-rent-website-template\ar\reset_password.php:23: $stmt = $conn->prepare("UPDATE user SET password = :password, reset_token = NULL, reset_token_expiry = NULL WHERE iduser = :iduser");
+C:\Users\aaguezzoul\Documents\GitHub\car-rent-website-template\assets\connectDB.php:46: $dbName = getenv('DB_NAME');
+C:\Users\aaguezzoul\Documents\GitHub\car-rent-website-template\assets\connectDB.php:48: $dbPassword = getenv('DB_PASSWORD');
+C:\Users\aaguezzoul\Documents\GitHub\car-rent-website-template\assets\connectDB.php:91: 'mysql:host=%s;port=%d;dbname=%s;charset=%s',
+C:\Users\aaguezzoul\Documents\GitHub\car-rent-website-template\en\confirm_reservation.php:16: $password = $_POST['password'] ?? '';
+C:\Users\aaguezzoul\Documents\GitHub\car-rent-website-template\en\confirm_reservation.php:46: $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+C:\Users\aaguezzoul\Documents\GitHub\car-rent-website-template\en\login.php:66: $password = trim($_POST['password']);
+C:\Users\aaguezzoul\Documents\GitHub\car-rent-website-template\en\reserve.php:96: var password = document.getElementById("password").value;
+C:\Users\aaguezzoul\Documents\GitHub\car-rent-website-template\en\reserve.php:97: var confirmPassword = document.getElementById("confirm_password").value;
+C:\Users\aaguezzoul\Documents\GitHub\car-rent-website-template\en\reset_password.php:20: $newPassword = password_hash($_POST['new_password'], PASSWORD_DEFAULT);
+C:\Users\aaguezzoul\Documents\GitHub\car-rent-website-template\en\reset_password.php:23: $stmt = $conn->prepare("UPDATE user SET password = :password, reset_token = NULL, reset_token_expiry = NULL WHERE iduser = :iduser");
+C:\Users\aaguezzoul\Documents\GitHub\car-rent-website-template\en\signup.php:11: $password = trim($_POST['password']);
+C:\Users\aaguezzoul\Documents\GitHub\car-rent-website-template\en\signup.php:12: $confirmPassword = trim($_POST['confirm_password']);
+C:\Users\aaguezzoul\Documents\GitHub\car-rent-website-template\en\signup.php:32: $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+C:\Users\aaguezzoul\Documents\GitHub\car-rent-website-template\en\signup.php:168: const password = document.querySelector('input[name="password"]').value;
+C:\Users\aaguezzoul\Documents\GitHub\car-rent-website-template\en\signup.php:169: const confirmPassword = document.querySelector('input[name="confirm_password"]').value;
+C:\Users\aaguezzoul\Documents\GitHub\car-rent-website-template\fr\confirm_reservation.php:17: $password = $_POST['password'] ?? '';
+C:\Users\aaguezzoul\Documents\GitHub\car-rent-website-template\fr\login.php:7: $password = $_POST['password'];
+C:\Users\aaguezzoul\Documents\GitHub\car-rent-website-template\fr\reset_password.php:20: $newPassword = password_hash($_POST['new_password'], PASSWORD_DEFAULT);
+C:\Users\aaguezzoul\Documents\GitHub\car-rent-website-template\fr\reset_password.php:23: $stmt = $conn->prepare("UPDATE user SET password = :password, reset_token = NULL, reset_token_expiry = NULL WHERE iduser = :iduser");
