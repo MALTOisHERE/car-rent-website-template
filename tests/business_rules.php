@@ -1,0 +1,6 @@
+<?php
+require_once __DIR__ . '/../app/config.php';require_once __DIR__ . '/../app/validation.php';require_once __DIR__ . '/../app/auth.php';require_once __DIR__ . '/../app/domain.php';
+$failures=[];$assert=function($condition,$message)use(&$failures){if(!$condition)$failures[]=$message;};
+$assert(validDateValue('2026-02-28') instanceof DateTimeImmutable,'Valid date rejected');$assert(validDateValue('2026-02-30')===null,'Invalid date accepted');$assert(passwordValidationErrors('weak')!==[],'Weak password accepted');$assert(passwordValidationErrors('StrongDemo!2026')===[],'Strong password rejected');$assert(in_array('confirmed',reservationTransitions()['pending'],true),'Pending cannot transition to confirmed');$assert(!in_array('active',reservationTransitions()['cancelled'],true),'Cancelled reservation can transition');
+$price=calculateRentalPrice(['pickup_at'=>new DateTimeImmutable('2026-01-01 10:00:00'),'return_at'=>new DateTimeImmutable('2026-01-04 10:00:00'),'daily_price'=>'200.00','options_total'=>'50.00','fees_total'=>'0.00','discount_percent'=>10,'tax_rate'=>20]);$assert($price['days']===3,'Rental day calculation failed');$assert($price['total']==='702.00','Price breakdown failed');
+if($failures){foreach($failures as $failure)fwrite(STDERR,"FAIL: $failure\n");exit(1);}echo "Business rule tests passed.\n";

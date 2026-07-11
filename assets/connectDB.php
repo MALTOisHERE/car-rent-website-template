@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . '/../app/bootstrap.php';
+
 /**
  * Central database bootstrap.
  *

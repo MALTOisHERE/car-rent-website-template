@@ -1,0 +1,12 @@
+<?php
+
+require_once __DIR__ . '/bootstrap.php';
+require_once __DIR__ . '/../assets/connectDB.php';
+require_once __DIR__ . '/database.php';
+require_once __DIR__ . '/validation.php';
+require_once __DIR__ . '/audit.php';
+require_once __DIR__ . '/auth_service.php';
+require_once __DIR__ . '/upload.php';
+require_once __DIR__ . '/domain.php';
+require_once __DIR__ . '/operations.php';
+require_once __DIR__ . '/i18n.php';

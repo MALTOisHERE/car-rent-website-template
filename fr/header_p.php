@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/../app/bootstrap.php';
 
 // Si une langue est choisie, la définir dans la session et rediriger vers le dossier correspondant
 if (isset($_GET['lang'])) {
@@ -145,7 +145,7 @@ if (isset($_GET['lang'])) {
                             </div>
                         </div>
                     </div>
-                    <a style="margin-right: 10px;" href="login.php" class="btn btn-primary rounded-pill py-2 px-4">
+                    <a style="margin-right: 10px;" href="../account/login.php?lang=fr" class="btn btn-primary rounded-pill py-2 px-4">
                         <i class="fas fa-user me-2"></i> Connexion
                     </a>
                 </div>

@@ -1,5 +1,5 @@
 <?php
-session_start();
+require_once __DIR__ . '/app/bootstrap.php';
 
 // If language is already set, redirect to the corresponding folder (en or fr)
 if (isset($_SESSION['lang'])) {
