@@ -55,8 +55,16 @@ function tableExists($tableName)
     if (!preg_match('/^[A-Za-z0-9_]+$/', (string) $tableName)) {
         return false;
     }
-    $statement = db()->prepare('SHOW TABLES LIKE :table_name');
+
+    $statement = db()->prepare(
+        'SELECT 1
+         FROM information_schema.tables
+         WHERE table_schema = DATABASE()
+           AND table_name = :table_name
+         LIMIT 1'
+    );
     $statement->execute(['table_name' => $tableName]);
+
     return (bool) $statement->fetchColumn();
 }
 
