@@ -220,6 +220,10 @@ function transitionReservation($reservationId, $newStatus, $reason = null)
             }
         }
         dbExecute('UPDATE reservations SET status = :status, cancellation_reason = :reason, updated_by = :user_id WHERE id = :id', ['status' => $newStatus, 'reason' => $newStatus === 'cancelled' ? $reason : null, 'user_id' => currentUserId(), 'id' => $reservationId]);
+        if(in_array($newStatus,['confirmed','deposit_paid','ready'],true))dbExecute("UPDATE vehicles SET status='reserved',updated_by=:user WHERE id=:id AND status='available'",['user'=>currentUserId(),'id'=>$reservation['vehicle_id']]);
+        elseif($newStatus==='active')dbExecute("UPDATE vehicles SET status='rented',updated_by=:user WHERE id=:id",['user'=>currentUserId(),'id'=>$reservation['vehicle_id']]);
+        elseif($newStatus==='completed')dbExecute("UPDATE vehicles SET status='cleaning',updated_by=:user WHERE id=:id",['user'=>currentUserId(),'id'=>$reservation['vehicle_id']]);
+        elseif(in_array($newStatus,['cancelled','no_show','expired'],true))dbExecute("UPDATE vehicles SET status='available',updated_by=:user WHERE id=:id AND status='reserved'",['user'=>currentUserId(),'id'=>$reservation['vehicle_id']]);
         dbExecute('INSERT INTO reservation_status_history (reservation_id, from_status, to_status, reason, changed_by) VALUES (:id, :from_status, :to_status, :reason, :user_id)', ['id' => $reservationId, 'from_status' => $reservation['status'], 'to_status' => $newStatus, 'reason' => $reason, 'user_id' => currentUserId()]);
         auditLog('reservation.status_changed', 'reservation', $reservationId, ['status' => $reservation['status']], ['status' => $newStatus, 'reason' => $reason], $reservation['agency_id']);
         return true;

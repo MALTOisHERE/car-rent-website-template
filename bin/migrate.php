@@ -9,6 +9,12 @@ $applied = array_flip(array_column(dbFetchAll('SELECT version FROM schema_migrat
 foreach ($files as $file) {
     $version = pathinfo($file, PATHINFO_FILENAME);
     if (isset($applied[$version])) { echo "SKIP $version\n"; continue; }
+    if ($version === '002_import_legacy_data'
+        && (!tableExists('user') || !tableExists('car') || !tableExists('reservation'))) {
+        dbExecute('INSERT IGNORE INTO schema_migrations(version) VALUES(:version)', ['version'=>$version]);
+        echo "SKIP $version (legacy tables not present)\n";
+        continue;
+    }
     $sql = file_get_contents($file);
     if ($sql === false) { throw new RuntimeException('Cannot read migration: ' . $file); }
     echo "APPLY $version\n";
@@ -22,4 +28,3 @@ foreach ($files as $file) {
     }
 }
 echo "Migrations complete.\n";
-
