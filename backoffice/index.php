@@ -14,17 +14,24 @@ $agencyId = (int) ($_GET['agency_id'] ?? ($agencyIds[0] ?? 0));
 requireAgencyAccess($agencyId);
 $periodStart = date('Y-m-01 00:00:00');
 $periodEnd = date('Y-m-t 23:59:59');
-$metrics = [
-    'Revenue this month' => dbFetchOne("SELECT COALESCE(SUM(amount),0) value FROM payments WHERE agency_id=:agency AND status='paid' AND paid_at BETWEEN :start AND :end", ['agency'=>$agencyId,'start'=>$periodStart,'end'=>$periodEnd])['value'],
-    'Unpaid balance' => dbFetchOne("SELECT COALESCE(SUM(remaining_amount),0) value FROM reservations WHERE agency_id=:agency AND status NOT IN ('cancelled','expired')", ['agency'=>$agencyId])['value'],
-    'Deposits held' => dbFetchOne("SELECT COALESCE(SUM(d.amount-d.retained_amount),0) value FROM deposits d JOIN reservations r ON r.id=d.reservation_id WHERE r.agency_id=:agency AND d.status IN ('received','held','partially_retained')", ['agency'=>$agencyId])['value'],
-];
+$metrics = [];
+$canViewFinancialMetrics = canViewFinancialDashboard();
+if ($canViewFinancialMetrics) {
+    $metrics = [
+        'Revenue this month' => dbFetchOne("SELECT COALESCE(SUM(amount),0) value FROM payments WHERE agency_id=:agency AND status='paid' AND paid_at BETWEEN :start AND :end", ['agency'=>$agencyId,'start'=>$periodStart,'end'=>$periodEnd])['value'],
+        'Unpaid balance' => dbFetchOne("SELECT COALESCE(SUM(remaining_amount),0) value FROM reservations WHERE agency_id=:agency AND status NOT IN ('cancelled','expired')", ['agency'=>$agencyId])['value'],
+        'Deposits held' => dbFetchOne("SELECT COALESCE(SUM(d.amount-d.retained_amount),0) value FROM deposits d JOIN reservations r ON r.id=d.reservation_id WHERE r.agency_id=:agency AND d.status IN ('received','held','partially_retained')", ['agency'=>$agencyId])['value'],
+    ];
+}
 $vehicleCounts = dbFetchAll('SELECT status, COUNT(*) total FROM vehicles WHERE agency_id=:agency AND archived_at IS NULL GROUP BY status', ['agency'=>$agencyId]);
 $upcoming = dbFetchAll("SELECT r.reference,r.pickup_at,r.return_at,r.status,c.first_name,c.last_name,v.registration_number FROM reservations r JOIN customers c ON c.id=r.customer_id LEFT JOIN vehicles v ON v.id=r.vehicle_id WHERE r.agency_id=:agency AND r.status IN ('confirmed','deposit_paid','ready','active') AND r.return_at>=NOW() ORDER BY r.pickup_at LIMIT 10", ['agency'=>$agencyId]);
 $alerts = dbFetchAll("SELECT v.registration_number,vd.document_type,vd.expires_at FROM vehicle_documents vd JOIN vehicles v ON v.id=vd.vehicle_id WHERE v.agency_id=:agency AND vd.archived_at IS NULL AND vd.expires_at BETWEEN CURDATE() AND DATE_ADD(CURDATE(),INTERVAL 30 DAY) ORDER BY vd.expires_at LIMIT 10", ['agency'=>$agencyId]);
 
-backofficeHeader(t('dashboard'), 'index.php'); ?>
-<div class="page-head"><h1><?= e(t('dashboard')) ?></h1><span>Agency #<?= e($agencyId) ?></span></div>
+backofficeHeader(t('dashboard'), 'index.php');
+pageHeader(t('dashboard'), 'Today’s fleet, rental, and agency activity at a glance.', [
+    'breadcrumbs'=>[['label'=>'Overview'],['label'=>'dashboard']],
+    'metadata'=>'Agency #' . $agencyId,
+]); ?>
 <section class="cards">
 <?php foreach ($metrics as $label=>$value): ?><article class="card metric"><span><?= e($label) ?></span><strong><?= money($value) ?></strong></article><?php endforeach; ?>
 <?php foreach ($vehicleCounts as $row): ?><article class="card metric"><span><?= e(ucfirst($row['status']).' vehicles') ?></span><strong><?= e($row['total']) ?></strong></article><?php endforeach; ?>

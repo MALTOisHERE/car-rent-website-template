@@ -14,11 +14,24 @@ require_once __DIR__ . '/../app/bootstrap.php';
 ini_set('display_errors', '0');
 ini_set('log_errors', '1');
 
+if (!function_exists('logDatabaseTechnicalError')) {
+    /** Keep CLI diagnostics out of command output while retaining protected technical logs. */
+    function logDatabaseTechnicalError($message)
+    {
+        if (PHP_SAPI === 'cli') {
+            error_log((string) $message . PHP_EOL, 3, dirname(__DIR__) . '/storage/php-error.log');
+            return;
+        }
+
+        error_log((string) $message);
+    }
+}
+
 if (!function_exists('reportDatabaseError')) {
     /** Log technical details server-side and return a browser-safe message. */
     function reportDatabaseError(Throwable $exception, $context = 'Database operation failed')
     {
-        error_log(sprintf(
+        logDatabaseTechnicalError(sprintf(
             '[database] %s (%s): %s',
             $context,
             get_class($exception),
@@ -33,7 +46,12 @@ if (!function_exists('databaseConfigurationError')) {
     /** Stop startup without exposing configuration or connection details. */
     function databaseConfigurationError($technicalMessage)
     {
-        error_log('[database] Configuration error: ' . $technicalMessage);
+        logDatabaseTechnicalError('[database] Configuration error: ' . $technicalMessage);
+
+        if (PHP_SAPI === 'cli') {
+            fwrite(STDERR, "The service is temporarily unavailable.\n");
+            exit(1);
+        }
 
         if (!headers_sent()) {
             http_response_code(500);

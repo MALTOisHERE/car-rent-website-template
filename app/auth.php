@@ -63,7 +63,7 @@ function rolePermissions()
 {
     return [
         ROLE_OWNER => ['*'],
-        ROLE_AGENCY_MANAGER => ['dashboard.view', 'agencies.view', 'users.manage', 'customers.manage', 'vehicles.manage', 'reservations.manage', 'contracts.manage', 'payments.manage', 'invoices.manage', 'expenses.manage', 'inspections.manage', 'maintenance.manage', 'reports.view'],
+        ROLE_AGENCY_MANAGER => ['dashboard.view', 'agencies.view', 'users.manage', 'customers.manage', 'vehicles.manage', 'reservations.manage', 'contracts.manage', 'payments.manage', 'invoices.manage', 'expenses.manage', 'inspections.manage', 'maintenance.manage', 'pricing.manage', 'reports.view'],
         ROLE_RENTAL_AGENT => ['dashboard.view', 'customers.manage', 'vehicles.view', 'reservations.manage', 'contracts.manage', 'payments.create', 'inspections.manage'],
         ROLE_ACCOUNTANT => ['dashboard.view', 'payments.manage', 'invoices.manage', 'expenses.manage', 'reports.financial', 'reports.view'],
         ROLE_FLEET_AGENT => ['dashboard.view', 'vehicles.manage', 'inspections.manage', 'maintenance.manage', 'vehicle_documents.manage'],
@@ -84,6 +84,26 @@ function can($permission)
         return in_array(substr($permission, 0, -7) . '.manage', $permissions, true);
     }
     return false;
+}
+
+function canCreateAgency()
+{
+    return currentUserRole() === ROLE_OWNER;
+}
+
+function canViewFinancialDashboard()
+{
+    return can('payments.manage') || can('reports.financial');
+}
+
+function canViewFinanceHistory()
+{
+    return can('payments.manage');
+}
+
+function canViewInvoiceSections()
+{
+    return can('invoices.manage');
 }
 
 function requirePermission($permission)
