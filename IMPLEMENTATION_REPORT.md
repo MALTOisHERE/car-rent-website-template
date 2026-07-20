@@ -204,11 +204,63 @@ Role smoke matrix:
 
 The five demo password hashes and login-state fields were temporarily replaced only for deterministic local authentication, restored from in-memory values in `finally`, and never written to the evidence or report. Temporary authentication audit rows, server logs, and session storage were also cleaned in `finally`. No password, cookie, token, session identifier, or credential hash is present in the smoke evidence or tracked files.
 
-### Remaining limitations and recommended Phase 2
+### Phase 1 limitations carried forward
 
 Phase 1 intentionally leaves deep module redesign for later. `actionMenu()` supports links only; destructive or state-changing POST/CSRF actions need a separate component API in a later approved phase. Embedded forms are still present, although visually demoted and linked from page actions. Existing large tables still primarily use responsive overflow; module-specific mobile record cards are prepared in the design system but not yet populated. Full translation coverage, translated validation/status/catalogue labels, advanced visual regression testing, and all real browser/screen-reader combinations remain outstanding. The dialog fallback and spinner are code- and syntax-verified, but their browser-native confirmation prompt and pixel-level animation remain manual cross-browser visual checks.
 
-Recommended Phase 2 is the translation and RTL correction project: namespaced EN/FR/AR keys, translated roles/statuses/validation/confirmation text, locale-aware date/money helpers, preservation of filters across language switching, and browser-based RTL visual QA. Do not begin the vehicle-detail/gallery redesign until it is separately approved.
+The translation and RTL correction work identified here was implemented in the Phase 2 section below. Deep module redesign, the vehicle-detail/gallery project, and native-browser visual QA remain outside this phase.
+
+## Back-office internationalization foundation — Phase 2 (2026-07-18)
+
+### Objective and architecture
+
+Phase 2 provides a maintainable English, French, and Arabic internationalization layer for the authenticated back office while preserving the procedural PHP architecture, route names, POST actions, database schema, business workflows, and Phase 1 permission boundaries.
+
+`app/i18n.php` now owns language validation, catalogue loading/caching, current-language and explicit-language translation, English and readable-key fallback, safe scalar placeholder interpolation, translated roles/statuses/booleans/validation messages, deterministic date/date-time/money formatting, and allowlisted language-switch URLs. Translation strings remain unescaped in the catalogues; HTML escaping occurs at rendering boundaries. The EN, FR, and AR catalogues each contain 663 string keys with identical key coverage and namespaced groups including `common.*`, `shell.*`, `nav.*`, `role.*`, `status.*`, `field.*`, `action.*`, `page.*`, `section.*`, `validation.*`, `message.*`, `confirm.*`, `empty.*`, `option.*`, and `auth.*`. Legacy Phase 1 aliases remain for backward compatibility.
+
+Missing keys resolve from the selected language to English, then to a readable label derived from the key. Explicit-language translation is used for notification fallback content so a message selected as French or Arabic does not inherit the operator's UI language. Placeholder interpolation accepts scalar values only; output is still escaped where rendered.
+
+### Shared shell, routes, and formatting
+
+The shared layout, navigation, components, login/logout pages, and all 21 active back-office routes now use catalogue-backed page headings, descriptions, breadcrumbs, card titles, labels, buttons, filters, table headings, empty states, role/status labels, validation messages, flash messages, and confirmations. Database-owned customer/agency names, notes, emails, phones, registrations, reservation/contract/invoice references, identifiers, and currency codes remain untranslated.
+
+Dates and times are formatted only at rendering time. English uses forms such as `17 Jul 2026, 10:45`; French uses `17 juil. 2026 à 10:45`; Arabic uses Arabic month names with an unambiguous time. Money remains server-calculated and deterministic: English `MAD 1,250.00`, French `1 250,00 MAD`, and Arabic `1,250.00 MAD`. Dynamic codes, references, email/phone values, dates, registrations, and money use `<bdi>` or the shared bidi-isolation classes so mixed-direction values remain readable.
+
+The language switcher replaces only `lang`, preserves validated route-local filters (`page`, `status`, `search`, `q`, supported dates and scoped identifiers), and drops CSRF values, passwords, redirects, tokens, and unsupported parameters. URLs remain escaped at output.
+
+### RTL, accessibility, and JavaScript
+
+Arabic renders with `lang="ar" dir="rtl"`; English and French render LTR. The Phase 1 logical layout was retained and extended with logical text alignment, logical dropdown positioning, RTL drawer/sidebar behavior, direction-aware breadcrumb chevrons, viewport-bounded action menus, Arabic navigation typography, and unicode-bidi isolation for mixed-direction controls and values. No duplicate RTL stylesheet was added.
+
+`backoffice/assets/app.js` has no independent translation catalogue. Server-translated data attributes supply the remaining runtime table label, while the existing translated confirmation dialog supplies confirmation text. Dialog fallback, clicked-submitter preservation, double-submit protection, dropdown behavior, drawer focus management, and Escape handling remain unchanged.
+
+### Automated tests and verification
+
+`tests/business_rules.php` now verifies required namespaced key parity and scalar values across all languages; English/readable missing-key fallback; role and status coverage; interpolation; safe escaping at the rendering boundary; deterministic money/date/date-time output including invalid input; and language-switch preservation/removal rules.
+
+Final database-backed verification results:
+
+```text
+Translation keys: EN 663, FR 663, AR 663
+PHP syntax: 139 files checked, 0 failures
+Business rules: passed (domain, permissions, visibility, translations, localization, safe language switching)
+Migration: all three versions SKIP (already applied), exit 0
+JavaScript syntax: passed
+Git diff check: passed
+HTTP smoke: 1,326 passed, 0 failed
+Runtime/server error scan: 0
+Shared physical assets: app.css and app.js both 200 (2/2)
+```
+
+The HTTP matrix covered OWNER, AGENCY_MANAGER, RENTAL_AGENT, ACCOUNTANT, and FLEET_AGENT in EN, FR, and AR. Owner and manager retained 21 permitted routes; rental agent retained 12 permitted and 9 prohibited routes; accountant retained 6 permitted and 15 prohibited routes; fleet agent retained 5 permitted and 16 prohibited routes. Every permitted response retained the shell and page heading, translated navigation/role/status content, and the expected direction. Every prohibited route returned 403. Finance visibility, manager/owner pricing access, and owner-only agency creation remained unchanged. Login pages were also checked in all three languages.
+
+### Files changed and limitations
+
+Phase 2 changes are confined to `app/i18n.php`, the three catalogues, shared authentication/error text, `backoffice/_layout.php`, `_navigation.php`, `_components.php`, both shared assets, all 21 active route files, login/logout, `tests/business_rules.php`, and this report. No schema, migration, package, framework, route, form action, commit, or push was introduced.
+
+No WCAG compliance or pixel-perfect RTL claim is made. Browser screenshot comparison, real-device Arabic typography, screen-reader testing, outbound email rendering, and public/portal/print-template translation remain manual or later-scope work. Only two physical files exist under `backoffice/assets/`, so the asset check is truthfully 2/2 rather than an asserted 3/3.
+
+During verification, an initial temporary-login harness failed while restoring its in-memory password snapshots because its cleanup statement supplied extra PDO bindings. Recovery was then completed explicitly and transactionally for exactly the five isolated `.demo@example.test` staff accounts using the configured User-scope `DEMO_PASSWORD`. No password or hash was displayed or written to tracked evidence. Real credential login subsequently passed for OWNER, AGENCY_MANAGER, RENTAL_AGENT, ACCOUNTANT, and FLEET_AGENT, followed by the complete 1,326-check matrix. Login-state fields were restored, smoke-specific authentication audit rows were removed, and temporary cookies, sessions, server logs, and runners were cleaned.
 
 ## Remaining limitations and pending depth
 

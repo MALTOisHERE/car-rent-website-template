@@ -21,44 +21,44 @@ function navigationIcon($name)
 function backofficeNavigation()
 {
     return [
-        ['label'=>'Overview','icon'=>'overview','items'=>[
-            ['label'=>'dashboard','href'=>'index.php','permission'=>'dashboard.view'],
-            ['label'=>'Notifications','href'=>'notifications.php','permission'=>'reservations.manage'],
-            ['label'=>'Portal requests','href'=>'requests.php','permission'=>'reservations.manage'],
+        ['label'=>'nav.overview','icon'=>'overview','items'=>[
+            ['label'=>'nav.dashboard','href'=>'index.php','permission'=>'dashboard.view'],
+            ['label'=>'nav.notifications','href'=>'notifications.php','permission'=>'reservations.manage'],
+            ['label'=>'nav.portal_requests','href'=>'requests.php','permission'=>'reservations.manage'],
         ]],
-        ['label'=>'Rentals','icon'=>'rentals','items'=>[
-            ['label'=>'reservations','href'=>'reservations.php','permission'=>'reservations.manage'],
-            ['label'=>'Planning','href'=>'reservations.php#availability-planning','permission'=>'reservations.manage','active'=>'planning'],
-            ['label'=>'contracts','href'=>'contracts.php','permission'=>'contracts.manage'],
-            ['label'=>'Inspections','href'=>'inspections.php','permission'=>'inspections.manage'],
+        ['label'=>'nav.rentals','icon'=>'rentals','items'=>[
+            ['label'=>'nav.reservations','href'=>'reservations.php','permission'=>'reservations.manage'],
+            ['label'=>'nav.planning','href'=>'reservations.php#availability-planning','permission'=>'reservations.manage','active'=>'planning'],
+            ['label'=>'nav.contracts','href'=>'contracts.php','permission'=>'contracts.manage'],
+            ['label'=>'nav.inspections','href'=>'inspections.php','permission'=>'inspections.manage'],
         ]],
-        ['label'=>'Customers','icon'=>'customers','items'=>[
-            ['label'=>'customers','href'=>'customers.php','permission'=>'customers.manage'],
-            ['label'=>'Customer documents','href'=>'customer_detail.php','permission'=>'customers.manage'],
+        ['label'=>'nav.customers','icon'=>'customers','items'=>[
+            ['label'=>'nav.customers_list','href'=>'customers.php','permission'=>'customers.manage'],
+            ['label'=>'nav.customer_documents','href'=>'customer_detail.php','permission'=>'customers.manage'],
         ]],
-        ['label'=>'Fleet','icon'=>'fleet','items'=>[
-            ['label'=>'vehicles','href'=>'vehicles.php','permission'=>'vehicles.view'],
-            ['label'=>'maintenance','href'=>'maintenance.php','permission'=>'maintenance.manage'],
-            ['label'=>'Vehicle documents','href'=>'maintenance.php#vehicle-documents','permission'=>'maintenance.manage'],
-            ['label'=>'Incidents','href'=>'incidents.php','permission'=>'vehicles.manage'],
+        ['label'=>'nav.fleet','icon'=>'fleet','items'=>[
+            ['label'=>'nav.vehicles','href'=>'vehicles.php','permission'=>'vehicles.view'],
+            ['label'=>'nav.maintenance','href'=>'maintenance.php','permission'=>'maintenance.manage'],
+            ['label'=>'nav.vehicle_documents','href'=>'maintenance.php#vehicle-documents','permission'=>'maintenance.manage'],
+            ['label'=>'nav.incidents','href'=>'incidents.php','permission'=>'vehicles.manage'],
         ]],
-        ['label'=>'Finance','icon'=>'finance','items'=>[
-            ['label'=>'payments','href'=>'finance.php','permission'=>'payments.create'],
-            ['label'=>'Deposits','href'=>'finance.php#deposits','permission'=>'payments.manage','active'=>'deposits'],
-            ['label'=>'Invoices','href'=>'invoices.php','permission'=>'invoices.manage'],
-            ['label'=>'expenses','href'=>'expenses.php','permission'=>'expenses.manage'],
-            ['label'=>'Cash register','href'=>'cash.php','permission'=>'payments.manage'],
+        ['label'=>'nav.finance','icon'=>'finance','items'=>[
+            ['label'=>'nav.payments','href'=>'finance.php','permission'=>'payments.create'],
+            ['label'=>'nav.deposits','href'=>'finance.php#deposits','permission'=>'payments.manage','active'=>'deposits'],
+            ['label'=>'nav.invoices','href'=>'invoices.php','permission'=>'invoices.manage'],
+            ['label'=>'nav.expenses','href'=>'expenses.php','permission'=>'expenses.manage'],
+            ['label'=>'nav.cash_register','href'=>'cash.php','permission'=>'payments.manage'],
         ]],
-        ['label'=>'Commercial','icon'=>'commercial','items'=>[
-            ['label'=>'Pricing rules','href'=>'pricing.php','permission'=>'pricing.manage'],
-            ['label'=>'Quotes / documents','href'=>'documents.php','permission'=>'contracts.manage'],
+        ['label'=>'nav.commercial','icon'=>'commercial','items'=>[
+            ['label'=>'nav.pricing','href'=>'pricing.php','permission'=>'pricing.manage'],
+            ['label'=>'nav.documents','href'=>'documents.php','permission'=>'contracts.manage'],
         ]],
-        ['label'=>'Analytics','icon'=>'analytics','items'=>[
-            ['label'=>'reports','href'=>'reports.php','permission'=>'reports.view'],
+        ['label'=>'nav.analytics','icon'=>'analytics','items'=>[
+            ['label'=>'nav.reports','href'=>'reports.php','permission'=>'reports.view'],
         ]],
-        ['label'=>'Administration','icon'=>'admin','items'=>[
-            ['label'=>'Agencies','href'=>'agencies.php','permission'=>'agencies.view'],
-            ['label'=>'Users','href'=>'users.php','permission'=>'users.manage'],
+        ['label'=>'nav.administration','icon'=>'admin','items'=>[
+            ['label'=>'nav.agencies','href'=>'agencies.php','permission'=>'agencies.view'],
+            ['label'=>'nav.users','href'=>'users.php','permission'=>'users.manage'],
         ]],
     ];
 }

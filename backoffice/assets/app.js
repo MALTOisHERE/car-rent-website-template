@@ -74,7 +74,8 @@
         wrapper.setAttribute('tabindex', wrapper.getAttribute('tabindex') || '0');
         if (!wrapper.getAttribute('aria-label')) {
             const heading = wrapper.closest('.card')?.querySelector('h2,h3');
-            wrapper.setAttribute('aria-label', heading?.textContent?.trim() || `Data table ${index + 1}`);
+            const template = body.dataset.tableLabel || ':number';
+            wrapper.setAttribute('aria-label', heading?.textContent?.trim() || template.replace(':number', String(index + 1)));
         }
         wrapper.querySelectorAll('th:not([scope])').forEach(cell => cell.setAttribute('scope', 'col'));
     });

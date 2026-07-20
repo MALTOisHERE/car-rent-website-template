@@ -15,7 +15,7 @@ set_exception_handler(function (Throwable $exception) {
         http_response_code(500);
         header('Content-Type: text/plain; charset=UTF-8');
     }
-    echo 'An unexpected error occurred. Please try again later.';
+    echo function_exists('t') ? t('message.unexpected_error') : 'An unexpected error occurred. Please try again later.';
 });
 
 sendSecurityHeaders();

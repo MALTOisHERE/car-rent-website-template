@@ -111,7 +111,7 @@ function requirePermission($permission)
     requireAuthentication();
     if (!can($permission)) {
         http_response_code(403);
-        exit('You are not authorized to perform this action.');
+        exit(t('validation.not_authorized'));
     }
 }
 
