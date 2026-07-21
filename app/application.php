@@ -8,5 +8,6 @@ require_once __DIR__ . '/audit.php';
 require_once __DIR__ . '/auth_service.php';
 require_once __DIR__ . '/upload.php';
 require_once __DIR__ . '/domain.php';
+require_once __DIR__ . '/vehicle_service.php';
 require_once __DIR__ . '/operations.php';
 require_once __DIR__ . '/i18n.php';

@@ -262,6 +262,96 @@ No WCAG compliance or pixel-perfect RTL claim is made. Browser screenshot compar
 
 During verification, an initial temporary-login harness failed while restoring its in-memory password snapshots because its cleanup statement supplied extra PDO bindings. Recovery was then completed explicitly and transactionally for exactly the five isolated `.demo@example.test` staff accounts using the configured User-scope `DEMO_PASSWORD`. No password or hash was displayed or written to tracked evidence. Real credential login subsequently passed for OWNER, AGENCY_MANAGER, RENTAL_AGENT, ACCOUNTANT, and FLEET_AGENT, followed by the complete 1,326-check matrix. Login-state fields were restored, smoke-specific authentication audit rows were removed, and temporary cookies, sessions, server logs, and runners were cleaned.
 
+## Vehicle workspace and protected gallery — Phase 3 (2026-07-20)
+
+### Delivered architecture
+
+Phase 3 adds an additive professional vehicle workspace while retaining `backoffice/vehicles.php` as the authoritative fleet list and lifecycle route. Each accessible fleet row now links to `backoffice/vehicle_detail.php?id=<vehicle_id>`, which provides allowlisted overview, profile, media, reservation, maintenance, inspection, document, incident, finance, and history tabs. Tabs, queries, counts, and deep links are rendered only when the current role already has the corresponding module permission. Existing related modules remain authoritative for their mutations and accept a validated optional `vehicle_id` context filter.
+
+`database/migrations/004_vehicle_detail_media.sql` adds the agency-scoped `vehicle_media` table, a composite vehicle/agency foreign key, user audit references, captions, alternative text, protected storage metadata, dimensions, stable ordering, archival fields, and a generated unique primary slot that enforces at most one active primary image per vehicle. Existing `primary_image_path` values are backfilled and retained as a compatibility mirror. The migration also upgrades `vehicles.updated_at` to microsecond precision for optimistic concurrency and adds the composite vehicle/agency candidate key required by the media foreign key. The migration is retry-tolerant after partial DDL and does not remove legacy data.
+
+`app/vehicle_service.php` centralizes scoped vehicle loading, tab validation, complete profile validation, optimistic stale-write rejection, row locking, category and unique identifier checks, mileage-correction reasoning, profile change auditing, status history, and gallery operations. Profile editing covers specifications, category, commercial rates/deposit, mileage and allowance, acquisition values, financing type, and monthly financing. Registration and VIN are normalized; model year, counts, mileage, dates, and monetary values are range checked; future purchase dates are rejected; submitted financing type is mandatory and restricted to `owned`, `loan`, or `lease`; loan and lease require a strictly positive monthly amount; owned vehicles always clear that amount; and a mileage reduction requires an audit-logged correction reason. Existing database rows with NULL, empty, or otherwise unrecognized financing values render as `owned` in the edit form for backward compatibility, without silently accepting an empty or invalid submitted value. Only changed profile fields are included in the audit entry.
+
+Gallery upload accepts verified JPEG, PNG, and WebP files through the existing private upload root. Image dimensions are now captured. A request is limited to 10 images and a vehicle to 50 active images. Multi-file uploads are transactionally all-or-nothing at the database level and newly written files are removed on failure. The first uploaded image in a new gallery becomes primary; captions and alternative text are editable; keyboard-accessible move-up/move-down controls maintain ordering; explicit primary selection updates both the enforced media flag and compatibility path; and archiving retains the established file and promotes the next active image. Restoration always appends the image with `is_primary=0`, never invokes primary selection, never changes an existing primary, and never populates `vehicles.primary_image_path`. When the active gallery has no primary, the compatibility path remains NULL until an authorized user explicitly selects one. All operations require `vehicles.manage`, CSRF, current-agency access, and audit logging.
+
+`backoffice/vehicle_media.php` is the only new delivery path. It authenticates and authorizes `vehicles.view` before lookup, joins the media row to the same-agency vehicle, rejects archived/missing records, resolves only files beneath `storage/uploads`, revalidates the actual MIME type, and emits a fixed safe inline filename, exact length, `nosniff`, and private cache headers. Storage paths and original filenames are not exposed in its URL.
+
+The workspace is fully represented in the EN, FR, and AR catalogues, now at 756 keys each with exact key-order parity. Language switching preserves only an allowlisted `tab`, and inaccessible requested tabs are normalized before switch links render. EN and FR remain LTR; AR remains RTL. Mixed-direction registrations, references, dates, and monetary values use the existing isolation helpers. Responsive vehicle headers, horizontal tabs, metrics, and gallery cards extend the existing logical-property design system; media ordering is not drag-only.
+
+### Permissions and finance isolation
+
+- OWNER and AGENCY_MANAGER receive the full editable workspace, related summaries, and finance tab.
+- FLEET_AGENT receives full profile/gallery editing and permitted maintenance, inspection, document, and incident summaries, with no finance query, count, tab, link, or placeholder.
+- RENTAL_AGENT receives read-only profile/gallery access and permitted reservation/inspection summaries. Mutation fields and maintenance, document, incident, and finance tabs are absent.
+- ACCOUNTANT and CUSTOMER remain denied because they do not have `vehicles.view`; anonymous requests redirect to the account login route.
+- Profitability is deliberately labelled as an estimate and uses paid vehicle reservation payments minus approved, non-archived vehicle expenses. No related-module permission was broadened.
+
+### Migration and verification
+
+The configured User-scope database environment applied the migration successfully:
+
+```text
+SKIP 001_authoritative_schema (already applied)
+SKIP 002_import_legacy_data (already applied)
+SKIP 003_operational_extensions (already applied)
+APPLY 004_vehicle_detail_media
+Migrations complete.
+```
+
+The final rerun returned all four migrations as `SKIP (already applied)` and exited 0. Information-schema and transaction-rollback integration checks proved the required media columns, composite agency foreign key, active-primary uniqueness, compatibility-path synchronization, metadata editing, exact-set ordering, archival/restoration, cross-agency insert rejection, and stale profile rejection without retaining test database records.
+
+Final automated gates:
+
+```text
+PHP syntax: 143 files checked, 0 failures
+Business rules: passed (including vehicle profile validation and safe vehicle tab switching)
+Phase 3 database integration: passed
+Migration rerun: all four versions SKIP, exit 0
+JavaScript syntax: passed
+Git diff check: passed
+Role/language/security HTTP matrix: 88 passed, 0 failed
+Full 21-route role/language regression: 707 passed, 0 failed
+Runtime/server error scan: 0
+Translation keys: EN 756, FR 756, AR 756
+```
+
+The focused HTTP matrix covered all five staff roles in EN, FR, and AR; expected 200/403 behavior; LTR/RTL direction; editable versus read-only profile rendering; finance isolation; all ten owner tabs; all six contextual module filters; invalid-vehicle and missing-media 404 responses; permission-first media denial; anonymous redirection; mutation RBAC; and the existing HTTP 419 CSRF failure contract. The complete pre-existing 21-route matrix was then rerun across the same five roles and three languages: all 707 status, direction, safe-content, and shared-asset checks passed with no runtime errors. A separate real multipart lifecycle verified upload, authenticated 200 image delivery with the correct MIME/private cache headers, caption/alternative-text update, archive followed by delivery 404, restoration followed by delivery 200, and zero runtime errors. Its media row, audit entries, stored file, sessions, runners, and test-only artifacts were removed afterward. No password, credential hash, cookie, session identifier, CSRF value, or token was printed or added to tracked files.
+
+### Senior-review remediation (2026-07-21)
+
+The Phase 3 senior review found two narrow compliance mismatches. First, `restoreVehicleMedia()` appended archived media correctly but called `setPrimaryVehicleMedia()` when no active media existed, which made restoration an implicit primary-selection action and populated the compatibility path. That call was removed. Restoration now only clears archival fields, forces `is_primary=0`, assigns the next active sort position, and writes the restore audit entry. It never modifies `vehicles.primary_image_path`; an empty gallery therefore remains without a primary until an authorized user explicitly selects one. Restoring into a populated gallery preserves its existing primary and compatibility path.
+
+Second, profile validation used an allowlist helper with a NULL fallback, causing submitted empty or invalid financing values to be silently stored as NULL. Financing now uses a single explicit `owned`/`loan`/`lease` allowlist and rejects every missing or invalid submitted value. The edit form is required and offers exactly those three choices. A display-only compatibility helper maps legacy NULL, empty, or unrecognized stored values to `owned`; this fallback is not used for submitted data. `owned` always clears monthly financing, while `loan` and `lease` reject empty, zero, negative, or invalid amounts and require a strictly positive amount.
+
+No schema change or new migration was required. `tests/business_rules.php` covers every financing value/amount combination and legacy display normalization. `tests/vehicle_phase3.php` verifies the same production service behavior against the database and proves restoration with an existing primary, restoration into an empty gallery, preserved NULL compatibility path, append ordering, restore audit logging, and explicit primary selection afterward. All database tests use rollback transactions.
+
+Remediation verification:
+
+```text
+PHP syntax: 143 files checked, 0 failures
+Business rules: passed
+Phase 3 integration: passed
+Migration: 001–004 SKIP (already applied), exit 0
+JavaScript syntax: passed
+Git diff check: passed
+Focused remediation HTTP: 68 passed, 0 failed
+Runtime/server error scan: 0
+Translation keys: EN 756, FR 756, AR 756; exact parity
+```
+
+The focused remediation HTTP run reconfirmed editable access for OWNER, AGENCY_MANAGER, and FLEET_AGENT; read-only access for RENTAL_AGENT; denial for ACCOUNTANT; finance isolation; EN/FR LTR; AR RTL; the mandatory financing control with exactly three options; legacy NULL rendering as selected `owned`; and absence of PHP warnings, fatal errors, SQL errors, PDO exceptions, or unhandled errors. Existing RBAC, CSRF, agency scoping, audit logging, upload validation, protected media delivery, and related-module ownership were not broadened or redesigned.
+
+No commit or push was performed, and Phase 4 was not started.
+
+### Phase 3 limitations
+
+- Images are retained in private local storage without resizing, thumbnails, EXIF processing, CDN/object storage, or derivative generation. Those changes require separate storage and retention decisions.
+- Archive is intentionally reversible and never physically deletes established media. Permanent deletion and orphan-file retention cleanup remain a separately approved operational feature.
+- Related modules are context-filtered and summarized, not redesigned; their existing routes and permissions remain authoritative.
+- Profitability is an operational estimate, not general-ledger accounting, and depends on complete payment and approved-expense capture.
+- The legacy `vehicles.primary_image_path` mirror remains intentionally until all public/portal consumers migrate to protected media IDs.
+- Automated HTML, direction, RBAC, and interaction contracts passed; pixel-level browser comparison, real-device Arabic typography, keyboard walkthrough, and screen-reader testing remain manual acceptance work.
+
 ## Remaining limitations and pending depth
 
 - Migration, seeding, session authentication, and the primary local HTTP routes are verified. Full browser interaction, concurrent multi-user allocation testing, outbound mail delivery, and production web-server configuration remain manual pilot checks.

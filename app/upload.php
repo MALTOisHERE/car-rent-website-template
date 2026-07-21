@@ -15,7 +15,8 @@ function storeValidatedImage(array $file, $category = 'images')
     $allowed = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/webp' => 'webp'];
     $finfo = new finfo(FILEINFO_MIME_TYPE);
     $mime = $finfo->file($file['tmp_name']);
-    if (!isset($allowed[$mime]) || @getimagesize($file['tmp_name']) === false) {
+    $imageSize = @getimagesize($file['tmp_name']);
+    if (!isset($allowed[$mime]) || $imageSize === false) {
         throw new InvalidArgumentException('Only valid JPEG, PNG, or WebP images are permitted.');
     }
 
@@ -38,7 +39,31 @@ function storeValidatedImage(array $file, $category = 'images')
         'mime_type' => $mime,
         'size' => (int) $file['size'],
         'original_name' => basename((string) ($file['name'] ?? 'image')),
+        'width' => (int) $imageSize[0],
+        'height' => (int) $imageSize[1],
     ];
+}
+
+function storedUploadAbsolutePath($relativePath)
+{
+    $relativePath = str_replace('\\', '/', trim((string) $relativePath));
+    if (!str_starts_with($relativePath, 'storage/uploads/') || str_contains($relativePath, '..')) {
+        return null;
+    }
+    $root = realpath(dirname(__DIR__) . '/storage/uploads');
+    $path = realpath(dirname(__DIR__) . '/' . $relativePath);
+    if ($root === false || $path === false || !is_file($path)) {
+        return null;
+    }
+    $root = rtrim(str_replace('\\', '/', $root), '/') . '/';
+    $normalized = str_replace('\\', '/', $path);
+    return str_starts_with($normalized, $root) ? $path : null;
+}
+
+function removeNewStoredUpload($relativePath)
+{
+    $absolutePath = storedUploadAbsolutePath($relativePath);
+    return $absolutePath !== null ? @unlink($absolutePath) : false;
 }
 
 function storeValidatedDocument(array $file, $category = 'documents')

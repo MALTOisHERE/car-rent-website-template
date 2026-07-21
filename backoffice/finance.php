@@ -41,10 +41,16 @@ if (requestMethod() === 'POST') {
 
 $agencyIds = currentAgencyIds(); if (!$agencyIds) $agencyIds = [0];
 $placeholders = implode(',', array_fill(0, count($agencyIds), '?'));
-$reservations = dbFetchAll("SELECT r.id,r.reference,r.total_amount,r.remaining_amount,r.currency,c.first_name,c.last_name,rc.id contract_id FROM reservations r JOIN customers c ON c.id=r.customer_id LEFT JOIN rental_contracts rc ON rc.reservation_id=r.id AND rc.status<>'cancelled' WHERE r.agency_id IN ($placeholders) AND r.status NOT IN ('cancelled','expired') ORDER BY r.created_at DESC LIMIT 200", $agencyIds);
-$payments = $canManageFinance ? dbFetchAll("SELECT p.*,r.reference reservation_reference FROM payments p JOIN reservations r ON r.id=p.reservation_id WHERE p.agency_id IN ($placeholders) ORDER BY p.paid_at DESC LIMIT 100", $agencyIds) : [];
-$deposits = $canManageFinance ? dbFetchAll("SELECT d.*,r.reference FROM deposits d JOIN reservations r ON r.id=d.reservation_id WHERE r.agency_id IN ($placeholders) ORDER BY d.created_at DESC LIMIT 100", $agencyIds) : [];
-$invoices = $canManageFinance && canViewInvoiceSections() ? dbFetchAll("SELECT i.*,r.reference FROM invoices i LEFT JOIN reservations r ON r.id=i.reservation_id WHERE i.agency_id IN ($placeholders) ORDER BY i.issued_at DESC LIMIT 100", $agencyIds) : [];
+$vehicleFilter=(int)($_GET['vehicle_id']??0);if($vehicleFilter&&!dbFetchOne("SELECT id FROM vehicles WHERE id=? AND agency_id IN ($placeholders) AND archived_at IS NULL",array_merge([$vehicleFilter],$agencyIds)))$vehicleFilter=0;
+$reservationSql="SELECT r.id,r.reference,r.total_amount,r.remaining_amount,r.currency,c.first_name,c.last_name,rc.id contract_id FROM reservations r JOIN customers c ON c.id=r.customer_id LEFT JOIN rental_contracts rc ON rc.reservation_id=r.id AND rc.status<>'cancelled' WHERE r.agency_id IN ($placeholders) AND r.status NOT IN ('cancelled','expired')";$reservationParams=$agencyIds;
+$paymentSql="SELECT p.*,r.reference reservation_reference FROM payments p JOIN reservations r ON r.id=p.reservation_id WHERE p.agency_id IN ($placeholders)";$paymentParams=$agencyIds;
+$depositSql="SELECT d.*,r.reference FROM deposits d JOIN reservations r ON r.id=d.reservation_id WHERE r.agency_id IN ($placeholders)";$depositParams=$agencyIds;
+$invoiceSql="SELECT i.*,r.reference FROM invoices i LEFT JOIN reservations r ON r.id=i.reservation_id WHERE i.agency_id IN ($placeholders)";$invoiceParams=$agencyIds;
+if($vehicleFilter){$reservationSql.=' AND r.vehicle_id=?';$reservationParams[]=$vehicleFilter;$paymentSql.=' AND r.vehicle_id=?';$paymentParams[]=$vehicleFilter;$depositSql.=' AND r.vehicle_id=?';$depositParams[]=$vehicleFilter;$invoiceSql.=' AND r.vehicle_id=?';$invoiceParams[]=$vehicleFilter;}
+$reservations=dbFetchAll($reservationSql.' ORDER BY r.created_at DESC LIMIT 200',$reservationParams);
+$payments=$canManageFinance?dbFetchAll($paymentSql.' ORDER BY p.paid_at DESC LIMIT 100',$paymentParams):[];
+$deposits=$canManageFinance?dbFetchAll($depositSql.' ORDER BY d.created_at DESC LIMIT 100',$depositParams):[];
+$invoices=$canManageFinance&&canViewInvoiceSections()?dbFetchAll($invoiceSql.' ORDER BY i.issued_at DESC LIMIT 100',$invoiceParams):[];
 
 backofficeHeader(t('page.finance.title'), 'finance.php');
 pageHeader('page.finance.title', 'page.finance.description', [

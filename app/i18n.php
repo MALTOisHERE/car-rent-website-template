@@ -178,7 +178,7 @@ function languageSwitchUrl($languageCode, $basePath = null, array $query = null)
         if (in_array($name, ['page','agency_id','customer_id','vehicle_id','reservation_id'], true)
             && ctype_digit($value) && (int) $value > 0) {
             $safe[$name] = (string) (int) $value;
-        } elseif ($name === 'status' && preg_match('/^[A-Za-z0-9_-]{1,40}$/', $value)) {
+        } elseif (in_array($name, ['status','tab'], true) && preg_match('/^[A-Za-z0-9_-]{1,40}$/', $value)) {
             $safe[$name] = $value;
         } elseif (in_array($name, ['search','q'], true) && strlen($value) <= 100 && !preg_match('/[\x00-\x1F\x7F]/', $value)) {
             $safe[$name] = $value;
