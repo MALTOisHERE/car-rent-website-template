@@ -39,3 +39,32 @@ Run `php bin/php_syntax_check.php` and `php tests/business_rules.php` first.
 3. Submit modification and cancellation requests.
 4. Resolve requests in the back office and verify authorized contract access.
 
+## Phase 4 automated and HTTP/security verification
+
+Run with the configured test database environment. The suites create only random `P4_TEST_<run-id>` fixtures and must finish with a successful cleanup audit.
+
+```powershell
+php bin/php_syntax_check.php
+php tests/business_rules.php
+php tests/vehicle_phase3.php
+php tests/customer_reservation_phase4.php
+php tests/phase4_http_smoke.php
+php tests/phase4_cleanup_audit.php
+php bin/migrate.php
+node --check backoffice/assets/app.js
+git diff --check
+```
+
+`tests/customer_reservation_phase4.php` covers schema definitions, server-derived customer history, lifecycle RBAC, strict operational vehicle-state transitions, cross-agency and archived vehicle rejection, deterministic extension, replacement rollback, opposite-direction ordered-lock concurrency, legacy-tax remediation, protected-file validation, two-process allocation concurrency, and cleanup. `tests/phase4_http_smoke.php` covers the owner/manager/rental-agent routes, prohibited accountant/fleet/customer routes, crafted sensitive actions, portal/staff document IDOR, archived-document behavior, MIME/private headers, an NTFS junction or POSIX symlink containment escape, EN/FR LTR, AR RTL, runtime logs, and cleanup.
+
+`tests/migration_phase4_recovery.php` always runs its database-independent remediation assertions, then requires permission to create and drop nine random disposable databases for fresh, compatible partial-identifier, incompatible-identifier, incompatible-primary-key, incompatible-foreign-key, and incompatible-CHECK scenarios. It must never be pointed at a business schema as a substitute. Exit code 2 means that the privileged scenarios remain pending because the configured account lacks disposable-database privileges; it is not a partial-DDL pass.
+
+## Phase 4 manual acceptance
+
+1. In two browsers, attempt to extend and replace the same reservation; confirm the stale actor receives a conflict and the committed record remains coherent.
+2. Check customer list/form/workspace and reservation list/form/workspace at desktop, tablet, and mobile widths.
+3. Check day/week planning at tablet width for horizontal scrolling and on mobile for chronological reservation, maintenance, and unavailability cards.
+4. Repeat core pages in Arabic and confirm logical alignment, mixed-direction references, dates, money, and controls remain readable.
+5. Complete keyboard-only navigation and a screen-reader walkthrough of tabs, filters, planning alternatives, forms, status messages, and protected-download links.
+6. Confirm no raw upload path appears in page source, browser URLs, downloaded filenames, or error responses.
+

@@ -7,6 +7,8 @@ const ROLE_ACCOUNTANT = 'ACCOUNTANT';
 const ROLE_FLEET_AGENT = 'FLEET_AGENT';
 const ROLE_CUSTOMER = 'CUSTOMER';
 
+class AuthorizationException extends RuntimeException {}
+
 function normalizeRole($role)
 {
     $role = strtoupper(trim((string) $role));
@@ -63,7 +65,7 @@ function rolePermissions()
 {
     return [
         ROLE_OWNER => ['*'],
-        ROLE_AGENCY_MANAGER => ['dashboard.view', 'agencies.view', 'users.manage', 'customers.manage', 'vehicles.manage', 'reservations.manage', 'contracts.manage', 'payments.manage', 'invoices.manage', 'expenses.manage', 'inspections.manage', 'maintenance.manage', 'pricing.manage', 'reports.view'],
+        ROLE_AGENCY_MANAGER => ['dashboard.view', 'agencies.view', 'users.manage', 'customers.manage', 'customers.lifecycle', 'vehicles.manage', 'reservations.manage', 'reservations.lifecycle', 'reservations.commercial_override', 'contracts.manage', 'payments.manage', 'invoices.manage', 'expenses.manage', 'inspections.manage', 'maintenance.manage', 'pricing.manage', 'reports.view'],
         ROLE_RENTAL_AGENT => ['dashboard.view', 'customers.manage', 'vehicles.view', 'reservations.manage', 'contracts.manage', 'payments.create', 'inspections.manage'],
         ROLE_ACCOUNTANT => ['dashboard.view', 'payments.manage', 'invoices.manage', 'expenses.manage', 'reports.financial', 'reports.view'],
         ROLE_FLEET_AGENT => ['dashboard.view', 'vehicles.manage', 'inspections.manage', 'maintenance.manage', 'vehicle_documents.manage'],
@@ -112,6 +114,13 @@ function requirePermission($permission)
     if (!can($permission)) {
         http_response_code(403);
         exit(t('validation.not_authorized'));
+    }
+}
+
+function enforcePermission($permission)
+{
+    if (!can($permission)) {
+        throw new AuthorizationException(t('validation.not_authorized'));
     }
 }
 

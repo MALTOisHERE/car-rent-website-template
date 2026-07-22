@@ -107,10 +107,11 @@ function vehicleHasConflict($vehicleId, DateTimeImmutable $pickup, DateTimeImmut
         $excludeSql = ' AND id <> :exclude_id';
         $parameters['exclude_id'] = $excludeReservationId;
     }
+    $lockingRead = db()->inTransaction() ? ' FOR UPDATE' : '';
     $row = dbFetchOne(
         "SELECT id FROM reservations WHERE vehicle_id = :vehicle_id
          AND status IN ('pending','confirmed','deposit_paid','ready','active')
-         AND pickup_at < :return_at AND return_at > :pickup_at" . $excludeSql . ' LIMIT 1',
+         AND pickup_at < :return_at AND return_at > :pickup_at" . $excludeSql . ' LIMIT 1' . $lockingRead,
         $parameters
     );
     if ($row) {
@@ -121,7 +122,7 @@ function vehicleHasConflict($vehicleId, DateTimeImmutable $pickup, DateTimeImmut
         "SELECT id FROM maintenance_records WHERE vehicle_id = :vehicle_id
          AND status IN ('scheduled','in_progress')
          AND COALESCE(entry_at, CONCAT(scheduled_date, ' 00:00:00')) < :return_at
-         AND COALESCE(actual_exit_at, estimated_exit_at, '9999-12-31 23:59:59') > :pickup_at LIMIT 1",
+         AND COALESCE(actual_exit_at, estimated_exit_at, '9999-12-31 23:59:59') > :pickup_at LIMIT 1" . $lockingRead,
         [
             'vehicle_id' => $vehicleId,
             'return_at' => $return->format('Y-m-d H:i:s'),
@@ -132,6 +133,7 @@ function vehicleHasConflict($vehicleId, DateTimeImmutable $pickup, DateTimeImmut
 
 function createReservation(array $input)
 {
+    if (function_exists('createReservationWorkspace')) return createReservationWorkspace($input);
     return withTransaction(function () use ($input) {
         $vehicle = dbFetchOne('SELECT * FROM vehicles WHERE id = :id AND archived_at IS NULL FOR UPDATE', ['id' => $input['vehicle_id']]);
         if (!$vehicle || in_array($vehicle['status'], ['maintenance', 'damaged', 'blocked', 'sold', 'retired'], true)) {
@@ -205,6 +207,7 @@ function reservationTransitions()
 
 function transitionReservation($reservationId, $newStatus, $reason = null)
 {
+    if (function_exists('transitionReservationWorkspace')) return transitionReservationWorkspace($reservationId,$newStatus,$reason);
     return withTransaction(function () use ($reservationId, $newStatus, $reason) {
         $reservation = dbFetchOne('SELECT * FROM reservations WHERE id = :id FOR UPDATE', ['id' => $reservationId]);
         if (!$reservation || !in_array($newStatus, reservationTransitions()[$reservation['status']] ?? [], true)) {
@@ -242,5 +245,6 @@ function expirePendingReservations()
 
 function updateReservationAllocation($reservationId, array $input)
 {
+    if (function_exists('updateReservationAllocationWorkspace')) return updateReservationAllocationWorkspace($reservationId,$input);
     return withTransaction(function()use($reservationId,$input){$reservation=dbFetchOne('SELECT * FROM reservations WHERE id=:id FOR UPDATE',['id'=>$reservationId]);if(!$reservation||in_array($reservation['status'],['completed','cancelled','no_show','expired'],true))throw new DomainException('This reservation can no longer be edited.');requireAgencyAccess($reservation['agency_id']);$vehicleId=(int)($input['vehicle_id']??$reservation['vehicle_id']);$vehicle=dbFetchOne('SELECT * FROM vehicles WHERE id=:id AND archived_at IS NULL FOR UPDATE',['id'=>$vehicleId]);if(!$vehicle||in_array($vehicle['status'],['maintenance','damaged','blocked','sold','retired'],true))throw new DomainException('The selected replacement vehicle is unavailable.');$pickup=validDateTimeValue($input['pickup_at']??'');$return=validDateTimeValue($input['return_at']??'');if(!$pickup||!$return||$return<=$pickup)throw new InvalidArgumentException('A valid pickup and return period is required.');if(vehicleHasConflict($vehicleId,$pickup,$return,$reservationId)){auditLog('reservation.edit_conflict','reservation',$reservationId,null,['vehicle_id'=>$vehicleId,'pickup_at'=>$input['pickup_at'],'return_at'=>$input['return_at']],$reservation['agency_id']);throw new DomainException('The requested allocation conflicts with another booking or maintenance period.');}$dailyPrice=$vehicleId===(int)$reservation['vehicle_id']?$reservation['daily_price']:$vehicle['base_daily_price'];$pricing=calculateRentalPrice(['pickup_at'=>$pickup,'return_at'=>$return,'daily_price'=>$dailyPrice,'agency_id'=>$reservation['agency_id'],'category_id'=>$vehicle['category_id'],'options_total'=>$reservation['options_total'],'fees_total'=>$reservation['fees_total'],'discount_percent'=>$reservation['discount_percent'],'tax_rate'=>0]);dbExecute('UPDATE reservations SET vehicle_id=:vehicle,category_id=:category,pickup_at=:pickup,return_at=:return_at,daily_price=:daily,rental_days=:days,discount_amount=:discount,tax_amount=:tax,total_amount=:total,remaining_amount=GREATEST(0,:total2-advance_amount),pricing_snapshot_json=:snapshot,updated_by=:user WHERE id=:id',['vehicle'=>$vehicleId,'category'=>$vehicle['category_id'],'pickup'=>$pickup->format('Y-m-d H:i:s'),'return_at'=>$return->format('Y-m-d H:i:s'),'daily'=>$pricing['daily_price'],'days'=>$pricing['days'],'discount'=>$pricing['discount_amount'],'tax'=>$pricing['tax_amount'],'total'=>$pricing['total'],'total2'=>$pricing['total'],'snapshot'=>json_encode($pricing,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES),'user'=>currentUserId(),'id'=>$reservationId]);if($vehicleId!==(int)$reservation['vehicle_id']&&$reservation['status']==='active'){dbExecute("UPDATE vehicles SET status='cleaning',updated_by=:user WHERE id=:id",['user'=>currentUserId(),'id'=>$reservation['vehicle_id']]);dbExecute("UPDATE vehicles SET status='rented',updated_by=:user WHERE id=:id",['user'=>currentUserId(),'id'=>$vehicleId]);}auditLog('reservation.allocation_updated','reservation',$reservationId,['vehicle_id'=>$reservation['vehicle_id'],'pickup_at'=>$reservation['pickup_at'],'return_at'=>$reservation['return_at']],['vehicle_id'=>$vehicleId,'pickup_at'=>$pickup->format('Y-m-d H:i:s'),'return_at'=>$return->format('Y-m-d H:i:s'),'total'=>$pricing['total']],$reservation['agency_id']);return true;});
 }

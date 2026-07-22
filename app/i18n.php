@@ -175,14 +175,14 @@ function languageSwitchUrl($languageCode, $basePath = null, array $query = null)
     $safe = ['lang' => $languageCode];
     foreach ($query as $name => $value) {
         if (!is_string($value)) continue;
-        if (in_array($name, ['page','agency_id','customer_id','vehicle_id','reservation_id'], true)
+        if (in_array($name, ['page','size','agency_id','customer_id','vehicle_id','reservation_id','category_id'], true)
             && ctype_digit($value) && (int) $value > 0) {
             $safe[$name] = (string) (int) $value;
-        } elseif (in_array($name, ['status','tab'], true) && preg_match('/^[A-Za-z0-9_-]{1,40}$/', $value)) {
+        } elseif (in_array($name, ['status','tab','view','type','licence','source'], true) && preg_match('/^[A-Za-z0-9_-]{1,40}$/', $value)) {
             $safe[$name] = $value;
         } elseif (in_array($name, ['search','q'], true) && strlen($value) <= 100 && !preg_match('/[\x00-\x1F\x7F]/', $value)) {
             $safe[$name] = $value;
-        } elseif (in_array($name, ['date_from','date_to','from','to'], true)) {
+        } elseif (in_array($name, ['date','date_from','date_to','from','to'], true)) {
             $date = DateTimeImmutable::createFromFormat('!Y-m-d', $value);
             if ($date && $date->format('Y-m-d') === $value) $safe[$name] = $value;
         }

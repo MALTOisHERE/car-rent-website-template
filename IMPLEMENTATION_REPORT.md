@@ -110,6 +110,114 @@ php -S 127.0.0.1:8000
 
 See `docs/DEMO.md`. The seeder refuses `APP_ENV=production` and requires a strong `DEMO_PASSWORD` environment variable.
 
+## Product Phase 4 — customer and reservation redesign (2026-07-22)
+
+### Delivered architecture
+
+Phase 4 preserves the procedural PHP/PDO architecture and existing URLs while introducing `app/customer_service.php`, `app/reservation_service.php`, and `app/protected_file.php` as transaction, authorization, pricing, lifecycle, agency-scope, and protected-delivery boundaries. Existing domain entry points delegate to the reservation service for compatibility. Controllers remain server-rendered and use the shared Phase 1–3 layout and components.
+
+`ROADMAP.md` is now the authoritative six-phase product roadmap. The earlier Phase 0–19 list in this report remains historical internal implementation coverage and does not redefine product-phase numbering.
+
+Migration `005_customer_reservation_workspace.sql` is additive and retry-oriented for MariaDB 10.4. It upgrades customer/reservation optimistic timestamps, adds nullable explicit `tax_rate`, creates the composite customer/agency key, creates and validates `customer_status_history`, uses a PERSISTENT generated baseline slot with a unique index, installs non-cascading foreign keys and checks, adds listing/planning indexes, performs deterministic legacy tax backfill only when provable, inserts missing migration baselines with `WHERE NOT EXISTS`, and leaves version recording to `bin/migrate.php` after the complete SQL file succeeds.
+
+The customer module now has scoped filtered pagination, a dedicated complete create/edit form, optimistic updates, duplicate and driver-eligibility checks, lifecycle-sensitive manager actions, server-derived immutable history, additional drivers, document archive/restore, separate protected downloads, metrics, and permission-aware reservations, finance, incidents, requests, and history tabs. Rental agents retain ordinary create/edit work and are denied block, unblock, and archive in both UI and backend.
+
+The reservation module now has scoped filtered pagination, dedicated creation, a tabbed workspace, contextual allocation editing, status-sensitive actions, authorized cross-agency return checks, deterministic extension/replacement, manager-only commercial override, manager-only legacy-tax resolution, related-module summaries, finance visibility through existing helpers, and bounded server-rendered day/week planning. Planning uses batched queries, desktop/tablet timelines, mobile chronological cards, explicit maintenance/unavailability blocks, accessible text, logical CSS, and optional progressive JavaScript only.
+
+Extension and replacement reuse integer cents/basis points and the existing rental-day rule. Agreed daily rate, discount percentage, explicit tax rate, currency, options, fees, and fixed rule adjustment are preserved without querying current pricing rules. Same-date replacement preserves the exact stored total unless an authorized explicit commercial override is supplied. Overrides require owner/manager permission, a positive daily rate, a reason, a versioned snapshot, and complete before/after commercial audit data. Legacy tax resolution accepts only 0.00–100.00 with at most two decimals, locks and stale-checks the scoped reservation, updates the snapshot and audit, and leaves all historical totals, tax amount, payments, and balance unchanged.
+
+Staff and customer document routes perform their own authorization before passing metadata to the session-agnostic protected-file service. Delivery realpaths both upload root and file, rejects traversal and symlink/junction escape, requires an ordinary file, verifies detected MIME against stored MIME and the allowlist, synthesizes the download name, sends private/no-store/nosniff headers, and returns the same generic 404 for inaccessible records and files. Raw storage paths are not rendered.
+
+All Phase 4 UI keys are present in EN, FR, and AR with identical order and catalogue parity. Language switching preserves only allowlisted IDs, filters, dates, views, and tabs; it removes CSRF and sensitive values. EN/FR remain LTR and AR remains RTL.
+
+### Verification classification
+
+**AUTOMATED — EXECUTED**
+
+- `php bin/php_syntax_check.php`: 156 PHP files, 0 failures before the final documentation-only update; rerun in the final gate below.
+- `php tests/business_rules.php`: passed, including roles, translations, safe language switching, deterministic preserved-term pricing, legacy NULL-tax guard, and strict percentage boundaries.
+- `php tests/vehicle_phase3.php`: passed; Phase 3 schema, gallery, financing, ordering, audit, and stale-write behavior remain intact.
+- `php tests/customer_reservation_phase4.php`: passed; schema audit, agency/RBAC, lifecycle, deterministic pricing, legacy-tax behavior, protected files, true concurrency, and cleanup passed.
+- True concurrency used two independent PHP processes and a barrier. Both passed initial validation before GO; exactly one committed, exactly one received a safe conflict, and exactly one overlapping reservation remained before exact fixture cleanup. The test exposed a repeatable-read race in the former non-locking overlap query; production conflict checks now use current `FOR UPDATE` reads inside transactions, and the concurrency suite passed three consecutive isolated reruns plus the final gate run.
+- `php tests/phase4_cleanup_audit.php`: `P4_TEST fixture audit: users=0, agencies=0`.
+- `node --check backoffice/assets/app.js`: passed.
+- `git diff --check`: passed.
+
+**HTTP/SECURITY — EXECUTED**
+
+- `php tests/phase4_http_smoke.php`: passed for role routes, prohibited routes, login sessions, customer/staff document IDOR, generic archived 404, private download headers, rental-agent sensitive-action 403s, manager legacy-tax remediation, out-of-range tax rejection, cross-agency denial, EN/FR LTR, AR RTL, runtime error scanning, and cleanup.
+- Protected containment was exercised with a real NTFS junction from inside the upload root to a file outside it; the protected route returned the generic 404 and did not serve the file.
+- Runtime logs contained no warning, fatal error, SQLSTATE, PDO exception, unhandled exception, password-hash marker, session identifier, or database-password marker.
+
+**MANUAL — EXECUTED WITH EVIDENCE**
+
+- Source/diff review confirmed Phase 4 is confined to customer/reservation services and routes, planning, protected customer documents, translations, tests, and documentation; no Phase 5 module redesign was introduced.
+- Rendered HTTP responses were inspected programmatically for expected route ownership, status, direction, protected headers, uniform not-found bodies, absent raw storage paths, and absent sensitive manager controls for rental agents.
+- Migration 005 was executed against the existing Phase 3 database, then rerun. The current final verification returned `SKIP` for 001–005 and `Migrations complete.` with exit code 0. No credential value was printed or stored.
+
+**MANUAL — PENDING USER ACCEPTANCE**
+
+- Two-browser human concurrency behavior and conflict messaging.
+- Real desktop/tablet/mobile visual review, including planning scrolling/cards and pixel-level regressions.
+- Arabic visual typography and mixed-direction content review in a real browser.
+- Keyboard-only and screen-reader walkthrough; no WCAG conformance claim is made.
+
+### Migration evidence and reserves
+
+The existing Phase 3 upgrade executed migration 005 successfully, and its immediate rerun completed successfully. The final positive verification output was:
+
+```text
+SKIP 001_authoritative_schema (already applied)
+SKIP 002_import_legacy_data (already applied)
+SKIP 003_operational_extensions (already applied)
+SKIP 004_vehicle_detail_media (already applied)
+SKIP 005_customer_reservation_workspace (already applied)
+Migrations complete.
+```
+
+`tests/migration_phase4_recovery.php` was implemented for fresh 001–005, immediate rerun, partial-DDL continuation, post-baseline retry, definition audit, baseline uniqueness, and exact disposable-database cleanup. In the configured environment it exited 2 before creating any database because `rental_app` lacks `CREATE DATABASE`. Fresh-database and destructive partial-schema simulations therefore remain pending; they were not misrepresented as passed and the business database was not altered to manufacture evidence.
+
+### Phase 4 senior-review remediation (2026-07-22)
+
+The review identified five narrow correctness gaps. Migration 005 could add an unindexed `AUTO_INCREMENT` identifier before its primary key; foreign-key checks compared only relationship columns; CHECK validation accepted any same-named constraint; reservation replacement locked only the requested vehicle; and operational lifecycle transitions did not validate the locked vehicle state or assert conditional state-update success.
+
+Migration identifier recovery now classifies the live `id` and primary-key state before repairing anything. A missing identifier and primary key are added in one MariaDB-compatible `ALTER`; a compatible existing identifier is upgraded together with its missing primary key where required; an exact complete definition is skipped; and incompatible identifier types, nullability, or primary keys fail closed before the remaining partial-table repair. No recovery branch drops a structure or deletes or rewrites a history row.
+
+Each Phase 4 history foreign key now derives a complete descriptor from `TABLE_CONSTRAINTS`, `KEY_COLUMN_USAGE`, and `REFERENTIAL_CONSTRAINTS`: local table, ordered local columns, referenced schema/table, ordered referenced columns, and normalized non-cascading update/delete rules. Exact matches skip, absent names are created, and same-named incompatible definitions—including cascade rules, different schemas, or different order—signal a schema mismatch without dropping the production constraint. Each CHECK now uses `CHECK_CONSTRAINTS.CHECK_CLAUSE`; normalization removes only identifier quoting and whitespace, preserving literals and operators. The four exact approved expressions are compared conservatively, so permissive, unrelated, or unverifiable same-named checks fail closed.
+
+Reservation replacement continues to lock the scoped reservation first, then locks the unique current/requested vehicle IDs with one ascending `ORDER BY id ASC FOR UPDATE` query. Both locked rows must belong to the origin agency. A changed target must be unarchived and exactly `available`; invalid operational states are rejected; overlap and maintenance checks run after the locks; and reserved/rented state transfers use conditional updates whose affected row must equal one. A bounded retry handles transient MariaDB serialization/deadlock victims without exposing database details; exhaustion becomes the translated safe conflict error. Any failed check or mutation rolls back the reservation and both vehicle states.
+
+Transitions to `confirmed`, `deposit_paid`, `ready`, and `active` now lock and load the assigned vehicle, validate origin agency, existence, archival state, operational status, and the expected `available` or `reserved` state, then recheck reservation and maintenance conflicts under the transaction locks. Confirmation and activation perform their vehicle mutation before the reservation status update and require exactly one affected row. Existing cancellation, no-show, expiry, and completion behavior remains unchanged.
+
+`tests/customer_reservation_phase4.php` now proves confirmation success; rejection for maintenance, damaged, blocked, sold, retired, archived, missing, and cross-agency vehicles; invalid activation rollback; maintenance-conflict recheck; failed replacement state preservation; cross-agency and invalid replacement rejection; successful active replacement state transfer; and two simultaneous opposite-direction replacements through independent workers. The ordered lock contract and affected-row guard are also asserted structurally. The suite passed with exact fixture cleanup.
+
+`tests/migration_phase4_recovery.php` now runs database-independent assertions before requesting database privileges and defines nine isolated disposable scenarios: fresh installation; missing identifier; identifier without auto-increment; identifier without a primary key; auto-increment identifier without a primary key; incompatible identifier type; incompatible primary key; incompatible same-named cascading foreign key; and incompatible same-named permissive CHECK. Successful scenarios audit exact identifier, primary key, foreign keys, rules, CHECK clauses, survivor rows, baseline uniqueness, retry behavior, and immediate rerun. Failure scenarios require exit code 1, no recorded 005 version, retained conflicting definitions, and retained history data. The configured account still lacks `CREATE DATABASE`, so only the structural assertions executed and passed; the privileged DDL scenarios remain pending and are not claimed as passed.
+
+Final remediation verification:
+
+```text
+PHP syntax: 156 files checked, 0 failures
+Business rules: passed
+Phase 3 vehicle regression: passed
+Phase 4 integration: passed in three consecutive final runs, including strict transitions, replacement rollback, and opposite replacement concurrency
+Phase 4 HTTP/security: passed, including runtime scan and cleanup
+Phase 4 cleanup audit: users=0, agencies=0
+Migration recovery: structural assertions passed; privileged disposable-database scenarios pending (CREATE DATABASE unavailable)
+Current database migration rerun: 001–005 SKIP, Migrations complete, exit 0
+JavaScript syntax: passed
+Git diff check: passed
+```
+
+No password, hash, cookie, session identifier, token, or database credential was written to remediation output or tracked files. Temporary Phase 4 sessions, workers, runtime markers, uploads, and HTTP logs were removed. No permission was broadened, no Phase 5 work was started, and no commit or push was performed.
+
+**Senior-review remediation verdict: REMEDIATION COMPLETE WITH RESERVES.** The only remediation reserve is execution of the already implemented disposable-schema matrix under a suitably privileged test-only database account.
+
+### Remaining limitations and verdict
+
+The implementation is complete within Phase 4’s application scope. Reserves are limited to disposable fresh/partial migration execution under a suitably privileged test-only account and genuine human browser/device/accessibility acceptance. Finance, contracts, inspections, incidents, notifications, the customer portal appearance, the Phase 3 gallery, and all Phase 5 redesign work remain authoritative and unchanged apart from permission-aware links or the minimal protected customer-document link.
+
+**Phase 4 verdict: IMPLEMENTATION COMPLETE WITH RESERVES.**
+
 ## Back-office SaaS foundation — Phase 1 (2026-07-12)
 
 ### Objective and starting state

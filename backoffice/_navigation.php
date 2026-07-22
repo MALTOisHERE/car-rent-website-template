@@ -28,13 +28,13 @@ function backofficeNavigation()
         ]],
         ['label'=>'nav.rentals','icon'=>'rentals','items'=>[
             ['label'=>'nav.reservations','href'=>'reservations.php','permission'=>'reservations.manage'],
-            ['label'=>'nav.planning','href'=>'reservations.php#availability-planning','permission'=>'reservations.manage','active'=>'planning'],
+            ['label'=>'nav.planning','href'=>'reservation_planning.php','permission'=>'reservations.manage','active'=>'reservation_planning'],
             ['label'=>'nav.contracts','href'=>'contracts.php','permission'=>'contracts.manage'],
             ['label'=>'nav.inspections','href'=>'inspections.php','permission'=>'inspections.manage'],
         ]],
         ['label'=>'nav.customers','icon'=>'customers','items'=>[
             ['label'=>'nav.customers_list','href'=>'customers.php','permission'=>'customers.manage'],
-            ['label'=>'nav.customer_documents','href'=>'customer_detail.php','permission'=>'customers.manage'],
+            ['label'=>'nav.customer_documents','href'=>'customers.php','permission'=>'customers.manage'],
         ]],
         ['label'=>'nav.fleet','icon'=>'fleet','items'=>[
             ['label'=>'nav.vehicles','href'=>'vehicles.php','permission'=>'vehicles.view'],

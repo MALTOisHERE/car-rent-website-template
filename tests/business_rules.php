@@ -7,6 +7,9 @@ require_once __DIR__ . '/../app/auth.php';
 require_once __DIR__ . '/../app/domain.php';
 require_once __DIR__ . '/../app/i18n.php';
 require_once __DIR__ . '/../app/vehicle_service.php';
+require_once __DIR__ . '/../app/customer_service.php';
+require_once __DIR__ . '/../app/reservation_service.php';
+require_once __DIR__ . '/../app/protected_file.php';
 
 $failures = [];
 $assert = function ($condition, $message) use (&$failures) {
@@ -96,6 +99,9 @@ $assert(canViewFinanceHistory(), 'Owner cannot see payment history and deposits'
 $assert(canViewInvoiceSections(), 'Owner cannot see invoice sections');
 
 $_SESSION['role'] = ROLE_AGENCY_MANAGER;
+$assert(can('customers.lifecycle'), 'Agency manager cannot manage customer lifecycle');
+$assert(can('reservations.lifecycle'), 'Agency manager cannot manage reservation lifecycle');
+$assert(can('reservations.commercial_override'), 'Agency manager cannot approve commercial overrides');
 $assert(can('pricing.manage'), 'Agency manager cannot manage pricing rules');
 $assert(can('payments.manage'), 'Agency manager cannot manage finance');
 $assert(!canCreateAgency(), 'Agency manager can see the owner-only agency creation action');
@@ -104,6 +110,9 @@ $assert(canViewFinanceHistory(), 'Agency manager cannot see payment history and 
 $assert(canViewInvoiceSections(), 'Agency manager cannot see invoice sections');
 
 $_SESSION['role'] = ROLE_RENTAL_AGENT;
+$assert(!can('customers.lifecycle'), 'Rental agent can manage customer lifecycle');
+$assert(!can('reservations.lifecycle'), 'Rental agent can cancel or declare no-show');
+$assert(!can('reservations.commercial_override'), 'Rental agent can approve commercial overrides');
 $assert(can('payments.create'), 'Rental agent cannot create payments');
 $assert(!can('payments.manage'), 'Rental agent can manage finance');
 $assert(!can('pricing.manage'), 'Rental agent can manage pricing rules');
@@ -131,6 +140,16 @@ $assert(!canViewFinancialDashboard(), 'Fleet agent can see financial dashboard m
 $assert(!canViewFinanceHistory(), 'Fleet agent can see payment history or deposits');
 $assert(!canViewInvoiceSections(), 'Fleet agent can see invoice sections');
 unset($_SESSION['role']);
+
+$commands=customerLifecycleCommands();
+$assert(($commands['block']['status']??null)==='blocked'&&($commands['block']['action']??null)==='blocked'&&!empty($commands['block']['sensitive']),'Customer block command trust map is invalid');
+$assert(($commands['mark_vip']['status']??null)==='VIP'&&empty($commands['mark_vip']['sensitive']),'Customer ordinary status command trust map is invalid');
+$fixtureReservation=['tax_rate'=>'20.00','daily_price'=>'200.00','options_total'=>'50.00','fees_total'=>'10.00','discount_percent'=>'10.00','pricing_snapshot_json'=>json_encode(['pricing_rule_adjustment'=>'-20.00']),'currency'=>'MAD'];
+try{$preserved=preservedReservationPrice($fixtureReservation,new DateTimeImmutable('2026-01-01 10:00:00'),new DateTimeImmutable('2026-01-05 10:00:00'));$assert($preserved['days']===4&&$preserved['daily_price']==='200.00'&&$preserved['discount_percent']==='10.00'&&$preserved['tax_rate']==='20.00'&&$preserved['total']==='907.20','Preserved-term extension pricing is not deterministic');}catch(Throwable$e){$assert(false,'Preserved-term pricing rejected a valid fixture');}
+$legacyFixture=$fixtureReservation;$legacyFixture['tax_rate']=null;
+try{preservedReservationPrice($legacyFixture,new DateTimeImmutable('2026-01-01 10:00:00'),new DateTimeImmutable('2026-01-05 10:00:00'));$assert(false,'Legacy NULL tax rate was repriced');}catch(DomainException$e){$assert(true,'Legacy tax guard active');}
+$assert(percentageToBasisPoints('0.00')===0&&percentageToBasisPoints('100.00')===10000,'Percentage boundary parsing failed');
+$assert(percentageToBasisPoints('100.01')===null&&percentageToBasisPoints('101')===null,'Out-of-range percentage was not rejected');
 
 $requiredTranslationKeys = [
     'common.save','common.cancel','common.confirm','common.actions','shell.sign_out',
@@ -172,10 +191,10 @@ $assert(localizedDate('2026-07-17', 'ar') === '17 يوليو 2026', 'Arabic date
 $assert(localizedDateTime('2026-07-17 10:45:00', 'fr') === '17 juil. 2026 à 10:45', 'Localized date-time formatting failed');
 $assert(localizedDate('not-a-date', 'en') === '' && localizedDateTime('', 'en') === '', 'Invalid date values were not handled safely');
 
-$switch = languageSwitchUrl('ar', 'vehicle_detail.php', ['page'=>'2','status'=>'paid','tab'=>'media','search'=>'Client A','date_from'=>'2026-07-01','agency_id'=>'3','vehicle_id'=>'7','_csrf'=>'secret','password'=>'secret','redirect'=>'https://example.test']);
+$switch = languageSwitchUrl('ar', 'reservation_planning.php', ['page'=>'2','status'=>'paid','tab'=>'pricing','view'=>'week','source'=>'agency','type'=>'company','licence'=>'valid','search'=>'Client A','date'=>'2026-07-01','date_from'=>'2026-07-01','agency_id'=>'3','vehicle_id'=>'7','category_id'=>'4','_csrf'=>'secret','password'=>'secret','redirect'=>'https://example.test']);
 parse_str((string) parse_url($switch, PHP_URL_QUERY), $switchQuery);
-$assert(str_starts_with($switch, 'vehicle_detail.php?'), 'Language switch changed the route');
-$assert(($switchQuery['lang'] ?? null) === 'ar' && ($switchQuery['page'] ?? null) === '2' && ($switchQuery['agency_id'] ?? null) === '3' && ($switchQuery['vehicle_id'] ?? null)==='7' && ($switchQuery['tab'] ?? null)==='media', 'Language switch lost safe vehicle workspace filters');
+$assert(str_starts_with($switch, 'reservation_planning.php?'), 'Language switch changed the route');
+$assert(($switchQuery['lang'] ?? null) === 'ar' && ($switchQuery['page'] ?? null) === '2' && ($switchQuery['agency_id'] ?? null) === '3' && ($switchQuery['vehicle_id'] ?? null)==='7' && ($switchQuery['category_id']??null)==='4' && ($switchQuery['tab'] ?? null)==='pricing' && ($switchQuery['view']??null)==='week' && ($switchQuery['date']??null)==='2026-07-01', 'Language switch lost safe Phase 4 workspace filters');
 $assert(!isset($switchQuery['_csrf'], $switchQuery['password'], $switchQuery['redirect']), 'Language switch retained an unsafe value');
 $unsafeSwitch = languageSwitchUrl('fr', '../evil.php', ['page'=>'-1','agency_id'=>'x','date_from'=>'invalid','status'=>'<script>']);
 $assert(str_starts_with($unsafeSwitch, 'evil.php?') && !str_contains($unsafeSwitch, 'script'), 'Language switch did not reject invalid filter values');

@@ -91,6 +91,11 @@
     }
     reservationAllocation?.addEventListener('change', fillReservationAllocation); fillReservationAllocation();
 
+    const planningBoard = document.querySelector('[data-planning-board]');
+    if (planningBoard) {
+        planningBoard.querySelector('.reservation-block')?.scrollIntoView({block: 'nearest', inline: 'nearest'});
+    }
+
     const drawer = document.querySelector('[data-drawer]'); const drawerBackdrop = document.querySelector('[data-drawer-backdrop]');
     function closeDrawer() { if (!drawer) return; drawer.hidden = true; drawer.classList.remove('open'); drawerBackdrop.hidden = true; body.classList.remove('drawer-open'); returnFocus?.focus(); }
     document.querySelectorAll('[data-drawer-target]').forEach(button => button.addEventListener('click', () => {

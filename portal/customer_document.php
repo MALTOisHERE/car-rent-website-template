@@ -1,0 +1,3 @@
+<?php
+require_once __DIR__ . '/../app/application.php';requireAuthentication('../account/login.php');if(currentUserRole()!==ROLE_CUSTOMER){http_response_code(403);exit(t('validation.not_authorized'));}
+try{$id=filter_input(INPUT_GET,'id',FILTER_VALIDATE_INT,['options'=>['min_range'=>1]]);if(!$id)throw new InvalidArgumentException('not found');$document=dbFetchOne("SELECT d.id,d.storage_path,d.mime_type FROM customer_documents d JOIN customers c ON c.id=d.customer_id WHERE d.id=:id AND d.archived_at IS NULL AND c.archived_at IS NULL AND c.user_id=:user",['id'=>$id,'user'=>currentUserId()]);if(!$document)throw new InvalidArgumentException('not found');deliverAuthorizedProtectedFile($document,'customer-document');}catch(InvalidArgumentException$e){protectedFileNotFound();}

@@ -56,7 +56,8 @@ function percentageToBasisPoints($value)
     $value=trim((string)$value);
     if(!preg_match('/^\d{1,3}(?:\.\d{1,2})?$/',$value))return null;
     [$whole,$fraction]=array_pad(explode('.',$value,2),2,'');
-    return min(10000,((int)$whole*100)+(int)str_pad($fraction,2,'0'));
+    $basisPoints=((int)$whole*100)+(int)str_pad($fraction,2,'0');
+    return $basisPoints<=10000?$basisPoints:null;
 }
 
 function percentageOfCents($cents,$basisPoints)
