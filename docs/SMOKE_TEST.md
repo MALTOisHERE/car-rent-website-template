@@ -2,6 +2,69 @@
 
 Run `php bin/php_syntax_check.php` and `php tests/business_rules.php` first.
 
+## Phase 5A automated finance verification
+
+Run with the configured application database environment. The suites use only random
+`P5A_TEST_<id>` fixtures and must finish with a successful cleanup audit.
+
+```powershell
+php bin/php_syntax_check.php
+php tests/business_rules.php
+php tests/vehicle_phase3.php
+php tests/customer_reservation_phase4.php
+php tests/finance_phase5a.php
+php tests/finance_phase5a_concurrency.php
+php tests/migration_phase5a_recovery.php
+php tests/phase5a_http_smoke.php
+php tests/phase5a_cleanup_audit.php
+php bin/migrate.php
+php bin/migrate.php
+node --check backoffice/assets/app.js
+git diff --check
+```
+
+`tests/finance_phase5a_concurrency.php` uses independent PHP processes and a
+synchronization barrier for duplicate payment, competing-balance payments,
+refund/refund, refund/close, payment/close, duplicate invoice target, invoice number,
+expense decision, and deposit terminal-event races. Sequential simulation is not used.
+
+`tests/migration_phase5a_recovery.php` always performs database-independent structural
+assertions. Its destructive recovery scenarios create only random disposable databases.
+Exit code 2 means the configured account lacks `CREATE DATABASE`; fresh and partial-DDL
+recovery remain privileged migration checks and must not be reported as passed.
+
+The Phase 5A senior-review remediation also requires the migration recovery suite to
+exercise wrong column type, nullability/default, generated expression, unique-index,
+same-named non-unique-index, cascading-FK, reordered-FK, permissive-CHECK, and
+wrong-definition/correct-column-count fixtures. The suite must report the static
+assertions separately and exit 2 when disposable-database authority is unavailable.
+The final database-integrity remediation additionally requires exact validation of
+the five composite agency FKs: invoice/customer, invoice/reservation,
+payment/reservation, payment/invoice, and expense/vehicle. Recovery fixtures cover
+all five cross-agency mismatches plus same-named cascading, local-order, and
+referenced-order conflicts. The authoritative parent UNIQUE keys must exist exactly;
+nullable child relationships remain valid NULLs.
+`tests/finance_phase5a.php` and `tests/finance_phase5a_concurrency.php` must prove
+that completed replays return the original entity, create no second business row,
+leave no reserved allocation (or explicitly void an unused replay allocation), and
+that invoice-scoped payments cannot exceed either reservation or invoice net
+remaining. They must also cover concurrent `createAndIssueInvoiceFromReservation()`
+calls and verify one issued invoice and one authoritative idempotency result.
+
+After Phase 5A ledger rows exist, never re-enable an old mutable finance controller.
+The finance write cutover requires migration 006 and the new ledger tables. A code
+rollback that cannot satisfy that guard must be treated as finance read-only until a
+compatible forward deployment is restored.
+
+## Phase 5A manual acceptance
+
+1. Use separate browsers for OWNER, AGENCY_MANAGER, RENTAL_AGENT, ACCOUNTANT, and FLEET_AGENT; verify the documented finance visibility and direct-route denials.
+2. Confirm a rental agent can submit only an in-balance payment and cannot view its history or evidence afterward.
+3. Repeat the finance pages in EN, FR, and AR; visually verify LTR/RTL layout, mixed-direction references, money, tables, and print output.
+4. Complete keyboard-only and screen-reader checks for forms, errors, status messages, evidence links, and printable invoices.
+5. At desktop, tablet, and mobile widths, verify payment, deposit, invoice, expense, and cash-register detail pages.
+6. On a disposable privileged database host, execute every fresh and partial-DDL recovery scenario before production rollout.
+
 ## Security and access
 
 1. Confirm unauthenticated access to `/backoffice/` redirects to the central login.

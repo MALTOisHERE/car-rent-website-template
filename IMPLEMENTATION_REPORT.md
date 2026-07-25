@@ -460,6 +460,190 @@ No commit or push was performed, and Phase 4 was not started.
 - The legacy `vehicles.primary_image_path` mirror remains intentionally until all public/portal consumers migrate to protected media IDs.
 - Automated HTML, direction, RBAC, and interaction contracts passed; pixel-level browser comparison, real-device Arabic typography, keyboard walkthrough, and screen-reader testing remain manual acceptance work.
 
+## Phase 5A — Finance Core (2026-07-22)
+
+Phase 5A introduces a single finance write boundary in `app/finance_service.php`. Payment,
+adjustment, excess allocation, deposit, invoice/credit-note, expense, cash-register, cash
+movement, idempotency, number-allocation, evidence, audit, agency, and permission rules are
+enforced in that service. Compatibility functions in `app/operations.php` delegate only;
+the complete PHP-source mutation scan found no finance controller mutation outside the
+service, migrations, or test setup/cleanup.
+
+Migration 006 was applied to the configured database and a subsequent verification run
+returned versions 001–006 as already applied with exit code 0. Its preflight rejects
+multiple open agency registers, duplicate active reservation invoices, cross-agency
+finance links, impossible monetary relationships, and incompatible partial table/column
+definitions before cutover. Additive DDL and deterministic legacy backfills are used;
+ambiguous legacy deposit history is retained unresolved and receives no fabricated event.
+Migration version 006 is recorded only after the migration runner completes every
+statement successfully.
+
+Every allocated invoice, credit-note, payment, adjustment, deposit-event, and movement
+number is retained in `financial_number_allocations` as reserved, consumed, or voided.
+Business rejections void safe unused allocations, while ambiguous failures may leave a
+reserved gap; no allocation is deleted or reused. Operation-scoped idempotency keys are
+stored and locked. Authoritative balance and register rows are locked for mutations, and
+deadlock/serialization retries are bounded.
+
+Explicit excess tender is represented by one immutable payment for the received amount,
+one exact `excess_reallocation` adjustment, and one dedicated deposit. Reservation and
+invoice paid totals subtract that adjustment. Cash tender produces separate `payment_in`
+and `deposit_in` movements, preventing the excess from being counted as revenue.
+Adjustments and deposit events are append-only. Issued invoices are immutable operational
+records; draft cancellation and capped credit notes replace destructive edits. Expenses
+require a separate decision actor, except for a reasoned and audited OWNER exception, and
+rejected expenses do not create cash movements. Cash close uses a locked timestamp
+boundary and records any explained difference as a movement.
+
+The common financial evidence endpoint authorizes permission and agency before lookup,
+then rejects missing, archived, cross-agency, missing-file, invalid-MIME, traversal, and
+containment-escape cases through the same not-found response. It never exposes raw paths
+or original filenames. RENTAL_AGENT can create only a normal within-balance payment with
+optional proof; the role cannot read payment history/evidence or access adjustment,
+deposit, invoice, expense, or cash workflows. ACCOUNTANT access remains agency-scoped and
+finance-specific; FLEET_AGENT and CUSTOMER have no Phase 5A back-office access.
+
+### Phase 5A verification classification
+
+- AUTOMATED — EXECUTED: PHP syntax (169 files, 0 failures), business rules, Phase 3 vehicle integration, Phase 4 customer/reservation integration, Phase 5A finance integration, JavaScript syntax, migration reruns, and Git diff validation.
+- AUTOMATED — EXECUTED: nine real independent-process concurrency races passed: duplicate payment, competing balance, refund/refund, refund/close, payment/close, invoice target, numbering, expense decision, and deposit terminal event.
+- HTTP/SECURITY — EXECUTED: role access, crafted-action denial, agency IDOR, protected evidence, EN/FR/AR direction and invoice print, runtime-log scan, and test cleanup passed.
+- AUTOMATED — EXECUTED: cleanup audit reported zero `P5A_TEST` users, agencies, allocations, and artifacts.
+- PRIVILEGED MIGRATION — PENDING: structural recovery assertions passed, but the configured account cannot create disposable databases; fresh and partial-DDL scenarios exited 2 and are not claimed as passed.
+- MANUAL — EXECUTED WITH EVIDENCE: none.
+- MANUAL — PENDING USER ACCEPTANCE: real-browser responsive/Arabic visual review, keyboard and screen-reader walkthrough, and production-like privileged migration rehearsal.
+
+The finance cutover is deliberately fail-closed. Migration 006 must exist before new
+writes. After any Phase 5A ledger activity, old mutable finance controllers must never be
+re-enabled; a code rollback without the Phase 5A service must default to finance read-only
+operation until a compatible forward deployment is restored.
+
+### Phase 5A remaining limitations
+
+- Privileged fresh-install and partial-DDL recovery scenarios remain pending because this database account lacks disposable-database creation authority.
+- Browser-level responsive, Arabic visual, keyboard, and screen-reader acceptance remains manual.
+- Financial evidence uses protected local storage; lifecycle retention, malware scanning, object storage, and backup policy remain deployment responsibilities.
+- Phase 5A is an operational subledger, not a general ledger, tax filing system, bank reconciliation engine, or payment-gateway integration.
+- Legacy finance rows with unknowable opening history remain explicitly unresolved rather than reconstructed.
+- CLI tests in this sandbox require a writable `session.save_path`; HTTP tests create an isolated writable session directory.
+
+No commit or push was performed. Phase 5B, 5C, and 5D were not started.
+
+### Phase 5A senior-review remediation (2026-07-23)
+
+The senior review identified four correctness gaps in the original Phase 5A
+implementation. Migration 006 previously treated same-named objects and column
+counts as sufficient evidence, numbered commands allocated numbers before checking
+completed idempotency, invoice-scoped payments capped only the reservation in some
+paths, and the compatibility invoice command used two independently idempotent
+commands. These behaviors could accept an incompatible partial schema, leave an
+unexplained reserved number, bypass an invoice net balance, or create a second
+compatibility result after a replay.
+
+The remediation is confined to `database/migrations/006_finance_core.sql`,
+`app/finance_service.php`, `tests/migration_phase5a_recovery.php`,
+`tests/finance_phase5a.php`, `tests/finance_phase5a_concurrency.php`, this report,
+and `docs/SMOKE_TEST.md`.
+
+Migration 006 now keeps expected column, index, foreign-key, CHECK, engine, and
+collation descriptors and compares existing information-schema metadata before
+altering or creating objects. Column comparisons include type, unsignedness,
+nullability, default, EXTRA, generated expression, and datetime precision. Index
+comparisons include name, ordered columns, uniqueness, and type. Foreign-key
+comparisons include local and referenced schema/table/column order and normalized
+RESTRICT/NO ACTION rules. CHECK clauses are read from `CHECK_CONSTRAINTS` and
+normalized only for harmless quoting/whitespace. Missing definitions remain
+creatable; incompatible or unverifiable definitions fail closed; no unexpected
+production structure is dropped or rewritten.
+
+Numbered finance operations retain the safe preallocation strategy but now void
+every unused allocation on a completed idempotent replay with the explicit reason
+`Idempotent replay; allocation unused`. Consumed numbers are immutable and never
+reused. The tests cover normal and excess payments, adjustments, deposits and
+deposit events, invoice issue and credit notes, manual cash movement, cash close,
+and expense decisions, including concurrent duplicate requests.
+
+Invoice-scoped normal and excess payments lock the reservation and selected invoice,
+require the invoice to be same-agency, issued, non-draft, non-cancelled, and
+eligible, and cap payable tender to the smaller reservation/invoice net remainder.
+Credit notes are included in the invoice net balance; explicit excess sends only
+the excess to the dedicated deposit workflow, and audit data records both balances,
+payable, and excess.
+
+`createAndIssueInvoiceFromReservation()` is now one authoritative command with one
+caller idempotency row and one invoice-number allocation. A replay returns the same
+issued invoice, creates no draft or issue attempt, and voids any unused replay
+allocation. Separate draft and issue APIs retain independent idempotency.
+
+Strengthened tests add exact migration metadata assertions and disposable scenarios
+for wrong column type, nullability/default, generated expression, unique index,
+same-named non-unique index, cascading or reordered foreign keys, permissive CHECK,
+and a wrong definition with the expected column count. Finance tests assert zero
+reserved/consumed allocation growth on replay (or an explicit replay void), invoice
+net-payment caps, compatibility replay identity, and concurrent duplicate behavior.
+
+Remediation verification currently recorded:
+
+```text
+php -d session.save_path=storage tests/finance_phase5a.php: PASS
+php -d session.save_path=storage tests/finance_phase5a_concurrency.php: PASS
+php -d session.save_path=storage tests/migration_phase5a_recovery.php:
+  structural assertions: PASS
+  privileged disposable-database scenarios: PENDING (exit 2; CREATE DATABASE authority unavailable)
+php -d session.save_path=storage bin/php_syntax_check.php: PASS (170 files, 0 failures)
+php -d session.save_path=storage tests/business_rules.php: PASS
+php -d session.save_path=storage tests/vehicle_phase3.php: PASS
+php -d session.save_path=storage tests/customer_reservation_phase4.php: PASS
+php -d session.save_path=storage tests/phase5a_http_smoke.php: PASS
+php -d session.save_path=storage tests/phase5a_cleanup_audit.php: PASS (zero fixtures/artifacts)
+php -d session.save_path=storage bin/migrate.php (twice): PASS (001-006 SKIP; exit 0)
+node --check backoffice/assets/app.js: PASS
+git diff --check: PASS
+```
+
+All non-privileged final gates listed above have now been rerun successfully. No
+privileged migration scenario is claimed as passed when the account cannot create
+disposable databases. Browser visual, keyboard, and screen-reader acceptance remain
+manual limitations. No commit or push was performed, and Phase 5B, 5C, and 5D were
+not started.
+
+### Phase 5A final database-integrity remediation (2026-07-24)
+
+Migration 006 now adds and validates these five composite agency foreign keys:
+
+- `fk_invoices_customer_agency`: `invoices(customer_id, agency_id)` → `customers(id, agency_id)`
+- `fk_invoices_reservation_agency`: `invoices(reservation_id, agency_id)` → `reservations(id, agency_id)`
+- `fk_payments_reservation_agency`: `payments(reservation_id, agency_id)` → `reservations(id, agency_id)`
+- `fk_payments_invoice_agency`: `payments(invoice_id, agency_id)` → `invoices(id, agency_id)`
+- `fk_expenses_vehicle_agency`: `expenses(vehicle_id, agency_id)` → `vehicles(id, agency_id)`
+
+Before any FK DDL, the migration requires the exact authoritative composite
+UNIQUE keys `uq_customers_id_agency`, `uq_vehicles_id_agency`,
+`uq_reservations_id_agency`, and `uq_invoices_id_agency`. Existing invoice,
+payment, and expense rows are preflighted for cross-agency mismatches; any
+mismatch raises a generic migration failure and no historical row is updated,
+deleted, or relinked. Nullable relationship columns remain nullable.
+
+Existing same-named constraints are checked through information_schema for
+constraint type, local table and ordered columns, referenced schema/table and
+ordered columns, and UPDATE/DELETE rules. Only RESTRICT and NO ACTION are
+accepted. Cascading, reordered, wrong-schema, wrong-table, non-FK, or otherwise
+incompatible definitions fail closed; missing compatible constraints are added
+without dropping unexpected production constraints.
+
+Recovery tests now cover exact presence of all five FKs, five cross-agency
+mismatch fixtures, cascading definitions, wrong local order, wrong referenced
+order, and prior Phase 5A structural scenarios. Finance integration tests also
+assert persisted same-agency relationships across payments, invoices, deposits,
+deposit events, adjustments, expenses, and related parent entities.
+
+Final verification on 2026-07-24: PHP syntax (170 files), business rules,
+Phase 3, Phase 4, finance, concurrency, HTTP/security smoke, cleanup audit,
+JavaScript syntax, both migration reruns, and diff checks passed. Migration
+recovery structural assertions passed; its disposable-database scenarios remain
+PENDING with exit code 2 because CREATE DATABASE authority is unavailable.
+No commit or push was performed, and Phase 5B, 5C, and 5D were not started.
+
 ## Remaining limitations and pending depth
 
 - Migration, seeding, session authentication, and the primary local HTTP routes are verified. Full browser interaction, concurrent multi-user allocation testing, outbound mail delivery, and production web-server configuration remain manual pilot checks.

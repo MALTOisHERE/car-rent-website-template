@@ -47,7 +47,7 @@ function backofficeNavigation()
             ['label'=>'nav.deposits','href'=>'finance.php#deposits','permission'=>'payments.manage','active'=>'deposits'],
             ['label'=>'nav.invoices','href'=>'invoices.php','permission'=>'invoices.manage'],
             ['label'=>'nav.expenses','href'=>'expenses.php','permission'=>'expenses.manage'],
-            ['label'=>'nav.cash_register','href'=>'cash.php','permission'=>'payments.manage'],
+            ['label'=>'nav.cash_register','href'=>'cash.php','permission'=>'cash.manage'],
         ]],
         ['label'=>'nav.commercial','icon'=>'commercial','items'=>[
             ['label'=>'nav.pricing','href'=>'pricing.php','permission'=>'pricing.manage'],

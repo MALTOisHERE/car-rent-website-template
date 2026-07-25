@@ -13,8 +13,8 @@ pageHeader('page.invoices.title', 'page.invoices.description', [
 <div class="table-wrap" role="region" aria-label="<?=e(t('page.invoices.title'))?>" tabindex="0"><table><thead><tr>
 <th scope="col"><?=e(t('field.number'))?></th><th scope="col"><?=e(t('field.customer'))?></th><th scope="col"><?=e(t('field.reservation'))?></th><th scope="col"><?=e(t('field.issued'))?></th><th scope="col"><?=e(t('field.total'))?></th><th scope="col"><?=e(t('status.paid'))?></th><th scope="col"><?=e(t('common.status'))?></th><th scope="col"><?=e(t('field.documents'))?></th>
 </tr></thead><tbody><?php foreach($invoices as $invoice):?><tr>
-<td><?=isolatedValue($invoice['invoice_number'],'reference-value')?></td><td><?=e($invoice['company_name']?:$invoice['first_name'].' '.$invoice['last_name'])?></td><td><?=isolatedValue($invoice['reference'],'reference-value')?></td><td><?=formattedDateTime($invoice['issued_at'])?></td>
+<td><a href="invoice_detail.php?id=<?=e($invoice['id'])?>"><?=isolatedValue($invoice['invoice_number']?:t('status.draft'),'reference-value')?></a></td><td><?=e($invoice['company_name']?:$invoice['first_name'].' '.$invoice['last_name'])?></td><td><?=isolatedValue($invoice['reference'],'reference-value')?></td><td><?=formattedDateTime($invoice['issued_at'])?></td>
 <td class="money"><?=money($invoice['total_amount'],$invoice['currency'])?></td><td class="money"><?=money($invoice['paid_amount'],$invoice['currency'])?></td><td><?=statusBadge($invoice['status'])?></td>
-<td><a class="btn secondary" target="_blank" rel="noopener" href="invoice_print.php?id=<?=e($invoice['id'])?>"><?=e(t('common.print_pdf'))?></a></td>
+<td><?php if($invoice['issued_at']):?><a class="btn secondary" target="_blank" rel="noopener" href="invoice_print.php?id=<?=e($invoice['id'])?>"><?=e(t('common.print_pdf'))?></a><?php endif;?></td>
 </tr><?php endforeach;?></tbody></table><?php if(!$invoices) echo emptyState('empty.no_invoices'); ?></div>
 <?php backofficeFooter();
