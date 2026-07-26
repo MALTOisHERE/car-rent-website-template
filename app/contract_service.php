@@ -60,9 +60,9 @@ function contractAcquireIdempotency(int $agencyId,string $operation,$rawKey,arra
     if(!preg_match('/^[a-f0-9]{64}$/',$rawKey))throw new InvalidArgumentException(t('validation.contract_idempotency'));
     $keyHash=hash('sha256',$rawKey);$payloadHash=contractCanonicalPayload($payload);$actor=(int)currentUserId();
     dbExecute(
-        "INSERT IGNORE INTO rental_operation_idempotency_keys(origin_agency_id,operation_type,key_hash,payload_hash,status,created_by)
-         VALUES(:agency,:operation,:key_hash,:payload_hash,'in_progress',:actor)",
-        ['agency'=>$agencyId,'operation'=>$operation,'key_hash'=>$keyHash,'payload_hash'=>$payloadHash,'actor'=>$actor]
+        "INSERT IGNORE INTO rental_operation_idempotency_keys(origin_agency_id,performing_agency_id,operation_type,key_hash,payload_hash,status,created_by)
+         VALUES(:agency,:performing_agency,:operation,:key_hash,:payload_hash,'in_progress',:actor)",
+        ['agency'=>$agencyId,'performing_agency'=>$agencyId,'operation'=>$operation,'key_hash'=>$keyHash,'payload_hash'=>$payloadHash,'actor'=>$actor]
     );
     $row=dbFetchOne(
         'SELECT * FROM rental_operation_idempotency_keys
@@ -297,6 +297,145 @@ function contractCancel($input): int
     }catch(ContractIdempotentReplay$replay){return$replay->result();}
 }
 
+function contractAcknowledgementTypes(): array
+{
+    return ['customer','agency_representative'];
+}
+
+function contractAcknowledgementActor(int $agencyId): array
+{
+    $actor=(int)currentUserId();
+    if($actor<=0)throw new AuthorizationException(t('validation.not_authorized'));
+    $row=dbFetchOne(
+        "SELECT u.id,u.fullname,u.role
+         FROM users u
+         WHERE u.id=:actor AND u.status='active'
+           AND (u.role=:owner OR EXISTS(SELECT 1 FROM user_agencies ua WHERE ua.user_id=u.id AND ua.agency_id=:agency))
+         FOR UPDATE",
+        ['actor'=>$actor,'owner'=>ROLE_OWNER,'agency'=>$agencyId]
+    );
+    if(!$row)throw new AuthorizationException(t('validation.contract_ack_actor'));
+    return $row;
+}
+
+function contractAcknowledgementParty(array $contract,array $actor,string $type,string $submitted): string
+{
+    $submitted=trim($submitted);
+    if($submitted===''||mb_strlen($submitted)>190)throw new InvalidArgumentException(t('validation.contract_ack_party'));
+    if($type==='customer'){
+        $customer=dbFetchOne(
+            'SELECT CONCAT(c.first_name,\' \',c.last_name) party_name
+             FROM reservations r JOIN customers c ON c.id=r.customer_id AND c.agency_id=r.agency_id
+             WHERE r.id=:reservation AND r.agency_id=:agency FOR UPDATE',
+            ['reservation'=>$contract['reservation_id'],'agency'=>$contract['agency_id']]
+        );
+        $party=trim((string)($customer['party_name']??''));
+    }else{
+        $party=trim((string)$actor['fullname']);
+    }
+    if($party===''||mb_strlen($party)>190||!hash_equals(mb_strtolower($party),mb_strtolower($submitted))){
+        throw new InvalidArgumentException(t('validation.contract_ack_party'));
+    }
+    return $party;
+}
+
+function contractAcknowledgementsForVersion(int $contractId,int $versionId): array
+{
+    contractRequireCutover();enforcePermission('contract.view');
+    $contract=contractScopedRecord($contractId,false);
+    if(!$contract)throw new InvalidArgumentException(t('validation.contract_not_found'));
+    $version=dbFetchOne('SELECT id FROM contract_versions WHERE id=:version AND contract_id=:contract AND agency_id=:agency',['version'=>$versionId,'contract'=>$contractId,'agency'=>$contract['agency_id']]);
+    if(!$version)throw new InvalidArgumentException(t('validation.contract_version_not_found'));
+    return dbFetchAll(
+        'SELECT ca.*,u.fullname recorded_by_name FROM contract_acknowledgements ca JOIN users u ON u.id=ca.recorded_by
+         WHERE ca.agency_id=:agency AND ca.contract_id=:contract AND ca.contract_version_id=:version
+         ORDER BY ca.acknowledged_at,ca.id',
+        ['agency'=>$contract['agency_id'],'contract'=>$contractId,'version'=>$versionId]
+    );
+}
+
+function contractRequiredAcknowledgementsComplete(array $acknowledgements): bool
+{
+    return count(array_unique(array_column($acknowledgements,'acknowledgement_type')))===2
+        && !array_diff(contractAcknowledgementTypes(),array_column($acknowledgements,'acknowledgement_type'));
+}
+
+function contractCanRecordAcknowledgement(array $contract,string $type): bool
+{
+    return $contract['status']==='issued'
+        && in_array($type,contractAcknowledgementTypes(),true)
+        && can($type==='customer'?'contract.acknowledge_customer':'contract.acknowledge_agency');
+}
+
+function contractRecordAcknowledgement(array $input): int
+{
+    contractRequireCutover();
+    $contractId=(int)($input['contract_id']??0);$versionId=(int)($input['contract_version_id']??0);
+    $type=(string)($input['acknowledgement_type']??'');$language=(string)($input['language_code']??'');
+    $method=(string)($input['acknowledgement_method']??'');$submittedParty=trim((string)($input['party_name']??''));$key=$input['idempotency_key']??'';
+    if(!in_array($type,contractAcknowledgementTypes(),true))throw new InvalidArgumentException(t('validation.contract_ack_type'));
+    enforcePermission($type==='customer'?'contract.acknowledge_customer':'contract.acknowledge_agency');
+    if(!in_array($language,['en','fr','ar'],true))throw new InvalidArgumentException(t('validation.contract_ack_language'));
+    if($method!=='in_person')throw new InvalidArgumentException(t('validation.contract_ack_method'));
+    if($submittedParty===''||mb_strlen($submittedParty)>190)throw new InvalidArgumentException(t('validation.contract_ack_party'));
+    $unlocked=contractScopedRecord($contractId,false);
+    if(!$unlocked)throw new InvalidArgumentException(t('validation.contract_not_found'));
+    $agencyId=(int)$unlocked['agency_id'];
+    try{
+        return contractWithRetry(function()use($agencyId,$contractId,$versionId,$type,$language,$method,$submittedParty,$key){
+            $contract=contractScopedRecord($contractId,true);
+            if(!$contract)throw new InvalidArgumentException(t('validation.contract_not_found'));
+            $version=dbFetchOne(
+                'SELECT * FROM contract_versions WHERE id=:version AND contract_id=:contract AND agency_id=:agency FOR UPDATE',
+                ['version'=>$versionId,'contract'=>$contractId,'agency'=>$agencyId]
+            );
+            if(!$version||(int)$contract['current_version_id']!==$versionId||(string)$version['language_code']!==$language){
+                throw new DomainException(t('validation.contract_ack_version'));
+            }
+            $existing=dbFetchAll(
+                'SELECT * FROM contract_acknowledgements WHERE agency_id=:agency AND contract_id=:contract AND contract_version_id=:version ORDER BY acknowledgement_type FOR UPDATE',
+                ['agency'=>$agencyId,'contract'=>$contractId,'version'=>$versionId]
+            );
+            $actor=contractAcknowledgementActor($agencyId);
+            $party=contractAcknowledgementParty($contract,$actor,$type,$submittedParty);
+            $idem=contractAcquireIdempotency($agencyId,'contract_acknowledgement',$key,[
+                'contract_id'=>$contractId,'contract_version_id'=>$versionId,'acknowledgement_type'=>$type,
+                'language_code'=>$language,'party_name'=>mb_strtolower($party),'acknowledgement_method'=>$method,
+            ]);
+            if($idem['completed'])throw new ContractIdempotentReplay($idem['result_id']);
+            if($contract['status']!=='issued')throw new DomainException(t('validation.contract_ack_state'));
+            foreach($existing as$ack)if($ack['acknowledgement_type']===$type)throw new DomainException(t('validation.contract_ack_duplicate'));
+            dbExecute(
+                "INSERT INTO contract_acknowledgements(agency_id,contract_id,contract_version_id,acknowledgement_type,language_code,party_name,acknowledgement_method,acknowledged_at,recorded_by)
+                 VALUES(:agency,:contract,:version,:type,:language,:party,'in_person',NOW(6),:actor)",
+                ['agency'=>$agencyId,'contract'=>$contractId,'version'=>$versionId,'type'=>$type,'language'=>$language,'party'=>$party,'actor'=>$actor['id']]
+            );
+            $event=$type==='customer'?'contract_customer_acknowledged':'contract_agency_representative_acknowledged';
+            auditLog($event,'contract',$contractId,null,['contract_version_id'=>$versionId,'acknowledgement_type'=>$type,'language_code'=>$language,'recorded_by'=>(int)$actor['id']],$agencyId);
+            if(PHP_SAPI==='cli'&&defined('CONTRACT_ACKNOWLEDGEMENT_TEST_HOOK')&&CONTRACT_ACKNOWLEDGEMENT_TEST_HOOK===true&&function_exists('contractAcknowledgementTestHook')){
+                contractAcknowledgementTestHook('after_acknowledgement_audit',['contract_id'=>$contractId,'contract_version_id'=>$versionId,'acknowledgement_type'=>$type]);
+            }
+            $all=array_merge($existing,[['acknowledgement_type'=>$type]]);
+            if(contractRequiredAcknowledgementsComplete($all)){
+                $changed=dbExecute(
+                    "UPDATE rental_contracts SET status='signed',signed_at=NOW(6),updated_by=:actor
+                     WHERE id=:contract AND agency_id=:agency AND status='issued'",
+                    ['actor'=>$actor['id'],'contract'=>$contractId,'agency'=>$agencyId]
+                );
+                if($changed->rowCount()!==1)throw new DomainException(t('validation.contract_stale'));
+                dbExecute(
+                    "INSERT INTO contract_status_history(agency_id,contract_id,reservation_id,from_status,to_status,changed_by,occurred_at,metadata_json)
+                     VALUES(:agency,:contract,:reservation,'issued','signed',:actor,NOW(6),:metadata)",
+                    ['agency'=>$agencyId,'contract'=>$contractId,'reservation'=>$contract['reservation_id'],'actor'=>$actor['id'],'metadata'=>json_encode(['source'=>'contract_acknowledgement','contract_version_id'=>$versionId],JSON_UNESCAPED_SLASHES)]
+                );
+                auditLog('contract_signed','contract',$contractId,['status'=>'issued'],['status'=>'signed','contract_version_id'=>$versionId],$agencyId);
+            }
+            contractCompleteIdempotency($idem['id'],$contractId);
+            return $contractId;
+        });
+    }catch(ContractIdempotentReplay$replay){return $replay->result();}
+}
+
 function contractScopedList(array $filters=[]): array
 {
     contractRequireCutover();enforcePermission('contract.view');
@@ -334,10 +473,14 @@ function contractScopedDetail(int $contractId): array
         array_merge([$contractId],$ids)
     );
     if(!$contract)throw new InvalidArgumentException(t('validation.contract_not_found'));
+    $acknowledgements=$contract['current_version_id']
+        ?contractAcknowledgementsForVersion($contractId,(int)$contract['current_version_id'])
+        :[];
     return[
         'contract'=>$contract,
         'versions'=>dbFetchAll('SELECT id,version_number,language_code,snapshot_sha256,created_at FROM contract_versions WHERE contract_id=:contract AND agency_id=:agency ORDER BY version_number,language_code',['contract'=>$contractId,'agency'=>$contract['agency_id']]),
         'history'=>contractStatusHistory($contractId),
+        'acknowledgements'=>$acknowledgements,
     ];
 }
 
