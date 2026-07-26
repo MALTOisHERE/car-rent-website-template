@@ -12,7 +12,9 @@ function vehicleStatuses()
 
 function contractStatuses()
 {
-    return ['draft', 'generated', 'signed', 'active', 'completed', 'cancelled', 'amended'];
+    return function_exists('contractLifecycleStatuses')
+        ? contractLifecycleStatuses()
+        : ['draft', 'issued', 'signed', 'active', 'completed', 'cancelled'];
 }
 
 function currentAgencyIds()
@@ -27,7 +29,7 @@ function requireAgencyAccess($agencyId)
 {
     if (currentUserRole() !== ROLE_OWNER && !in_array((int) $agencyId, currentAgencyIds(), true)) {
         http_response_code(403);
-        exit('You are not authorized to access this agency.');
+        exit(t('validation.agency_scope'));
     }
 }
 

@@ -13,5 +13,6 @@ require_once __DIR__ . '/customer_service.php';
 require_once __DIR__ . '/reservation_service.php';
 require_once __DIR__ . '/protected_file.php';
 require_once __DIR__ . '/finance_service.php';
+require_once __DIR__ . '/contract_service.php';
 require_once __DIR__ . '/operations.php';
 require_once __DIR__ . '/i18n.php';

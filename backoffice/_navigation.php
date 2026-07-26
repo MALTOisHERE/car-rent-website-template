@@ -29,7 +29,7 @@ function backofficeNavigation()
         ['label'=>'nav.rentals','icon'=>'rentals','items'=>[
             ['label'=>'nav.reservations','href'=>'reservations.php','permission'=>'reservations.manage'],
             ['label'=>'nav.planning','href'=>'reservation_planning.php','permission'=>'reservations.manage','active'=>'reservation_planning'],
-            ['label'=>'nav.contracts','href'=>'contracts.php','permission'=>'contracts.manage'],
+            ['label'=>'nav.contracts','href'=>'contracts.php','permission'=>'contract.view'],
             ['label'=>'nav.inspections','href'=>'inspections.php','permission'=>'inspections.manage'],
         ]],
         ['label'=>'nav.customers','icon'=>'customers','items'=>[

@@ -65,8 +65,8 @@ function rolePermissions()
 {
     return [
         ROLE_OWNER => ['*'],
-        ROLE_AGENCY_MANAGER => ['dashboard.view', 'agencies.view', 'users.manage', 'customers.manage', 'customers.lifecycle', 'vehicles.manage', 'reservations.manage', 'reservations.lifecycle', 'reservations.commercial_override', 'contracts.manage', 'payments.manage', 'payments.adjust', 'payments.excess', 'deposits.manage', 'invoices.manage', 'expenses.manage', 'expenses.decide', 'cash.manage', 'finance.evidence.view', 'inspections.manage', 'maintenance.manage', 'pricing.manage', 'reports.view'],
-        ROLE_RENTAL_AGENT => ['dashboard.view', 'customers.manage', 'vehicles.view', 'reservations.manage', 'contracts.manage', 'payments.create', 'inspections.manage'],
+        ROLE_AGENCY_MANAGER => ['dashboard.view', 'agencies.view', 'users.manage', 'customers.manage', 'customers.lifecycle', 'vehicles.manage', 'reservations.manage', 'reservations.lifecycle', 'reservations.commercial_override', 'contract.view', 'contract.create', 'contract.issue', 'contract.cancel', 'contracts.manage', 'payments.manage', 'payments.adjust', 'payments.excess', 'deposits.manage', 'invoices.manage', 'expenses.manage', 'expenses.decide', 'cash.manage', 'finance.evidence.view', 'inspections.manage', 'maintenance.manage', 'pricing.manage', 'reports.view'],
+        ROLE_RENTAL_AGENT => ['dashboard.view', 'customers.manage', 'vehicles.view', 'reservations.manage', 'contract.view', 'contract.create', 'contract.issue', 'contracts.manage', 'payments.create', 'inspections.manage'],
         ROLE_ACCOUNTANT => ['dashboard.view', 'payments.manage', 'payments.adjust', 'payments.excess', 'deposits.manage', 'invoices.manage', 'expenses.manage', 'expenses.decide', 'cash.manage', 'finance.evidence.view', 'reports.financial', 'reports.view'],
         ROLE_FLEET_AGENT => ['dashboard.view', 'vehicles.manage', 'inspections.manage', 'maintenance.manage', 'vehicle_documents.manage'],
         ROLE_CUSTOMER => ['portal.use'],

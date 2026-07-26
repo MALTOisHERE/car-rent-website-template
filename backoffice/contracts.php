@@ -1,6 +1,49 @@
 <?php
-require_once __DIR__ . '/_layout.php';requirePermission('contracts.manage');
-if(requestMethod()==='POST'){requireCsrfPost();$action=$_POST['action']??'';try{if($action==='generate'){$id=createContractFromReservation((int)($_POST['reservation_id']??0),$_POST['language']??'fr');flash('success',t('message.contract_generated',['id'=>$id]));}elseif($action==='amend'){$version=amendContract((int)$_POST['id'],trim((string)($_POST['reason']??'')),$_POST['language']??'fr');flash('success',t('message.contract_amended',['version'=>$version]));}elseif($action==='status'){$id=(int)$_POST['id'];$contract=dbFetchOne('SELECT rc.*,r.agency_id FROM rental_contracts rc JOIN reservations r ON r.id=rc.reservation_id WHERE rc.id=:id',['id'=>$id]);if(!$contract)throw new InvalidArgumentException(t('validation.contract_not_found'));requireAgencyAccess($contract['agency_id']);$status=validateChoice($_POST['status']??'',contractStatuses(),null);if(!$status)throw new InvalidArgumentException(t('validation.invalid_contract_status'));if(in_array($contract['status'],['signed','active','completed'],true)&&$status==='draft')throw new DomainException(t('validation.signed_contract_draft'));dbExecute('UPDATE rental_contracts SET status=:status,signed_at=IF(:status2=\'signed\',NOW(),signed_at),completed_at=IF(:status3=\'completed\',NOW(),completed_at),cancelled_at=IF(:status4=\'cancelled\',NOW(),cancelled_at),cancellation_reason=:reason,updated_by=:user WHERE id=:id',['status'=>$status,'status2'=>$status,'status3'=>$status,'status4'=>$status,'reason'=>$status==='cancelled'?trim((string)($_POST['reason']??'')):null,'user'=>currentUserId(),'id'=>$id]);auditLog('contract.status_changed','contract',$id,['status'=>$contract['status']],['status'=>$status],$contract['agency_id']);flash('success',t('message.contract_status_updated'));}}catch(InvalidArgumentException|DomainException $exception){flash('danger',$exception->getMessage());}catch(Throwable $exception){reportDatabaseError($exception,'Contract operation failed');flash('danger',t('message.contract_failed'));}safeRedirect('contracts.php');}
-$agencyIds=currentAgencyIds();$placeholders=implode(',',array_fill(0,count($agencyIds),'?'));if(!$agencyIds)$agencyIds=[0];$eligible=dbFetchAll("SELECT r.id,r.reference,c.first_name,c.last_name FROM reservations r JOIN customers c ON c.id=r.customer_id LEFT JOIN rental_contracts rc ON rc.reservation_id=r.id AND rc.status<>'cancelled' WHERE r.agency_id IN ($placeholders) AND r.status IN ('confirmed','deposit_paid','ready') AND rc.id IS NULL ORDER BY r.created_at DESC",$agencyIds);$contracts=dbFetchAll("SELECT rc.*,r.reference,r.agency_id,c.first_name,c.last_name,v.registration_number FROM rental_contracts rc JOIN reservations r ON r.id=rc.reservation_id JOIN customers c ON c.id=r.customer_id LEFT JOIN vehicles v ON v.id=r.vehicle_id WHERE r.agency_id IN ($placeholders) ORDER BY rc.created_at DESC LIMIT 100",$agencyIds);
-backofficeHeader(t('page.contracts.title'),'contracts.php');?><?php pageHeader('page.contracts.title', 'page.contracts.description', ['breadcrumbs'=>[['label'=>'nav.rentals'],['label'=>'nav.contracts']],'primary'=>['label'=>'action.generate_contract','href'=>'#new-contract']]); ?><div class="grid"><section class="card" id="new-contract"><h2><?=e(t('section.generate_reservation'))?></h2><form method="post"><?=csrfField()?><input type="hidden" name="action" value="generate"><label><?=e(t('field.reservation'))?><select name="reservation_id" required><?php foreach($eligible as $row):?><option value="<?=e($row['id'])?>"><?=e($row['reference'].' — '.$row['first_name'].' '.$row['last_name'])?></option><?php endforeach;?></select></label><label><?=e(t('field.contract_language'))?><select name="language"><?php foreach(['fr','ar','en'] as $lang):?><option value="<?=e($lang)?>"><?=e(t('language.'.$lang))?></option><?php endforeach;?></select></label><button class="btn primary"><?=e(t('action.generate_contract'))?></button></form></section><section class="card"><h2><?=e(t('section.contract_register'))?></h2><div class="table-wrap"><table><tr><th><?=e(t('field.number'))?></th><th><?=e(t('field.reservation'))?></th><th><?=e(t('field.customer'))?></th><th><?=e(t('field.vehicle'))?></th><th><?=e(t('field.version'))?></th><th><?=e(t('common.status'))?></th><th><?=e(t('field.documents'))?></th></tr><?php foreach($contracts as $contract):?><tr><td><?=isolatedValue($contract['contract_number'],'reference-value')?></td><td><?=isolatedValue($contract['reference'],'reference-value')?></td><td><?=e($contract['first_name'].' '.$contract['last_name'])?></td><td><?=isolatedValue($contract['registration_number'],'registration-value')?></td><td><?=e($contract['current_version'])?></td><td><?=statusBadge($contract['status'])?><form method="post"><?=csrfField()?><input type="hidden" name="action" value="status"><input type="hidden" name="id" value="<?=e($contract['id'])?>"><select name="status"><?php foreach(contractStatuses() as $status):?><option value="<?=e($status)?>" <?=$status===$contract['status']?'selected':''?>><?=e(translatedStatus($status))?></option><?php endforeach;?></select><input name="reason" placeholder="<?=e(t('field.reason'))?>"><button class="btn secondary"><?=e(t('common.update'))?></button></form></td><td><a class="btn secondary" href="contract_print.php?id=<?=e($contract['id'])?>&lang=fr" target="_blank"><?=e(t('common.print_pdf'))?></a><?php if(in_array($contract['status'],['signed','active','amended'],true)):?><form method="post"><?=csrfField()?><input type="hidden" name="action" value="amend"><input type="hidden" name="id" value="<?=e($contract['id'])?>"><input type="hidden" name="language" value="fr"><input name="reason" required placeholder="<?=e(t('field.reason'))?>"><button class="btn secondary"><?=e(t('action.create_amendment'))?></button></form><?php endif;?></td></tr><?php endforeach;?></table><?php if(!$contracts):?><p class="empty"><?=e(t('empty.no_filtered_records'))?></p><?php endif;?></div></section></div><?php backofficeFooter();
+require_once __DIR__.'/_layout.php';
+requirePermission('contract.view');
 
+if(requestMethod()==='POST'){
+    requireCsrfPost();$action=(string)($_POST['action']??'');$redirect='contracts.php';
+    try{
+        if($action==='create'){
+            $id=contractCreateFromReservation([
+                'reservation_id'=>(int)($_POST['reservation_id']??0),
+                'idempotency_key'=>$_POST['idempotency_key']??'',
+            ]);
+            flash('success',t('message.contract_created',['id'=>$id]));$redirect='contract_detail.php?id='.$id;
+        }else throw new InvalidArgumentException(t('validation.invalid_action'));
+    }catch(InvalidArgumentException|DomainException|AuthorizationException$exception){
+        flash('danger',$exception->getMessage());
+    }catch(Throwable$exception){
+        reportDatabaseError($exception,'Contract register operation failed');flash('danger',t('message.contract_failed'));
+    }
+    safeRedirect($redirect);
+}
+
+$filters=['status'=>$_GET['status']??'','reservation_id'=>(int)($_GET['reservation_id']??0)];
+$contracts=contractScopedList($filters);$agencyIds=contractScopedAgencyIds();$ph=implode(',',array_fill(0,count($agencyIds),'?'));
+$eligible=[];
+if(can('contract.create')){
+    $eligible=dbFetchAll(
+        "SELECT r.id,r.reference,c.first_name,c.last_name
+         FROM reservations r JOIN customers c ON c.id=r.customer_id AND c.agency_id=r.agency_id
+         LEFT JOIN rental_contracts rc ON rc.reservation_id=r.id AND rc.status IN('draft','issued','signed','active')
+         WHERE r.agency_id IN ($ph) AND r.archived_at IS NULL
+           AND r.status IN('confirmed','deposit_paid','ready') AND r.vehicle_id IS NOT NULL AND rc.id IS NULL
+         ORDER BY r.created_at DESC LIMIT 200",
+        $agencyIds
+    );
+}
+backofficeHeader(t('page.contracts.title'),'contracts.php');
+pageHeader('page.contracts.title','page.contracts.description',['breadcrumbs'=>[['label'=>'nav.rentals'],['label'=>'nav.contracts']]]);
+?>
+<?php if(can('contract.create')):?><section class="card" id="new-contract"><h2><?=e(t('section.create_contract'))?></h2>
+<?php if($eligible):?><form method="post"><?=csrfField()?><?=contractIdempotencyField('contract.create')?><input type="hidden" name="action" value="create">
+<label><?=e(t('field.reservation'))?><select name="reservation_id" required><?php foreach($eligible as$row):?><option value="<?=e($row['id'])?>"><?=e($row['reference'].' — '.$row['first_name'].' '.$row['last_name'])?></option><?php endforeach;?></select></label>
+<button class="btn primary"><?=e(t('action.create_contract'))?></button></form>
+<?php else:?><?=emptyState('empty.no_eligible_reservations','message.contract_eligibility_help')?><?php endif;?></section><?php endif;?>
+<form class="filters" method="get"><label><?=e(t('common.status'))?><select name="status"><option value=""><?=e(t('common.all'))?></option><?php foreach(contractLifecycleStatuses()as$status):?><option value="<?=e($status)?>" <?=$filters['status']===$status?'selected':''?>><?=e(translatedStatus($status))?></option><?php endforeach;?></select></label><button class="btn secondary"><?=e(t('common.filter'))?></button><a class="btn ghost" href="contracts.php"><?=e(t('common.reset'))?></a></form>
+<section class="card"><div class="section-heading"><h2><?=e(t('section.contract_register'))?></h2><span><?=e(t('message.record_count',['count'=>count($contracts)]))?></span></div><div class="table-wrap"><table><thead><tr><th><?=e(t('field.number'))?></th><th><?=e(t('field.agency'))?></th><th><?=e(t('field.reservation'))?></th><th><?=e(t('field.customer'))?></th><th><?=e(t('field.vehicle'))?></th><th><?=e(t('field.version'))?></th><th><?=e(t('common.status'))?></th><th><?=e(t('common.actions'))?></th></tr></thead><tbody>
+<?php foreach($contracts as$contract):?><tr><td><?=isolatedValue($contract['contract_number'],'reference-value')?></td><td><?=e($contract['agency_name'])?></td><td><?=isolatedValue($contract['reference'],'reference-value')?></td><td><?=e($contract['first_name'].' '.$contract['last_name'])?></td><td><?=isolatedValue($contract['registration_number'],'registration-value')?></td><td><?=e($contract['current_version'])?></td><td><?=statusBadge($contract['status'])?></td><td><?=actionMenu([['label'=>'common.view','href'=>'contract_detail.php?id='.$contract['id']]])?></td></tr><?php endforeach;?>
+</tbody></table><?php if(!$contracts)echo emptyState('empty.no_filtered_records','empty.adjust_filters');?></div></section>
+<?php backofficeFooter();

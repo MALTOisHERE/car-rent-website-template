@@ -110,6 +110,9 @@ function createReservationWorkspace(array $input)
 
 function transitionReservationWorkspace($reservationId, $newStatus, $reason = null)
 {
+    if(in_array($newStatus,['active','completed'],true)){
+        throw new DomainException(t('validation.rental_orchestration_required'));
+    }
     enforcePermission(in_array($newStatus,['cancelled','no_show'],true)?'reservations.lifecycle':'reservations.manage');
     return withTransaction(function()use($reservationId,$newStatus,$reason){
         $reservation=scopedReservationRecord($reservationId,true);if(!$reservation||!in_array($newStatus,reservationTransitions()[$reservation['status']]??[],true))throw new DomainException(t('validation.reservation_transition'));
@@ -205,7 +208,7 @@ function reservationWorkspaceData($reservationId)
     $data['customer']=dbFetchOne('SELECT * FROM customers WHERE id=:id AND agency_id=:agency',['id'=>$reservation['customer_id'],'agency'=>$reservation['agency_id']]);
     $data['vehicle']=dbFetchOne('SELECT v.*,vc.name category_name FROM vehicles v LEFT JOIN vehicle_categories vc ON vc.id=v.category_id WHERE v.id=:id AND v.agency_id=:agency',['id'=>$reservation['vehicle_id'],'agency'=>$reservation['agency_id']]);
     $data['status_history']=dbFetchAll('SELECT h.*,u.fullname changed_by_name FROM reservation_status_history h LEFT JOIN users u ON u.id=h.changed_by WHERE h.reservation_id=:id ORDER BY h.changed_at DESC,h.id DESC',['id'=>$id]);
-    $data['contracts']=can('contracts.manage')?dbFetchAll('SELECT * FROM rental_contracts WHERE reservation_id=:id ORDER BY created_at DESC',['id'=>$id]):[];
+    $data['contracts']=can('contract.view')?dbFetchAll('SELECT * FROM rental_contracts WHERE reservation_id=:id AND agency_id=:agency ORDER BY created_at DESC',['id'=>$id,'agency'=>$reservation['agency_id']]):[];
     $data['inspections']=can('inspections.manage')?dbFetchAll('SELECT vi.id,vi.inspection_type,vi.inspected_at,vi.status FROM vehicle_inspections vi JOIN rental_contracts rc ON rc.id=vi.contract_id WHERE rc.reservation_id=:id ORDER BY vi.inspected_at DESC',['id'=>$id]):[];
     $data['maintenance']=can('maintenance.manage')?dbFetchAll('SELECT id,maintenance_type,scheduled_date,status FROM maintenance_records WHERE vehicle_id=:vehicle ORDER BY COALESCE(entry_at,scheduled_date) DESC LIMIT 20',['vehicle'=>$reservation['vehicle_id']]):[];
     $data['documents']=(can('vehicles.manage')||can('vehicle_documents.manage'))?dbFetchAll('SELECT id,document_type,expires_at FROM vehicle_documents WHERE vehicle_id=:vehicle AND archived_at IS NULL ORDER BY expires_at LIMIT 20',['vehicle'=>$reservation['vehicle_id']]):[];
