@@ -15,9 +15,14 @@ A procedural PHP/PDO rental-agency management application with a multilingual pu
 2. Create an empty database and import the legacy `rental_car.sql` only when upgrading the original prototype.
 3. Back up the database.
 4. Run `php bin/migrate.php`.
-5. Start locally with `php -S 127.0.0.1:8000`.
+5. Start locally with `php -S 127.0.0.1:8000 dev_router.php`; the router denies direct storage requests, including private inspection-photo staging/final files.
 6. Open `/account/login.php`, `/backoffice/`, or `/portal/`.
 
 For a fictional demonstration, set `APP_ENV=development` and a strong `DEMO_PASSWORD`, then run `php bin/seed_demo.php`.
 
 See `IMPLEMENTATION_REPORT.md` and `docs/` for migration, testing, security, and demonstration instructions.
+
+### Inspection-photo orphan cleanup
+
+Run a deterministic, non-mutating review with `php bin/cleanup_inspection_photo_orphans.php --dry-run --limit=500`.
+After reviewing only the controlled relative paths printed by that command, remove those stale unreferenced files with `php bin/cleanup_inspection_photo_orphans.php --execute --limit=500`.

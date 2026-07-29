@@ -3,6 +3,7 @@
 .env.*
 !.env.example
 storage/uploads/
+storage/inspection-photo-private/
 storage/sess_*
 *.log
 phase*-review.txt

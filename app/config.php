@@ -44,6 +44,9 @@ function appConfig($key = null)
             'minimum_driver_age' => envInt('MINIMUM_DRIVER_AGE', 21, 18, 99),
             'minimum_licence_months' => envInt('MINIMUM_LICENCE_MONTHS', 12, 0, 600),
             'upload_max_bytes' => envInt('UPLOAD_MAX_BYTES', 5242880, 1024, 20971520),
+            'inspection_photo_min_bytes' => envInt('INSPECTION_PHOTO_MIN_BYTES', 128, 1, 1048576),
+            'inspection_photo_max_dimension' => envInt('INSPECTION_PHOTO_MAX_DIMENSION', 6000, 64, 12000),
+            'inspection_photo_orphan_grace_seconds' => envInt('INSPECTION_PHOTO_ORPHAN_GRACE_SECONDS', 3600, 60, 2592000),
         ];
         date_default_timezone_set($config['timezone']);
     }
