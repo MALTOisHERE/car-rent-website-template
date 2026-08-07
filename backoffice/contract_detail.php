@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__.'/_layout.php';
 requirePermission('contract.view');
-$id=filter_input(INPUT_GET,'id',FILTER_VALIDATE_INT,['options'=>['min_range'=>1]])?:(int)($_POST['contract_id']??0);
+$rawId=$_GET['id']??($_POST['contract_id']??null);$id=is_string($rawId)&&preg_match('/^[1-9]\d*$/',$rawId)?(int)$rawId:0;
 if(!$id){http_response_code(404);exit(t('validation.contract_not_found'));}
 if(requestMethod()==='POST'){
     requireCsrfPost();$action=(string)($_POST['action']??'');
@@ -13,8 +13,9 @@ if(requestMethod()==='POST'){
             contractCancel(['contract_id'=>$id,'reason'=>$_POST['reason']??'','idempotency_key'=>$_POST['idempotency_key']??'']);
             flash('success',t('message.contract_cancelled'));
         }elseif($action==='acknowledge'){
+            $rawVersionId=$_POST['contract_version_id']??null;if(!is_string($rawVersionId)||!preg_match('/^[1-9]\d*$/',$rawVersionId))throw new InvalidArgumentException(t('validation.contract_version_not_found'));
             contractRecordAcknowledgement([
-                'contract_id'=>$id,'contract_version_id'=>$_POST['contract_version_id']??0,
+                'contract_id'=>$id,'contract_version_id'=>(int)$rawVersionId,
                 'acknowledgement_type'=>$_POST['acknowledgement_type']??'', 'language_code'=>$_POST['language_code']??'',
                 'party_name'=>$_POST['party_name']??'', 'acknowledgement_method'=>$_POST['acknowledgement_method']??'',
                 'idempotency_key'=>$_POST['idempotency_key']??'',
@@ -41,7 +42,7 @@ pageHeader('page.contract_detail.title','page.contract_detail.description',[
 <div><dt><?=e(t('field.agency'))?></dt><dd><?=e($contract['agency_name'])?></dd></div>
 <div><dt><?=e(t('field.reservation'))?></dt><dd><a href="reservation_detail.php?id=<?=e($contract['reservation_id'])?>"><?=isolatedValue($contract['reference'],'reference-value')?></a></dd></div>
 <div><dt><?=e(t('common.status'))?></dt><dd><?=statusBadge($contract['status'])?></dd></div>
-<div><dt><?=e(t('field.current_version'))?></dt><dd><?=e($contract['current_version']?:t('common.none'))?><?php if($contract['current_version_id']):?> · #<?=e($contract['current_version_id'])?><?php endif;?></dd></div>
+<div><dt><?=e(t('field.current_version'))?></dt><dd><?=e($contract['current_version']?:t('common.none'))?><?php if($contract['current_version_id']):?> · <?=isolatedValue('#'.$contract['current_version_id'],'reference-value')?><?php endif;?></dd></div>
 <div><dt><?=e(t('field.issued'))?></dt><dd><?=formattedDateTime($contract['issued_at'])?></dd></div>
 <?php if($contract['signed_at']):?><div><dt><?=e(t('field.signed'))?></dt><dd><?=formattedDateTime($contract['signed_at'])?></dd></div><?php endif;?>
 <?php if($contract['cancelled_at']):?><div><dt><?=e(t('field.cancelled'))?></dt><dd><?=formattedDateTime($contract['cancelled_at'])?><br><?=e($contract['cancellation_reason'])?></dd></div><?php endif;?>

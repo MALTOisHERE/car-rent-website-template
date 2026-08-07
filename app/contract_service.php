@@ -162,9 +162,9 @@ function contractSnapshot(array $reservation,string $language): array
     ];
 }
 
-function contractApprovedTerms(): string
+function contractApprovedTerms(string $language='en'): string
 {
-    return 'The renter accepts the agreed rental period, vehicle condition, mileage, fuel, payment, deposit, and liability terms recorded in this contract.';
+    return translateInLanguage('contract.approved_terms',$language);
 }
 
 function contractCreateFromReservation($input): int
@@ -229,8 +229,9 @@ function contractIssue($input): int
                 ||dbFetchOne('SELECT id FROM contract_versions WHERE contract_id=:id LIMIT 1 FOR UPDATE',['id'=>$contractId])){
                 throw new DomainException(t('validation.contract_version_state'));
             }
-            $terms=contractApprovedTerms();$versionIds=[];
+            $versionIds=[];
             foreach(['en','fr','ar']as$language){
+                $terms=contractApprovedTerms($language);
                 $snapshot=contractSnapshot($reservation,$language);
                 $json=json_encode($snapshot,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES|JSON_THROW_ON_ERROR);
                 dbExecute(

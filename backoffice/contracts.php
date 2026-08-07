@@ -6,8 +6,9 @@ if(requestMethod()==='POST'){
     requireCsrfPost();$action=(string)($_POST['action']??'');$redirect='contracts.php';
     try{
         if($action==='create'){
+            $rawReservationId=$_POST['reservation_id']??null;if(!is_string($rawReservationId)||!preg_match('/^[1-9]\d*$/',$rawReservationId))throw new InvalidArgumentException(t('validation.contract_reservation_not_found'));
             $id=contractCreateFromReservation([
-                'reservation_id'=>(int)($_POST['reservation_id']??0),
+                'reservation_id'=>(int)$rawReservationId,
                 'idempotency_key'=>$_POST['idempotency_key']??'',
             ]);
             flash('success',t('message.contract_created',['id'=>$id]));$redirect='contract_detail.php?id='.$id;

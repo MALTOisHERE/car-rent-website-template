@@ -22,6 +22,16 @@ For a fictional demonstration, set `APP_ENV=development` and a strong `DEMO_PASS
 
 See `IMPLEMENTATION_REPORT.md` and `docs/` for migration, testing, security, and demonstration instructions.
 
+## Rental lifecycle (Phase 5B)
+
+The approved rental lifecycle is implemented through Phase 5B.1 (contract lifecycle), 5B.2 (authoritative acknowledgements and signing), 5B.5 (protected inspection-photo bundles), 5B.3 (checkout and handover), and 5B.4 (check-in and return). Phase 5B.6 consolidation and release hardening are complete, and the complete Phase 5B rental lifecycle is approved and release-ready. Phase 5C remains future work and is the next implementation phase.
+
+The authoritative sequence is:
+
+`reservation ready → contract signed → checkout → active rental → return inspection → check-in → completed rental`
+
+Checkout and return each require exactly six protected photos: front, rear, left, right, interior, and dashboard. Checkout and check-in are transactional and idempotent, enforce role permissions and agency isolation, and support English, French, and Arabic interfaces with RTL rendering for Arabic. Phase 5C fleet and incident workflows remain future work and are not part of this lifecycle.
+
 ### Inspection-photo orphan cleanup
 
 Run a deterministic, non-mutating review with `php bin/cleanup_inspection_photo_orphans.php --dry-run --limit=500`.
