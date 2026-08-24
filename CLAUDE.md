@@ -46,34 +46,63 @@ phase plan) without breaking the existing procedural pages:
   bootstraps Composer/session via `bootstrap.php` and delegates to `Infrastructure\Database`,
   so all existing pages keep working unchanged against the same `$mysqlconnection`/
   `reportDatabaseError()` interface.
-- **Not yet migrated**: every actual page (`en/`/`fr/`/`ar/*.php`, `admin/*.php`) still contains
-  its own inline SQL/session logic and has not been rewired to use the classes above. The plan
-  is to consolidate `en/`/`fr`/`ar/` into one page set backed by `I18n\Translator` (starting
-  with the booking flow: `cars.php` → `selection.php` → `process_booking.php` → `reserve.php`/`confirm_reservation.php`),
-  then auth (`login.php`/`signup.php`/`send_reset_link.php`/`reset_password.php`), then the
-  admin panel last.
-- **Known pre-existing bugs to fix when migrating those pages** (found during the Phase 1
-  review, not yet fixed since the pages themselves are untouched): `send_reset_link.php` and
-  `reset_password.php` reference an undefined `$conn` variable (should be `$mysqlconnection`) —
-  password reset is currently fatally broken; `admin/index.php`/`admin/cars.php` never call
-  `session_start()` before `admin_header.php`'s role check runs, so that guard is likely dead;
-  the admin edit-reservation modal echoes DB values unescaped into HTML attributes; no page has
-  CSRF protection on state-changing forms; `admin/add_car.php`'s file upload has no
-  extension/MIME whitelist; `ar/reserve.php` has diverged in logic (not just translation) from
-  `en/reserve.php`.
+- **Done (Phase 2)**: the booking flow — `cars.php`, `selection.php`, `process_booking.php`,
+  `reserve.php`, `confirm_reservation.php` — is consolidated into single implementations under
+  `pages/` (plus `pages/templates/header.php`/`footer.php`), used by all three languages via
+  thin shims at `en/`/`fr/`/`ar/<page>.php` (each just sets `$_SESSION['lang']` and
+  `require`s the shared page — this keeps every existing URL/bookmark working). A single shared
+  front-end asset copy lives at `assets/{css,js,lib}/` (verified byte-identical to the old
+  per-language copies before consolidating); `pages/templates/header.php` also sets
+  `dir="rtl"` for Arabic via `Translator::isRtl()`. See "Language triplication" and "Booking
+  flow" below for what this fixed. `en/`, `fr/`, `ar/` still each keep their own `css/`/`js/`/`lib/`
+  copies **on disk, untouched** — only pages migrated so far read from `assets/` instead; deleting
+  the old per-language copies has to wait until every page in that language is migrated.
+- **Not yet migrated**: every other page (`about.php`, `login.php`, `signup.php`, `contact.php`,
+  `send_reset_link.php`, `reset_password.php`, etc. in `en/`/`fr/`/`ar/`, and all of `admin/*.php`)
+  still contains its own inline SQL/session logic on the old per-language `header_p.php`/`footer_p.php`
+  and has not been rewired onto the classes in `src/`. Next up: auth (`login.php`/`signup.php`/
+  `send_reset_link.php`/`reset_password.php`), then remaining static pages, then the admin panel.
+- **Known pre-existing bugs still open** (not touched by Phase 2, since it only covered the
+  booking flow): `send_reset_link.php` and `reset_password.php` reference an undefined `$conn`
+  variable (should be `$mysqlconnection`) — password reset is currently fatally broken;
+  `admin/index.php`/`admin/cars.php` never call `session_start()` before `admin_header.php`'s
+  role check runs, so that guard is likely dead; the admin edit-reservation modal echoes DB
+  values unescaped into HTML attributes; no admin page has CSRF protection on state-changing
+  forms; `admin/add_car.php`'s file upload has no extension/MIME whitelist.
 
 ## Architecture
 
 ### Language triplication, not i18n
 
-The site is **not** internationalized via a shared template + translation files. `en/`, `fr/`,
-and `ar/` are near-complete copies of the same set of PHP pages (`cars.php`, `login.php`,
-`reserve.php`, `selection.php`, `confirm_reservation.php`, etc.), each with hardcoded strings
-in its language. **When fixing a bug or changing behavior in one language directory, check
-whether the same fix is needed in the other two** — this is the single most important thing to
-remember when editing this codebase. `index.php` and `logout.php` at the repo root are the only
-shared entry points; they redirect into the per-language folder based on
-`$_SESSION['lang']` (set by `header_p.php` when `?lang=xx` is passed).
+Most of the site is **still not** internationalized via a shared template + translation files:
+`en/`, `fr/`, `ar/` are near-complete copies of the same PHP pages (`login.php`, `about.php`,
+`contact.php`, etc.), each with hardcoded strings in its language. **When fixing a bug or
+changing behavior in one of these still-duplicated files, check whether the same fix is needed
+in the other two** — this is still the most important thing to remember for anything outside
+the booking flow. `index.php` and `logout.php` at the repo root are the only shared entry
+points; they redirect into the per-language folder based on `$_SESSION['lang']`.
+
+The booking flow (`cars.php`/`selection.php`/`process_booking.php`/`reserve.php`/`confirm_reservation.php`)
+is the **exception**: it's been consolidated (see "Refactor status") into one real
+implementation per page under `pages/`, with `en/`/`fr`/`ar/<page>.php` reduced to a 6-line
+shim (`session_start()` guard, `$_SESSION['lang'] = 'xx'`, `require __DIR__.'/../pages/<page>.php'`).
+**Never add logic to those five shim files** — edit the shared file under `pages/` instead, or
+it changes for all three languages at once anyway (that's the point). Language selection inside
+`pages/` (and its `templates/header.php`) always reads `$_SESSION['lang']`, which the shim sets
+on every request to match the folder actually requested — more reliable than the old
+`?lang=` toggle alone, which only updated the session on an explicit click.
+
+Consolidating this flow surfaced real bugs in `fr`/`ar` that the shared implementation now
+fixes for all three languages at once: `fr`/`ar` `selection.php` used the wrong prepared
+statement variable and never checked the requested date range at all (any past confirmed
+booking blocked a car regardless of the dates you searched); their `confirm_reservation.php`
+stored the guest's password in **plaintext** and inserted into a `name` column that doesn't
+exist in the `user` table (fatal error on every guest booking); their `header_p.php` was
+missing the logged-in-user nav swap entirely (always showed "Login", even to a logged-in user);
+and the guest-registration path (`confirm_reservation.php`) never re-checked availability
+before inserting a reservation, in `en` either — a race condition where two guests could double
+book the same car. All of that is what `pages/confirm_reservation.php` +
+`App\Service\BookingService`/`RegistrationService` fix by construction now.
 
 ### Database bootstrap: `assets/connectDB.php` → `App\Infrastructure\Database`
 
@@ -115,16 +144,25 @@ Three tables:
   (`update_confirm_status`) auto-resets `confirm` to `0` once a reservation's end date/time has
   passed.
 
-Availability checks (in `selection.php`, `process_booking.php`) query for overlapping
-`reservation` rows with `confirm = 1` using `STR_TO_DATE(CONCAT(Date_debut,' ',heureDebut), ...)`
-range comparisons — replicate that same overlap logic if you touch booking code anywhere.
+Availability checks query for overlapping `reservation` rows with `confirm = 1` using
+`STR_TO_DATE(CONCAT(Date_debut,' ',heureDebut), ...)` range comparisons — this now lives in
+exactly one place, `App\Repository\ReservationRepository::hasOverlap()` (used by
+`BookingService`); `admin/*.php` still has its own uses of `reservation`/`confirm` but doesn't
+duplicate this particular overlap query.
 
 ### Booking flow
 
-`cars.php` (search) → `selection.php` (shows cars, checks live availability per car) →
-`process_booking.php` (re-validates availability, inserts a `reservation` row if
-`$_SESSION['user_id']` is set, otherwise redirects guests to `reserve.php` with the booking
-params preserved in the query string) → confirmation.
+`pages/cars.php` (browse/marketing page — its own "Book Now" just links to `index.php`, this
+is pre-existing, not a bug I introduced) and `pages/selection.php` (search results — shows
+cars, checks live availability per car via `BookingService::isAvailable()`) →
+`pages/process_booking.php` (re-validates availability via `BookingService::book()`, inserts a
+`reservation` row if `$_SESSION['user_id']` is set, otherwise redirects guests to
+`pages/reserve.php` with the booking params preserved in the query string) →
+`pages/confirm_reservation.php` (guest path only: registers the account via
+`RegistrationService`, re-checks availability *before* creating the account so a sold-out car
+doesn't leave an orphaned user row, then books via `BookingService`). All reachable from any
+language through the `en/`/`fr/`/`ar/` shims described above. `App\Repository\ReservationRepository::hasOverlap()`
+is the one place the `STR_TO_DATE(...)` overlap query lives now — touch it there, not in a page.
 
 ### Auth & anti-bruteforce
 
@@ -151,7 +189,13 @@ treat `admin/plugins`, `admin/css`, `admin/js` as vendored, static template asse
 
 ### Front-end assets
 
-Each language directory (`en/`, `fr/`, `ar/`) has its own `css/`, `js/`, `lib/`, `scss/` — all
-static, vendored (Bootstrap, OwlCarousel, WOW.js, etc.), copy-pasted per language rather than
-shared. `img/` at the repo root is shared across all language directories and referenced as
+Each language directory (`en/`, `fr/`, `ar/`) still has its own `css/`, `js/`, `lib/`, `scss/`
+— all static, vendored (Bootstrap, OwlCarousel, WOW.js, etc.). These were verified
+byte-identical across all three languages before Phase 2 copied one shared set to
+`assets/{css,js,lib}/`, which only the consolidated `pages/` templates use so far (via
+`../assets/...` relative paths — valid because `en/`/`fr/`/`ar/` are always one directory below
+repo root, same depth as `pages/`'s callers). The old per-language copies are still on disk and
+still used by every not-yet-migrated page — **don't delete `en/css`/`fr/css`/etc. until every
+page in that language has been migrated to `pages/`**, or you'll break whatever's left. `img/`
+at the repo root has always been shared across all language directories and is referenced as
 `../img/<filename>` from car records in the `car` table.

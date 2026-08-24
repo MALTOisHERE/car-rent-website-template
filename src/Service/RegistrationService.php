@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Domain\User;
 use App\Repository\UserRepository;
+use App\Service\Exception\EmailAlreadyRegisteredException;
 use RuntimeException;
 
 /**
@@ -19,7 +20,7 @@ final class RegistrationService
     public function register(string $fullName, string $email, ?string $phone, string $plainPassword): User
     {
         if ($this->users->existsWithEmail($email)) {
-            throw new RuntimeException('An account with this email already exists.');
+            throw new EmailAlreadyRegisteredException('An account with this email already exists.');
         }
 
         $id = $this->users->create($fullName, $email, $phone, $plainPassword);

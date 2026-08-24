@@ -3,8 +3,8 @@
 namespace App\Service;
 
 use App\Repository\ReservationRepository;
+use App\Service\Exception\CarNotAvailableException;
 use DateTimeImmutable;
-use RuntimeException;
 
 /**
  * Single source of truth for availability-checking and reservation
@@ -31,7 +31,7 @@ final class BookingService
         DateTimeImmutable $end
     ): int {
         if (!$this->isAvailable($carId, $start, $end)) {
-            throw new RuntimeException('This car is no longer available for the selected dates.');
+            throw new CarNotAvailableException('This car is no longer available for the selected dates.');
         }
 
         return $this->reservations->create([
