@@ -17,5 +17,6 @@ require_once __DIR__ . '/contract_service.php';
 require_once __DIR__ . '/inspection_photo_service.php';
 require_once __DIR__ . '/rental_checkout_service.php';
 require_once __DIR__ . '/rental_checkin_service.php';
+require_once __DIR__ . '/vehicle_damage_service.php';
 require_once __DIR__ . '/operations.php';
 require_once __DIR__ . '/i18n.php';
