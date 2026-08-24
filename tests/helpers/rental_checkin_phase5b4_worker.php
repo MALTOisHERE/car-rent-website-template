@@ -1,0 +1,7 @@
+<?php
+if(PHP_SAPI!=='cli')exit(1);$command=json_decode((string)file_get_contents($argv[1]??''),true);$result=$command['barrier'].'/'.$command['label'].'.result';
+if(($command['mode']??'')==='stale_checkin'){define('RENTAL_CHECKIN_TEST_HOOK',true);function rentalCheckinCliTestHook(string $stage,array $context):void{if($stage==='after_idempotency'){$deadline=microtime(true)+20;while(!is_file($GLOBALS['p5b4_worker_command']['barrier'].'/vehicle_changed')&&microtime(true)<$deadline)usleep(5000);}}$GLOBALS['p5b4_worker_command']=$command;}
+try{require_once dirname(__DIR__,2).'/app/application.php';$_SESSION=['user_id'=>(int)$command['user_id'],'role'=>$command['role'],'agency_ids'=>[(int)$command['agency_id']],'_authenticated_at'=>time()];file_put_contents($command['barrier'].'/'.$command['label'].'.ready','ready');$deadline=microtime(true)+20;while(!is_file($command['barrier'].'/go')&&microtime(true)<$deadline)usleep(5000);
+    if(($command['mode']??'checkin')==='vehicle_change'){dbExecute("UPDATE vehicles SET status='maintenance' WHERE id=:id AND status='rented'",['id'=>$command['vehicle_id']]);file_put_contents($command['barrier'].'/vehicle_changed','changed');$value=1;}else{$value=rentalCheckin($command['args']);}
+    file_put_contents($result,json_encode(['ok'=>true,'result'=>$value]));
+}catch(Throwable$e){file_put_contents($result,json_encode(['ok'=>false,'class'=>get_class($e),'error'=>$e->getMessage()]));}

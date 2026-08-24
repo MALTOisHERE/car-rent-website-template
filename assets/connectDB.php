@@ -1,24 +1,127 @@
 <?php
 
+require_once __DIR__ . '/../app/bootstrap.php';
+
 /**
  * Central database bootstrap.
  *
- * Thin shim over App\Infrastructure\Database so the existing procedural
- * pages can keep doing `include("../assets/connectDB.php")` and using the
- * legacy $mysqlconnection variable and reportDatabaseError() helper. New
- * code should use App\Infrastructure\Database::connection() directly.
+ * Database credentials must be supplied by the process environment. This file
+ * intentionally preserves the legacy $mysqlconnection variable used by the
+ * existing procedural pages.
  */
 
-require_once __DIR__ . '/../bootstrap.php';
+// Prevent uncaught runtime details from reaching the browser on database-backed pages.
+ini_set('display_errors', '0');
+ini_set('log_errors', '1');
 
-use App\Infrastructure\Database;
-use App\Infrastructure\DatabaseErrorReporter;
-
-if (!function_exists('reportDatabaseError')) {
-    function reportDatabaseError(Throwable $exception, $context = 'Database operation failed')
+if (!function_exists('logDatabaseTechnicalError')) {
+    /** Keep CLI diagnostics out of command output while retaining protected technical logs. */
+    function logDatabaseTechnicalError($message)
     {
-        return DatabaseErrorReporter::report($exception, $context);
+        if (PHP_SAPI === 'cli') {
+            error_log((string) $message . PHP_EOL, 3, dirname(__DIR__) . '/storage/php-error.log');
+            return;
+        }
+
+        error_log((string) $message);
     }
 }
 
-$mysqlconnection = Database::connection();
+if (!function_exists('reportDatabaseError')) {
+    /** Log technical details server-side and return a browser-safe message. */
+    function reportDatabaseError(Throwable $exception, $context = 'Database operation failed')
+    {
+        logDatabaseTechnicalError(sprintf(
+            '[database] %s (%s): %s',
+            $context,
+            get_class($exception),
+            $exception->getMessage()
+        ));
+
+        return 'A database error occurred. Please try again later.';
+    }
+}
+
+if (!function_exists('databaseConfigurationError')) {
+    /** Stop startup without exposing configuration or connection details. */
+    function databaseConfigurationError($technicalMessage)
+    {
+        logDatabaseTechnicalError('[database] Configuration error: ' . $technicalMessage);
+
+        if (PHP_SAPI === 'cli') {
+            fwrite(STDERR, "The service is temporarily unavailable.\n");
+            exit(1);
+        }
+
+        if (!headers_sent()) {
+            http_response_code(500);
+        }
+
+        exit('The service is temporarily unavailable. Please try again later.');
+    }
+}
+
+$dbHost = getenv('DB_HOST');
+$dbPort = getenv('DB_PORT');
+$dbName = getenv('DB_NAME');
+$dbUser = getenv('DB_USER');
+$dbPassword = getenv('DB_PASSWORD');
+$dbCharset = getenv('DB_CHARSET');
+
+$dbPort = ($dbPort === false || $dbPort === '') ? '3306' : $dbPort;
+$dbCharset = ($dbCharset === false || $dbCharset === '') ? 'utf8mb4' : $dbCharset;
+
+$missingVariables = [];
+foreach ([
+    'DB_HOST' => $dbHost,
+    'DB_NAME' => $dbName,
+    'DB_USER' => $dbUser,
+    'DB_PASSWORD' => $dbPassword,
+] as $variableName => $value) {
+    if ($value === false || ($variableName !== 'DB_PASSWORD' && $value === '')) {
+        $missingVariables[] = $variableName;
+    }
+}
+
+if ($missingVariables !== []) {
+    databaseConfigurationError('Missing required environment variables: ' . implode(', ', $missingVariables));
+}
+
+if (!ctype_digit((string) $dbPort) || (int) $dbPort < 1 || (int) $dbPort > 65535) {
+    databaseConfigurationError('DB_PORT must be an integer between 1 and 65535.');
+}
+
+if (!preg_match('/^[A-Za-z0-9_]+$/', (string) $dbCharset)) {
+    databaseConfigurationError('DB_CHARSET contains unsupported characters.');
+}
+
+if (strtolower((string) $dbCharset) !== 'utf8mb4') {
+    databaseConfigurationError('DB_CHARSET must be utf8mb4.');
+}
+
+$dbCharset = 'utf8mb4';
+
+foreach (['DB_HOST' => $dbHost, 'DB_NAME' => $dbName] as $variableName => $value) {
+    if (preg_match('/[;\x00-\x1F\x7F]/', (string) $value)) {
+        databaseConfigurationError($variableName . ' contains unsupported characters.');
+    }
+}
+
+$dsn = sprintf(
+    'mysql:host=%s;port=%d;dbname=%s;charset=%s',
+    $dbHost,
+    (int) $dbPort,
+    $dbName,
+    $dbCharset
+);
+
+try {
+    $mysqlconnection = new PDO($dsn, $dbUser, $dbPassword, [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_EMULATE_PREPARES => false,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+    ]);
+} catch (Throwable $exception) {
+    reportDatabaseError($exception, 'Connection failed');
+    databaseConfigurationError('Unable to establish a database connection.');
+}

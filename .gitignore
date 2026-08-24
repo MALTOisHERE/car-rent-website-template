@@ -1,3 +1,13 @@
 .env
 .env.local
-/vendor/
+.env.*
+!.env.example
+storage/uploads/
+storage/inspection-photo-private/
+storage/sess_*
+*.log
+phase*-review.txt
+phase*-tests.txt
+phase*-tree.txt
+phase*-diff.txt
+phase*-smoke-tests.txt
