@@ -15,8 +15,7 @@ $i = dbFetchOne(
     array_merge([$id], $ids)
 );
 if (!$i) {
-    http_response_code(404);
-    exit(t('validation.finance_not_found'));
+    printNotFound(t('validation.finance_not_found'));
 }
 $lang = validateChoice($i['language_code'], supportedLanguages(), 'en');
 $dir = $lang === 'ar' ? 'rtl' : 'ltr';

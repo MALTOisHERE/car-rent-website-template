@@ -208,3 +208,12 @@ function statMoney($amount, $currency = null)
     $numberOnly = trim(str_replace($currency, '', localizedMoney($amount, $currency)));
     return isolatedValue($numberOnly, 'money-value');
 }
+
+/** Styled 404 for standalone print pages (contract/invoice/quote print) that don't load the app shell. Sends the response and exits. */
+function printNotFound($message)
+{
+    http_response_code(404);
+    $rtl = language() === 'ar';
+    ?><!doctype html><html lang="<?= e(language()) ?>" dir="<?= $rtl ? 'rtl' : 'ltr' ?>"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title><?= e($message) ?></title><style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#f4f6fb;font:15px/1.55 Inter,system-ui,-apple-system,"Segoe UI",sans-serif;color:#182231}.not-found-card{max-width:26rem;margin:1rem;padding:2.5rem 2rem;background:#fff;border-radius:16px;box-shadow:0 24px 60px rgba(15,23,42,.18);text-align:center}.not-found-icon{inline-size:3rem;block-size:3rem;margin:0 auto 1rem;display:grid;place-items:center;border-radius:50%;background:#fde8eb;color:#ad2f3d}.not-found-card h1{margin:0;font-size:1.15rem;font-weight:700}</style></head><body><div class="not-found-card"><span class="not-found-icon" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></span><h1><?= e($message) ?></h1></div></body></html><?php
+    exit;
+}
