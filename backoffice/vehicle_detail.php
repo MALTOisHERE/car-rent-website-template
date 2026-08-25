@@ -111,7 +111,7 @@ pageHeader(t('page.vehicle_detail.title'), t('page.vehicle_detail.description'),
     <?php if($primaryMedia):?><img class="vehicle-hero-image" src="vehicle_media.php?id=<?=e($primaryMedia['id'])?>" alt="<?=e($primaryMedia['alt_text'] ?: $vehicle['brand'].' '.$vehicle['model'])?>"><?php else:?><div class="vehicle-hero-placeholder" aria-hidden="true">🚗</div><?php endif;?>
     <div><div class="section-card-header"><h2><?=navigationIcon('fleet')?><?=e($vehicle['brand'].' '.$vehicle['model'])?></h2></div><p><?=isolatedValue($vehicle['registration_number'],'registration-value')?> · <?=e($vehicle['category_name'])?></p><div class="vehicle-hero-badges"><?=statusBadge($vehicle['status'])?><span><?=e(number_format((int)$vehicle['current_mileage']))?> <?=e(t('unit.km'))?></span><span><?=money($vehicle['base_daily_price'])?> / <?=e(t('unit.day'))?></span></div></div>
   </div>
-  <div><small><?=e(t('field.agency'))?></small><strong><?=e($vehicle['agency_name'])?></strong></div>
+  <div class="meta-block"><small><?=e(t('field.agency'))?></small><strong><?=e($vehicle['agency_name'])?></strong></div>
 </section>
 <nav class="tabs vehicle-tabs" aria-label="<?=e(t('section.vehicle_workspace'))?>"><?php foreach($visibleTabs as $item):?><a class="tab <?=$tab===$item?'active':''?>" <?=$tab===$item?'aria-current="page"':''?> href="<?=e(vehicleDetailLink($vehicleId,$item))?>"><?=e(t('vehicle_tab.'.$item))?></a><?php endforeach;?></nav>
 
