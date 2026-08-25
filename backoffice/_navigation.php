@@ -27,6 +27,7 @@ function backofficeNavigation()
             ['label'=>'nav.dashboard','href'=>'index.php','permission'=>'dashboard.view'],
             ['label'=>'nav.notifications','href'=>'notifications.php','permission'=>'reservations.manage'],
             ['label'=>'nav.portal_requests','href'=>'requests.php','permission'=>'reservations.manage'],
+            ['label'=>'nav.help','href'=>'help.php','permission'=>'dashboard.view'],
         ]],
         ['label'=>'nav.rentals','icon'=>'rentals','items'=>[
             ['label'=>'nav.reservations','href'=>'reservations.php','permission'=>'reservations.manage'],

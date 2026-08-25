@@ -116,3 +116,19 @@ input,select,textarea{width:100%;min-height:var(--control-height);padding:.65rem
 @media(max-width:600px){.contract-signatures{grid-template-columns:1fr}}
 @media print{body{background:#fff}.print-page{padding:0;background:#fff}.document{box-shadow:none;border-radius:0;max-width:none;padding:0}.btn{display:none}@page{margin:14mm}}
 @media(max-width:600px){.document-head{flex-direction:column}.document-title{text-align:start}}
+
+/* Help / field guide page */
+.help-jump{display:flex;flex-wrap:wrap;gap:var(--space-2)}
+.help-jump a{font-size:var(--font-xs);font-weight:700;color:var(--brand);background:var(--brand-soft);border-radius:var(--radius-pill);padding:.4rem .8rem}
+.help-jump a:hover{background:color-mix(in srgb,var(--brand-soft) 70%,var(--brand) 10%)}
+.help-module{scroll-margin-top:calc(var(--topbar-height) + var(--space-4))}
+.help-module+.help-module{margin-block-start:var(--space-8)}
+.help-status-grid{display:flex;flex-wrap:wrap;gap:var(--space-3)}
+.help-status-item{flex:1 1 15rem;display:flex;align-items:baseline;gap:var(--space-3);padding:var(--space-3) var(--space-4);border:1px solid var(--border);border-radius:var(--radius-md);background:var(--surface-subtle)}
+.help-status-item p{margin:0;color:var(--text-muted);font-size:var(--font-sm);line-height:1.5}
+.help-terms{margin:0}
+.help-terms dt{font-weight:700}
+.help-terms dd{color:var(--text-muted)}
+.help-subhead{margin:var(--space-5) 0 var(--space-3);font-size:var(--font-xs);font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted)}
+[dir=rtl] .help-subhead{letter-spacing:0}
+.help-module-tag{color:var(--text-muted);font-size:var(--font-sm);white-space:nowrap}
