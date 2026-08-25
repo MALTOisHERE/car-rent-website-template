@@ -200,3 +200,11 @@ function money($amount, $currency = null)
 {
     return isolatedValue(localizedMoney($amount, $currency), 'money-value');
 }
+
+/** Number-only money for stat cards: the currency code belongs in the card's label, not its (large) value. */
+function statMoney($amount, $currency = null)
+{
+    $currency = strtoupper((string) ($currency ?? appConfig('currency')));
+    $numberOnly = trim(str_replace($currency, '', localizedMoney($amount, $currency)));
+    return isolatedValue($numberOnly, 'money-value');
+}

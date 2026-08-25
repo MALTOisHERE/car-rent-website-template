@@ -34,12 +34,6 @@ pageHeader('page.dashboard.title', 'page.dashboard.description', [
 ]); ?>
 <section class="stat-grid">
 <?php
-function statMoney($amount)
-{
-    $currency = strtoupper((string) appConfig('currency'));
-    $numberOnly = trim(str_replace($currency, '', localizedMoney($amount, $currency)));
-    return isolatedValue($numberOnly, 'money-value');
-}
 $statCurrency = strtoupper((string) appConfig('currency'));
 $financeIconByIndex = ['finance', 'commercial', 'finance'];
 $financeColorByIndex = ['', 'warning', 'info'];
