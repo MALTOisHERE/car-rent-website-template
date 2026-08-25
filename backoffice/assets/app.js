@@ -81,6 +81,10 @@
     });
 
     document.querySelectorAll('[data-dismiss-alert]').forEach(button => button.addEventListener('click', () => button.closest('.alert')?.remove()));
+    document.querySelectorAll('[data-toast-stack] .alert').forEach(toast => {
+        const timer = setTimeout(() => toast.remove(), 6000);
+        toast.addEventListener('mouseenter', () => clearTimeout(timer));
+    });
     document.querySelectorAll('.table-wrap').forEach((wrapper, index) => {
         wrapper.setAttribute('role', wrapper.getAttribute('role') || 'region');
         wrapper.setAttribute('tabindex', wrapper.getAttribute('tabindex') || '0');

@@ -43,7 +43,8 @@ function backofficeHeader($title, $active = '')
             <div class="dropdown profile-dropdown"><button class="profile-button" type="button" data-menu-button aria-expanded="false" aria-controls="profile-menu" aria-label="<?= e(t('shell.profile')) ?>"><span class="avatar" aria-hidden="true"><?= e(strtoupper(substr($username,0,1)) ?: 'U') ?></span><span class="profile-copy"><strong><?= e($username) ?></strong><?= roleBadge(currentUserRole()) ?></span><?= $chevron ?></button><div class="dropdown-menu dropdown-menu-end" id="profile-menu" data-menu hidden><div class="dropdown-meta"><?= isolatedValue($_SESSION['email'] ?? '', 'email-value') ?></div><a class="dropdown-item" href="profile.php"><?= e(t('nav.profile')) ?></a><form action="../account/logout.php" method="post"><?= csrfField() ?><button class="dropdown-item dropdown-button" type="submit"><?= e(t('shell.sign_out')) ?></button></form></div></div>
           </div>
         </header>
-        <main class="page-container" id="main-content" tabindex="-1"><?= flashMessages() ?>
+        <div class="toast-stack" data-toast-stack aria-live="polite"><?= flashMessages() ?></div>
+        <main class="page-container" id="main-content" tabindex="-1">
     <?php
 }
 
