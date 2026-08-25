@@ -41,19 +41,21 @@ $currency=$data['currency']??'MAD';
 </header>
 <dl class="document-meta">
 <div><dt><?=e($tr('field.version'))?></dt><dd><?=e($version['version_number'])?></dd></div>
-<div><dt><?=e($tr('field.customer'))?></dt><dd>
-<?=e($data['customer']['name']??'')?>
-<?php if(!empty($data['customer']['identity_number'])):?><br><?=e($tr('field.identity'))?>: <?=isolatedValue($data['customer']['identity_number'],'reference-value')?><?php endif;?>
-<?php if(!empty($data['customer']['licence_number'])):?><br><?=e($tr('field.licence'))?>: <?=isolatedValue($data['customer']['licence_number'],'reference-value')?><?php endif;?>
-</dd></div>
-<div><dt><?=e($tr('field.vehicle'))?></dt><dd>
-<?=e($data['vehicle']['description']??'')?>
-<?php if(!empty($data['vehicle']['registration_number'])):?><br><?=e($tr('field.registration'))?>: <?=isolatedValue($data['vehicle']['registration_number'],'registration-value')?><?php endif;?>
-<?php if(!empty($data['vehicle']['vin'])):?><br>VIN: <?=isolatedValue($data['vehicle']['vin'],'reference-value')?><?php endif;?>
-</dd></div>
 <div><dt><?=e($tr('field.pickup'))?></dt><dd><?=e($data['period']['pickup_at']??'')?></dd></div>
 <div><dt><?=e($tr('field.return'))?></dt><dd><?=e($data['period']['return_at']??'')?></dd></div>
 </dl>
+<div class="document-columns">
+<div class="document-box"><h3><?=e($tr('field.customer'))?></h3><p>
+<?=e($data['customer']['name']??'')?>
+<?php if(!empty($data['customer']['identity_number'])):?><br><?=e($tr('field.identity'))?>: <?=isolatedValue($data['customer']['identity_number'],'reference-value')?><?php endif;?>
+<?php if(!empty($data['customer']['licence_number'])):?><br><?=e($tr('field.licence'))?>: <?=isolatedValue($data['customer']['licence_number'],'reference-value')?><?php endif;?>
+</p></div>
+<div class="document-box"><h3><?=e($tr('field.vehicle'))?></h3><p>
+<?=e($data['vehicle']['description']??'')?>
+<?php if(!empty($data['vehicle']['registration_number'])):?><br><?=e($tr('field.registration'))?>: <?=isolatedValue($data['vehicle']['registration_number'],'registration-value')?><?php endif;?>
+<?php if(!empty($data['vehicle']['vin'])):?><br>VIN: <?=isolatedValue($data['vehicle']['vin'],'reference-value')?><?php endif;?>
+</p></div>
+</div>
 <div class="table-wrap"><table>
 <tbody>
 <tr class="totals-row"><th><?=e($tr('field.deposit'))?></th><td><?=e(localizedMoney($data['deposit_amount']??0,$currency,$lang))?></td></tr>
@@ -69,7 +71,7 @@ $currency=$data['currency']??'MAD';
 <div class="contract-signature"><?=e($tr('print.agency_signature'))?></div>
 </div>
 <footer class="document-footer">
-<p class="document-generated"><img src="assets/img/aurevo-mark.png" alt="" class="document-generated-mark"><?=e($tr('print.generated_with',['name'=>appConfig('name')]))?></p>
+<p class="document-generated"><?=e($tr('print.generated_with'))?> <img src="assets/img/aurevo-mark.png" alt="<?=e(appConfig('name'))?>" class="document-generated-mark"></p>
 </footer>
 </div>
 </div>

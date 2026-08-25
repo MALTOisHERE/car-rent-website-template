@@ -98,6 +98,10 @@ input,select,textarea{width:100%;min-height:var(--control-height);padding:.65rem
 .document-meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(11rem,1fr));gap:var(--space-4);margin:0 0 var(--space-6)}
 .document-meta dt{margin:0;font-size:var(--font-xs);text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);font-weight:750}
 .document-meta dd{margin:.25rem 0 0;font-weight:650;line-height:1.5}
+.document-columns{display:grid;grid-template-columns:repeat(auto-fit,minmax(14rem,1fr));gap:var(--space-4);margin:0 0 var(--space-6)}
+.document-box{padding:var(--space-4);border:1px solid var(--border);border-radius:var(--radius-md);background:var(--surface-subtle)}
+.document-box h3{margin:0 0 var(--space-2);font-size:var(--font-xs);text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);font-weight:750}
+.document-box p{margin:0;font-weight:650;line-height:1.6}
 .document .credit-reason{padding:var(--space-3) var(--space-4);margin-block-end:var(--space-5);background:var(--danger-bg);color:var(--danger);border-radius:var(--radius-sm)}
 .document table th:nth-child(n+2),.document table td:nth-child(n+2){text-align:end;font-variant-numeric:tabular-nums}
 .document .totals-row td,.document .totals-row th{border-block-end:0;background:transparent}
@@ -105,8 +109,8 @@ input,select,textarea{width:100%;min-height:var(--control-height);padding:.65rem
 .document .totals-row.due th,.document .totals-row.due td{color:var(--danger);font-weight:800}
 .document-notes{margin-block-start:var(--space-5);padding:var(--space-4);background:var(--surface-subtle);border-radius:var(--radius-sm);color:var(--text-muted)}
 .document-footer{margin-block-start:var(--space-8);padding-block-start:var(--space-5);border-block-start:1px solid var(--border);color:var(--text-muted);font-size:var(--font-sm);text-align:center}
-.document-generated{margin:var(--space-3) 0 0;display:flex;align-items:center;justify-content:center;gap:.35rem;color:var(--text-muted);font-size:var(--font-xs)}
-.document-generated-mark{inline-size:.9rem;block-size:.9rem;object-fit:contain;filter:grayscale(1) opacity(.55)}
+.document-generated{margin:var(--space-5) 0 0;display:flex;align-items:center;justify-content:center;gap:.4rem;color:var(--text-muted);font-size:.65rem}
+.document-generated-mark{inline-size:1.15rem;block-size:1.15rem;object-fit:contain;filter:grayscale(1) opacity(.55)}
 .contract-signatures{display:grid;grid-template-columns:repeat(2,1fr);gap:var(--space-8);margin-block-start:var(--space-10)}
 .contract-signature{border-block-start:1px solid var(--border);padding-block-start:var(--space-2);color:var(--text-muted);font-size:var(--font-sm)}
 @media(max-width:600px){.contract-signatures{grid-template-columns:1fr}}
