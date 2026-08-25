@@ -102,7 +102,7 @@
         <div class="row g-4 align-items-center">
             <div class="col-md-6 text-center text-md-start mb-md-0">
                 <span class="text-body"><i
-                        class="fas fa-copyright text-light me-2"></i>REIMS CARS</a>, Tous droits
+                        class="fas fa-copyright text-light me-2"></i>Aurevo</a>, Tous droits
                     réservés.</span>
             </div>
             <div class="col-md-6 text-center text-md-end text-body">

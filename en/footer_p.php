@@ -34,7 +34,7 @@
                 <div class="footer-item d-flex flex-column">
                     <div class="footer-item">
                         <h4 class="text-white mb-4">About Us</h4>
-                        <p class="mb-3">At REIMS Cars, we are dedicated to providing exceptional car rental services tailored to your needs. With a wide selection of vehicles and a commitment to customer satisfaction, we make every journey memorable.</p>
+                        <p class="mb-3">At Aurevo, we are dedicated to providing exceptional car rental services tailored to your needs. With a wide selection of vehicles and a commitment to customer satisfaction, we make every journey memorable.</p>
                     </div>
                     <div class="position-relative">
                         <input class="form-control rounded-pill w-100 py-3 ps-4 pe-5" type="text"
@@ -82,7 +82,7 @@
                 <div class="footer-item d-flex flex-column">
                     <h4 class="text-white mb-4">Contact Info</h4>
                     <a href="#"><i class="fa fa-map-marker-alt me-2"></i> 456 Auto Drive, New York, USA</a>
-                    <a href="mailto:info@reimscars.com"><i class="fas fa-envelope me-2"></i> info@reimscars.com</a>
+                    <a href="mailto:info@aurevo.com"><i class="fas fa-envelope me-2"></i> info@aurevo.com</a>
                     <a href="tel:+012 345 67890"><i class="fas fa-phone me-2"></i> +012 345 67890</a>
                     <a href="tel:+012 345 67890" class="mb-3"><i class="fas fa-print me-2"></i> +012 345 67891</a>
                     <div class="d-flex">
@@ -108,7 +108,7 @@
         <div class="row g-4 align-items-center">
             <div class="col-md-6 text-center text-md-start mb-md-0">
                 <span class="text-body"><i
-                        class="fas fa-copyright text-light me-2"></i>REIMS CARS</a>, All right
+                        class="fas fa-copyright text-light me-2"></i>Aurevo</a>, All right
                     reserved.</span>
             </div>
             <div class="col-md-6 text-center text-md-end text-body">

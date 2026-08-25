@@ -226,7 +226,7 @@ include("header_p.php") ?>
             <div class="col-xl-6 wow fadeInLeft" data-wow-delay="0.2s">
                 <div class="about-item">
                     <div class="pb-5">
-                        <h1 style="color: #011468;" class="display-5 text-capitalize">À propos de REIMS Cars</h1>
+                        <h1 style="color: #011468;" class="display-5 text-capitalize">À propos de Aurevo</h1>
                         <p class="mb-0">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ut amet nemo
                             expedita asperiores commodi accusantium at cum harum, excepturi, quia tempora
                             cupiditate! Adipisci facilis modi quisquam quia distinctio,

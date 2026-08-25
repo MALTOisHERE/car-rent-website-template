@@ -225,7 +225,7 @@ include("header_p.php") ?>
             <div class="col-xl-6 wow fadeInLeft" data-wow-delay="0.2s">
                 <div class="about-item">
                     <div class="pb-5">
-                        <h1 style="color: #011468;" class="display-5 text-capitalize">من نحن في REIMS Cars</h1>
+                        <h1 style="color: #011468;" class="display-5 text-capitalize">من نحن في Aurevo</h1>
                         <p class="mb-0">لوريم إيبسوم دولور سيت أميت، كونسيكتيتور أديبيسينغ إليت. أوت أميت نيمو إكسبيديتا
                             أسبريريس كومودي أكرسانتيوم أت كيوم هاروم، إكسبيتوري، كويا تيمبورا كوبيديتات! أدبيسكي فاسيليس
                             مودي كويزكيام كويا ديستينكتيو،

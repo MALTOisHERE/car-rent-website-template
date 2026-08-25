@@ -252,7 +252,7 @@ if (isset($_GET['message'])) {
 <div class="container-fluid feature py-5">
     <div class="container py-5">
         <div class="text-center mx-auto pb-5 wow fadeInUp" data-wow-delay="0.1s" style="max-width: 800px;">
-            <h1 style="color:#011468;" class="display-5 text-capitalize mb-3">REIMS Cars Features</h1>
+            <h1 style="color:#011468;" class="display-5 text-capitalize mb-3">Aurevo Features</h1>
             <p class="mb-0">Discover the exceptional services and features that set us apart. We are committed to providing top-notch solutions tailored to meet your needs, ensuring a seamless and satisfying experience every time.</p>
         </div>
         <div class="row g-4 align-items-center">
@@ -323,8 +323,8 @@ if (isset($_GET['message'])) {
             <div class="col-xl-6 wow fadeInLeft" data-wow-delay="0.2s">
                 <div class="about-item">
                     <div class="pb-5">
-                        <h1 style="color: #011468;" class="display-5 text-capitalize">REIMS Cars About</h1>
-                        <p class="mb-0">At REIMS Cars, we are passionate about delivering exceptional automotive experiences. With years of expertise, we provide top-quality vehicles and services tailored to meet your needs. Our commitment to excellence ensures that every customer drives away satisfied.</p>
+                        <h1 style="color: #011468;" class="display-5 text-capitalize">Aurevo About</h1>
+                        <p class="mb-0">At Aurevo, we are passionate about delivering exceptional automotive experiences. With years of expertise, we provide top-quality vehicles and services tailored to meet your needs. Our commitment to excellence ensures that every customer drives away satisfied.</p>
                     </div>
                     <div class="row g-4">
                         <div class="col-lg-6">
@@ -346,7 +346,7 @@ if (isset($_GET['message'])) {
                             </div>
                         </div>
                     </div>
-                    <p class="text-item my-4">With a focus on innovation, reliability, and customer satisfaction, REIMS Cars has become a trusted name in the automotive industry. Our team of experts is dedicated to helping you find the perfect vehicle for your lifestyle and needs.</p>
+                    <p class="text-item my-4">With a focus on innovation, reliability, and customer satisfaction, Aurevo has become a trusted name in the automotive industry. Our team of experts is dedicated to helping you find the perfect vehicle for your lifestyle and needs.</p>
                     <div class="row g-4">
                         <div class="col-lg-6">
                             <div class="text-center rounded bg-custom-secondary p-4">
@@ -386,7 +386,7 @@ if (isset($_GET['message'])) {
                                     style="width: 100px; height: 100px;" alt="Image">
                                 <div class="ms-4">
                                     <h4>William Burgess</h4>
-                                    <p class="mb-0">REIMS Cars Founder</p>
+                                    <p class="mb-0">Aurevo Founder</p>
                                 </div>
                             </div>
                         </div>
@@ -476,7 +476,7 @@ if (isset($_GET['message'])) {
     <div class="container py-5">
         <div class="text-center mx-auto pb-5 wow fadeInUp" data-wow-delay="0.1s" style="max-width: 800px;">
             <h1 style="color: #011468;" class="display-5 text-capitalize mb-3">Central Services</h1>
-            <p class="mb-0">At REIMS Cars, we offer a wide range of services designed to make your car rental experience seamless and enjoyable. From convenient reservations to flexible rental options, we’ve got you covered every step of the way.</p>
+            <p class="mb-0">At Aurevo, we offer a wide range of services designed to make your car rental experience seamless and enjoyable. From convenient reservations to flexible rental options, we’ve got you covered every step of the way.</p>
         </div>
         <div class="row g-4">
             <div class="col-md-6 col-lg-4 wow fadeInUp" data-wow-delay="0.1s">
@@ -543,7 +543,7 @@ if (isset($_GET['message'])) {
     <div class="container py-5">
         <div class="text-center mx-auto pb-5 wow fadeInUp" data-wow-delay="0.1s" style="max-width: 800px;">
             <h1 class="display-5 text-capitalize text-white mb-3">Central Process</h1>
-            <p class="mb-0 text-white">At REIMS Cars, we’ve streamlined the car rental process to make it simple, fast, and hassle-free. Follow these easy steps to get behind the wheel of your dream car in no time.</p>
+            <p class="mb-0 text-white">At Aurevo, we’ve streamlined the car rental process to make it simple, fast, and hassle-free. Follow these easy steps to get behind the wheel of your dream car in no time.</p>
         </div>
         <div class="row g-4">
             <div class="col-lg-4 wow fadeInUp" data-wow-delay="0.1s">
