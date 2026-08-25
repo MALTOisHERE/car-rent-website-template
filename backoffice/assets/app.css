@@ -107,5 +107,8 @@ input,select,textarea{width:100%;min-height:var(--control-height);padding:.65rem
 .document-footer{margin-block-start:var(--space-8);padding-block-start:var(--space-5);border-block-start:1px solid var(--border);color:var(--text-muted);font-size:var(--font-sm);text-align:center}
 .document-generated{margin:var(--space-3) 0 0;display:flex;align-items:center;justify-content:center;gap:.35rem;color:var(--text-muted);font-size:var(--font-xs)}
 .document-generated-mark{inline-size:.9rem;block-size:.9rem;object-fit:contain;filter:grayscale(1) opacity(.55)}
+.contract-signatures{display:grid;grid-template-columns:repeat(2,1fr);gap:var(--space-8);margin-block-start:var(--space-10)}
+.contract-signature{border-block-start:1px solid var(--border);padding-block-start:var(--space-2);color:var(--text-muted);font-size:var(--font-sm)}
+@media(max-width:600px){.contract-signatures{grid-template-columns:1fr}}
 @media print{body{background:#fff}.print-page{padding:0;background:#fff}.document{box-shadow:none;border-radius:0;max-width:none;padding:0}.btn{display:none}@page{margin:14mm}}
 @media(max-width:600px){.document-head{flex-direction:column}.document-title{text-align:start}}

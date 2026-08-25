@@ -12,4 +12,66 @@ $version=dbFetchOne(
 );
 if(!$version){printNotFound(t('validation.contract_version_not_found'));}
 $data=json_decode($version['snapshot_json'],true)?:[];
-?><!doctype html><html lang="<?=e($lang)?>" dir="<?=$lang==='ar'?'rtl':'ltr'?>"><head><meta charset="utf-8"><title><?=e($contract['contract_number'])?></title><link rel="icon" href="assets/img/favicon.png"><style>body{font:14px Arial;max-width:900px;margin:30px auto;color:#172536}header{display:flex;justify-content:space-between;border-bottom:3px solid #143b61;padding-bottom:20px}h1{color:#143b61}section{margin:25px 0}.grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}.box{border:1px solid #ccd7e0;padding:15px}.signatures{display:grid;grid-template-columns:1fr 1fr;gap:50px;margin-top:70px}.signature{border-top:1px solid #333;padding-top:8px}bdi{unicode-bidi:isolate;direction:ltr}@media print{button{display:none}body{margin:0}}</style></head><body><button onclick="window.print()"><?=e(translateInLanguage('common.print_pdf',$lang))?></button><header><div><h1><?=e(translateInLanguage('print.rental_contract',$lang))?></h1><strong><?=e(appConfig('name'))?></strong></div><div><strong><bdi><?=e($contract['contract_number'])?></bdi></strong><br><?=e(translateInLanguage('field.version',$lang))?> <bdi><?=e($version['version_number'])?></bdi><br><?=e(translateInLanguage('status.'.$contract['status'],$lang))?></div></header><section class="grid"><div class="box"><h2><?=e(translateInLanguage('field.customer',$lang))?></h2><p><?=e($data['customer']['name']??'')?></p><p><?=e(translateInLanguage('field.identity',$lang))?>: <bdi><?=e($data['customer']['identity_number']??'')?></bdi></p><p><?=e(translateInLanguage('field.licence',$lang))?>: <bdi><?=e($data['customer']['licence_number']??'')?></bdi></p></div><div class="box"><h2><?=e(translateInLanguage('field.vehicle',$lang))?></h2><p><?=e($data['vehicle']['description']??'')?></p><p><?=e(translateInLanguage('field.registration',$lang))?>: <bdi><?=e($data['vehicle']['registration_number']??'')?></bdi></p><p>VIN: <bdi><?=e($data['vehicle']['vin']??'')?></bdi></p></div></section><section class="box"><h2><?=e(translateInLanguage('section.rental_summary',$lang))?></h2><p><?=e(translateInLanguage('field.pickup',$lang))?>: <bdi><?=e($data['period']['pickup_at']??'')?></bdi></p><p><?=e(translateInLanguage('field.return',$lang))?>: <bdi><?=e($data['period']['return_at']??'')?></bdi></p><p><?=e(translateInLanguage('field.total',$lang))?>: <bdi><?=localizedMoney($data['pricing']['total']??0,$data['currency']??'MAD',$lang)?></bdi></p><p><?=e(translateInLanguage('field.deposit',$lang))?>: <bdi><?=localizedMoney($data['deposit_amount']??0,$data['currency']??'MAD',$lang)?></bdi></p></section><section><h2><?=e(translateInLanguage('print.terms',$lang))?></h2><p><?=nl2br(e($version['terms_text']))?></p></section><div class="signatures"><div class="signature"><?=e(translateInLanguage('print.customer_signature',$lang))?></div><div class="signature"><?=e(translateInLanguage('print.agency_signature',$lang))?></div></div></body></html>
+$dir=$lang==='ar'?'rtl':'ltr';
+$tr=fn($key,$parameters=[])=>translateInLanguage($key,$lang,$parameters);
+$currency=$data['currency']??'MAD';
+?><!doctype html>
+<html lang="<?=e($lang)?>" dir="<?=e($dir)?>">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title><?=e($contract['contract_number'])?></title>
+<link rel="icon" href="assets/img/favicon.png">
+<link rel="stylesheet" href="assets/app.css?v=<?= e(assetVersion('backoffice/assets/app.css')) ?>">
+</head>
+<body>
+<div class="print-page">
+<div class="document">
+<button class="btn secondary" onclick="print()"><?=e($tr('common.print_pdf'))?></button>
+<header class="document-head">
+<div class="document-brand">
+<span class="invoice-mark" aria-hidden="true"><?=e(mb_strtoupper(mb_substr((string)$contract['agency_name'],0,1)))?></span>
+<div><strong><?=e($contract['agency_name'])?></strong></div>
+</div>
+<div class="document-title">
+<h1><?=e($tr('print.rental_contract'))?></h1>
+<p class="reference"><?=isolatedValue($contract['contract_number'],'reference-value')?></p>
+<?=statusBadge($contract['status'],$lang)?>
+</div>
+</header>
+<dl class="document-meta">
+<div><dt><?=e($tr('field.version'))?></dt><dd><?=e($version['version_number'])?></dd></div>
+<div><dt><?=e($tr('field.customer'))?></dt><dd>
+<?=e($data['customer']['name']??'')?>
+<?php if(!empty($data['customer']['identity_number'])):?><br><?=e($tr('field.identity'))?>: <?=isolatedValue($data['customer']['identity_number'],'reference-value')?><?php endif;?>
+<?php if(!empty($data['customer']['licence_number'])):?><br><?=e($tr('field.licence'))?>: <?=isolatedValue($data['customer']['licence_number'],'reference-value')?><?php endif;?>
+</dd></div>
+<div><dt><?=e($tr('field.vehicle'))?></dt><dd>
+<?=e($data['vehicle']['description']??'')?>
+<?php if(!empty($data['vehicle']['registration_number'])):?><br><?=e($tr('field.registration'))?>: <?=isolatedValue($data['vehicle']['registration_number'],'registration-value')?><?php endif;?>
+<?php if(!empty($data['vehicle']['vin'])):?><br>VIN: <?=isolatedValue($data['vehicle']['vin'],'reference-value')?><?php endif;?>
+</dd></div>
+<div><dt><?=e($tr('field.pickup'))?></dt><dd><?=e($data['period']['pickup_at']??'')?></dd></div>
+<div><dt><?=e($tr('field.return'))?></dt><dd><?=e($data['period']['return_at']??'')?></dd></div>
+</dl>
+<div class="table-wrap"><table>
+<tbody>
+<tr class="totals-row"><th><?=e($tr('field.deposit'))?></th><td><?=e(localizedMoney($data['deposit_amount']??0,$currency,$lang))?></td></tr>
+<tr class="totals-row grand"><th><?=e($tr('field.total'))?></th><td><?=e(localizedMoney($data['pricing']['total']??0,$currency,$lang))?></td></tr>
+</tbody>
+</table></div>
+<section>
+<h2><?=e($tr('print.terms'))?></h2>
+<p><?=nl2br(e($version['terms_text']))?></p>
+</section>
+<div class="contract-signatures">
+<div class="contract-signature"><?=e($tr('print.customer_signature'))?></div>
+<div class="contract-signature"><?=e($tr('print.agency_signature'))?></div>
+</div>
+<footer class="document-footer">
+<p class="document-generated"><img src="assets/img/aurevo-mark.png" alt="" class="document-generated-mark"><?=e($tr('print.generated_with',['name'=>appConfig('name')]))?></p>
+</footer>
+</div>
+</div>
+</body>
+</html>
