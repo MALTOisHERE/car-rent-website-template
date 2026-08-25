@@ -40,7 +40,7 @@ function backofficeNavigation()
         ['label'=>'nav.fleet','icon'=>'fleet','items'=>[
             ['label'=>'nav.vehicles','href'=>'vehicles.php','permission'=>'vehicles.view'],
             ['label'=>'nav.maintenance','href'=>'maintenance.php','permission'=>'maintenance.manage'],
-            ['label'=>'nav.vehicle_documents','href'=>'maintenance.php#vehicle-documents','permission'=>'maintenance.manage'],
+            ['label'=>'nav.vehicle_documents','href'=>'maintenance.php#vehicle-documents','permission'=>'maintenance.manage','active'=>'vehicle-documents'],
             ['label'=>'nav.incidents','href'=>'incidents.php','permission'=>'vehicles.manage'],
         ]],
         ['label'=>'nav.finance','icon'=>'finance','items'=>[
