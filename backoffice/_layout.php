@@ -18,8 +18,12 @@ function backofficeHeader($title, $active = '')
     $rtl = language() === 'ar';
     $title = uiLabel($title);
     $username = (string) ($_SESSION['username'] ?? '');
-    $agencyContext = isset($_GET['agency_id']) && ctype_digit((string) $_GET['agency_id'])
-        ? t('shell.agency_context', ['id'=>(int) $_GET['agency_id']]) : t('shell.all_assigned_agencies');
+    $agencyContext = t('shell.all_assigned_agencies');
+    if (isset($_GET['agency_id']) && ctype_digit((string) $_GET['agency_id'])) {
+        $requestedAgencyId = (int) $_GET['agency_id'];
+        $requestedAgencyName = dbFetchOne('SELECT name FROM agencies WHERE id=:id', ['id'=>$requestedAgencyId])['name'] ?? null;
+        $agencyContext = $requestedAgencyName ?? t('shell.agency_context', ['id'=>$requestedAgencyId]);
+    }
     ?><!doctype html><html lang="<?= e(language()) ?>" dir="<?= $rtl ? 'rtl' : 'ltr' ?>"><head>
     <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
     <title><?= e($title) ?> — <?= e(appConfig('name')) ?></title>

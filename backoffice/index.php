@@ -12,6 +12,7 @@ if (!tableExists('agencies')) {
 $agencyIds = currentAgencyIds();
 $agencyId = (int) ($_GET['agency_id'] ?? ($agencyIds[0] ?? 0));
 requireAgencyAccess($agencyId);
+$agencies = dbFetchAll('SELECT id,name FROM agencies WHERE archived_at IS NULL ORDER BY name');
 $periodStart = date('Y-m-01 00:00:00');
 $periodEnd = date('Y-m-t 23:59:59');
 $metrics = [];
@@ -30,8 +31,8 @@ $alerts = dbFetchAll("SELECT v.registration_number,vd.document_type,vd.expires_a
 backofficeHeader(t('page.dashboard.title'), 'index.php');
 pageHeader('page.dashboard.title', 'page.dashboard.description', [
     'breadcrumbs'=>[['label'=>'nav.overview'],['label'=>'nav.dashboard']],
-    'metadata'=>t('shell.agency_context', ['id'=>$agencyId]),
 ]); ?>
+<form class="filters"><label><?=e(t('field.agency'))?><select name="agency_id" onchange="this.form.submit()"><?php foreach($agencies as $a):if(currentUserRole()!==ROLE_OWNER&&!in_array((int)$a['id'],$agencyIds,true))continue;?><option value="<?=e($a['id'])?>" <?=$agencyId===(int)$a['id']?'selected':''?>><?=e($a['name'])?></option><?php endforeach;?></select></label><noscript><button class="btn primary"><?=e(t('action.apply'))?></button></noscript></form>
 <section class="stat-grid">
 <?php
 $statCurrency = strtoupper((string) appConfig('currency'));
