@@ -29,7 +29,8 @@ $rtl = language() === 'ar';
 <!doctype html><html lang="<?= e(language()) ?>" dir="<?= $rtl ? 'rtl' : 'ltr' ?>"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title><?= e(appConfig('name')) ?> — <?=e(t('auth.sign_in'))?></title>
-<link rel="stylesheet" href="../backoffice/assets/app.css?v=<?= e(assetVersion('backoffice/assets/app.css')) ?>"></head><body>
+<link rel="stylesheet" href="../backoffice/assets/app.css?v=<?= e(assetVersion('backoffice/assets/app.css')) ?>"><script src="../backoffice/assets/app.js?v=<?= e(assetVersion('backoffice/assets/app.js')) ?>" defer></script></head><body>
+<?php if (($_GET['reason'] ?? '') === 'session'): ?><div class="toast-stack" data-toast-stack aria-live="polite"><div class="alert alert-warning" role="status"><span><?= e(t('auth.session_expired')) ?></span><button type="button" class="alert-close icon-button" data-dismiss-alert aria-label="<?= e(t('shell.dismiss_alert')) ?>">&times;</button></div></div><?php endif; ?>
 <div class="auth-shell">
 <aside class="auth-brand-panel" aria-hidden="true">
 <div class="auth-brand-mark"><span class="product-logo"><?= e(mb_substr((string) appConfig('name'), 0, 1)) ?></span><strong><?= e(appConfig('name')) ?></strong></div>
