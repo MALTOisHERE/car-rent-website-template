@@ -36,7 +36,6 @@ function backofficeNavigation()
         ]],
         ['label'=>'nav.customers','icon'=>'customers','items'=>[
             ['label'=>'nav.customers_list','href'=>'customers.php','permission'=>'customers.manage'],
-            ['label'=>'nav.customer_documents','href'=>'customers.php','permission'=>'customers.manage'],
         ]],
         ['label'=>'nav.fleet','icon'=>'fleet','items'=>[
             ['label'=>'nav.vehicles','href'=>'vehicles.php','permission'=>'vehicles.view'],
