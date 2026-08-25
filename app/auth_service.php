@@ -66,6 +66,42 @@ function ensureCurrentSessionValid()
     }
 }
 
+function updateOwnProfile($userId, $fullname, $phone)
+{
+    $fullname = trim((string) $fullname);
+    $phone = trim((string) $phone);
+    if ($fullname === '') {
+        throw new InvalidArgumentException(t('validation.name_required'));
+    }
+    $before = dbFetchOne('SELECT fullname, phone FROM users WHERE id = :id', ['id' => $userId]);
+    dbExecute('UPDATE users SET fullname = :fullname, phone = :phone WHERE id = :id', [
+        'fullname' => $fullname, 'phone' => $phone, 'id' => $userId,
+    ]);
+    auditLog('user.profile_updated', 'user', $userId, $before, ['fullname' => $fullname, 'phone' => $phone]);
+    $_SESSION['username'] = $fullname;
+    return $fullname;
+}
+
+function changeOwnPassword($userId, $currentPassword, $newPassword)
+{
+    $user = dbFetchOne('SELECT password_hash FROM users WHERE id = :id', ['id' => $userId]);
+    if (!$user || !password_verify((string) $currentPassword, $user['password_hash'])) {
+        throw new InvalidArgumentException(t('validation.current_password_incorrect'));
+    }
+    $errors = passwordValidationErrors($newPassword);
+    if ($errors !== []) {
+        throw new InvalidArgumentException(implode(' ', $errors));
+    }
+    dbExecute(
+        'UPDATE users SET password_hash = :password_hash, password_changed_at = NOW(), sessions_invalid_before = NOW() WHERE id = :id',
+        ['password_hash' => password_hash($newPassword, PASSWORD_DEFAULT), 'id' => $userId]
+    );
+    auditLog('user.password_changed', 'user', $userId);
+    session_regenerate_id(true);
+    $_SESSION['_authenticated_at'] = time();
+    $_SESSION['_regenerated_at'] = time();
+}
+
 function createPasswordResetRequest($email, $languageCode = 'en')
 {
     $user = dbFetchOne(

@@ -13,6 +13,8 @@ function navigationIcon($name)
         'admin'=>'M12 15.5A3.5 3.5 0 1 0 12 8a3.5 3.5 0 0 0 0 7.5Zm0-13 1.2 2.2 2.5.4.4 2.5 2.2 1.2-1.2 2.2 1.2 2.2-2.2 1.2-.4 2.5-2.5.4L12 22l-1.2-2.2-2.5-.4-.4-2.5-2.2-1.2 1.2-2.2-1.2-2.2 2.2-1.2.4-2.5 2.5-.4L12 2.5Z',
         'bell'=>'M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9Zm-8 12h4',
         'document'=>'M6 2h9l5 5v15H6V2Zm9 0v6h5',
+        'profile'=>'M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2m8-10a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z',
+        'security'=>'M12 17a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm-6-9V6a6 6 0 0 1 12 0v2M5 8h14v13H5V8Z',
     ];
     $path = $paths[$name] ?? $paths['document'];
     return '<svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="' . e($path) . '"/></svg>';

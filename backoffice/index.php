@@ -34,11 +34,18 @@ pageHeader('page.dashboard.title', 'page.dashboard.description', [
 ]); ?>
 <section class="stat-grid">
 <?php
+function statMoney($amount)
+{
+    $currency = strtoupper((string) appConfig('currency'));
+    $numberOnly = trim(str_replace($currency, '', localizedMoney($amount, $currency)));
+    return isolatedValue($numberOnly, 'money-value');
+}
+$statCurrency = strtoupper((string) appConfig('currency'));
 $financeIconByIndex = ['finance', 'commercial', 'finance'];
 $financeColorByIndex = ['', 'warning', 'info'];
 $metricIndex = 0;
 foreach ($metrics as $label=>$value):
-?><article class="stat-card"><span class="stat-icon <?= e($financeColorByIndex[$metricIndex] ?? '') ?>"><?= navigationIcon($financeIconByIndex[$metricIndex] ?? 'finance') ?></span><div class="stat-body"><span><?= e($label) ?></span><strong><?= money($value) ?></strong></div></article>
+?><article class="stat-card"><span class="stat-icon <?= e($financeColorByIndex[$metricIndex] ?? '') ?>"><?= navigationIcon($financeIconByIndex[$metricIndex] ?? 'finance') ?></span><div class="stat-body"><span><?= e($label) ?> (<?= e($statCurrency) ?>)</span><strong><?= statMoney($value) ?></strong></div></article>
 <?php $metricIndex++; endforeach; ?>
 <?php
 $vehicleStatusColor = ['available'=>'success', 'reserved'=>'info', 'rented'=>'info', 'maintenance'=>'warning', 'damaged'=>'warning'];
