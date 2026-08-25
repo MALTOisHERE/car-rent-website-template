@@ -105,5 +105,7 @@ input,select,textarea{width:100%;min-height:var(--control-height);padding:.65rem
 .document .totals-row.due th,.document .totals-row.due td{color:var(--danger);font-weight:800}
 .document-notes{margin-block-start:var(--space-5);padding:var(--space-4);background:var(--surface-subtle);border-radius:var(--radius-sm);color:var(--text-muted)}
 .document-footer{margin-block-start:var(--space-8);padding-block-start:var(--space-5);border-block-start:1px solid var(--border);color:var(--text-muted);font-size:var(--font-sm);text-align:center}
+.document-generated{margin:var(--space-3) 0 0;display:flex;align-items:center;justify-content:center;gap:.35rem;color:var(--text-muted);font-size:var(--font-xs)}
+.document-generated-mark{inline-size:.9rem;block-size:.9rem;object-fit:contain;filter:grayscale(1) opacity(.55)}
 @media print{body{background:#fff}.print-page{padding:0;background:#fff}.document{box-shadow:none;border-radius:0;max-width:none;padding:0}.btn{display:none}@page{margin:14mm}}
 @media(max-width:600px){.document-head{flex-direction:column}.document-title{text-align:start}}
