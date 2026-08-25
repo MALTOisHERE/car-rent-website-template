@@ -109,7 +109,7 @@ input,select,textarea{width:100%;min-height:var(--control-height);padding:.65rem
 .document .totals-row.due th,.document .totals-row.due td{color:var(--danger);font-weight:800}
 .document-notes{margin-block-start:var(--space-5);padding:var(--space-4);background:var(--surface-subtle);border-radius:var(--radius-sm);color:var(--text-muted)}
 .document-footer{margin-block-start:var(--space-8);padding-block-start:var(--space-5);border-block-start:1px solid var(--border);color:var(--text-muted);font-size:var(--font-sm);text-align:center}
-.document-generated{margin:var(--space-5) 0 0;display:flex;align-items:center;justify-content:center;gap:.4rem;color:var(--text-muted);font-size:.65rem}
+.document-generated{position:fixed;inset-inline:0;inset-block-end:var(--space-3);display:flex;align-items:center;justify-content:center;gap:.4rem;color:var(--text-muted);font-size:.65rem;pointer-events:none}
 .document-generated-mark{inline-size:1.15rem;block-size:1.15rem;object-fit:contain;filter:grayscale(1) opacity(.55)}
 .contract-signatures{display:grid;grid-template-columns:repeat(2,1fr);gap:var(--space-8);margin-block-start:var(--space-10)}
 .contract-signature{border-block-start:1px solid var(--border);padding-block-start:var(--space-2);color:var(--text-muted);font-size:var(--font-sm)}
