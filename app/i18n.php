@@ -89,12 +89,12 @@ function translatedRole($role)
     return isset($keys[$normalized]) ? t($keys[$normalized]) : readableTranslationKey($normalized);
 }
 
-function translatedStatus($status)
+function translatedStatus($status, $languageCode = null)
 {
     $normalized = strtolower(trim((string) $status));
     $key = 'status.' . preg_replace('/[^a-z0-9_]+/', '_', $normalized);
     return hasTranslation($key) || hasTranslation($key, 'en')
-        ? t($key)
+        ? translateInLanguage($key, $languageCode ?? language())
         : ucwords(str_replace('_', ' ', $normalized));
 }
 

@@ -132,7 +132,7 @@ function roleBadge($role)
     return '<span class="role-badge role-' . e(strtolower(str_replace('_', '-', $role))) . '">' . e(translatedRole($role)) . '</span>';
 }
 
-function statusBadge($status)
+function statusBadge($status, $languageCode = null)
 {
     $status = strtolower(trim((string) $status));
     $semantic = [
@@ -141,7 +141,7 @@ function statusBadge($status)
         'cancelled'=>'danger','damaged'=>'danger','blocked'=>'danger','failed'=>'danger','rejected'=>'danger','expired'=>'danger','disputed'=>'danger','no_show'=>'danger','inactive'=>'neutral','retired'=>'neutral','sold'=>'neutral','draft'=>'neutral',
     ];
     $class = $semantic[$status] ?? 'neutral';
-    return '<span class="badge badge-' . e($class) . '"><span class="badge-dot" aria-hidden="true"></span>' . e(translatedStatus($status)) . '</span>';
+    return '<span class="badge badge-' . e($class) . '"><span class="badge-dot" aria-hidden="true"></span>' . e(translatedStatus($status, $languageCode)) . '</span>';
 }
 
 function emptyState($title = 'empty.no_records', $description = '', $action = '')

@@ -77,3 +77,26 @@ input,select,textarea{width:100%;min-height:var(--control-height);padding:.65rem
 .auth-field{margin-block-end:var(--space-4)}
 .auth-submit{width:100%;margin-block-start:var(--space-2)}
 @media(max-width:900px){.auth-shell{grid-template-columns:1fr}.auth-brand-panel{display:none}}
+.print-page{min-height:100vh;background:var(--bg);padding:var(--space-8) var(--space-4)}
+.document{max-width:52rem;margin-inline:auto;background:var(--surface);border-radius:var(--radius-lg);box-shadow:var(--shadow-lg);padding:clamp(var(--space-6),4vw,var(--space-10))}
+.document>.btn{margin-block-end:var(--space-6)}
+.document-head{display:flex;align-items:flex-start;justify-content:space-between;gap:var(--space-6);padding-block-end:var(--space-5);margin-block-end:var(--space-6);border-block-end:2px solid var(--border)}
+.document-brand{display:flex;align-items:center;gap:var(--space-3);min-width:0}
+.invoice-mark{inline-size:2.75rem;block-size:2.75rem;flex:none;display:grid;place-items:center;border-radius:var(--radius-md);background:var(--brand);color:#fff;font-weight:900;font-size:var(--font-lg)}
+.document-brand strong{display:block;font-size:var(--font-md)}
+.document-brand p{margin:.2rem 0 0;color:var(--text-muted);font-size:var(--font-sm)}
+.document-title{text-align:end}
+.document-title h1{margin:0;font-size:var(--font-2xl);letter-spacing:-.02em}
+.document-title .reference{margin:.3rem 0;color:var(--text-muted);font-weight:650;font-size:var(--font-sm)}
+.document-meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(11rem,1fr));gap:var(--space-4);margin:0 0 var(--space-6)}
+.document-meta dt{margin:0;font-size:var(--font-xs);text-transform:uppercase;letter-spacing:.06em;color:var(--text-muted);font-weight:750}
+.document-meta dd{margin:.25rem 0 0;font-weight:650;line-height:1.5}
+.document .credit-reason{padding:var(--space-3) var(--space-4);margin-block-end:var(--space-5);background:var(--danger-bg);color:var(--danger);border-radius:var(--radius-sm)}
+.document table th:nth-child(n+2),.document table td:nth-child(n+2){text-align:end;font-variant-numeric:tabular-nums}
+.document .totals-row td,.document .totals-row th{border-block-end:0;background:transparent}
+.document .totals-row.grand th,.document .totals-row.grand td{font-size:var(--font-lg);font-weight:800;border-block-start:2px solid var(--border);padding-block-start:var(--space-3)}
+.document .totals-row.due th,.document .totals-row.due td{color:var(--danger);font-weight:800}
+.document-notes{margin-block-start:var(--space-5);padding:var(--space-4);background:var(--surface-subtle);border-radius:var(--radius-sm);color:var(--text-muted)}
+.document-footer{margin-block-start:var(--space-8);padding-block-start:var(--space-5);border-block-start:1px solid var(--border);color:var(--text-muted);font-size:var(--font-sm);text-align:center}
+@media print{body{background:#fff}.print-page{padding:0;background:#fff}.document{box-shadow:none;border-radius:0;max-width:none;padding:0}.btn{display:none}@page{margin:14mm}}
+@media(max-width:600px){.document-head{flex-direction:column}.document-title{text-align:start}}
