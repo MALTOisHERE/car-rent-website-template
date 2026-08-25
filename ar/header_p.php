@@ -56,6 +56,12 @@ if (isset($_GET['lang'])) {
             <span class="sr-only">جار التحميل...</span>
         </div>
     </div>
+    <script>
+        setTimeout(function () {
+            var spinner = document.getElementById('spinner');
+            if (spinner) spinner.classList.remove('show');
+        }, 2000);
+    </script>
     <!-- نهاية المؤشر الدوار -->
 
     <!-- بداية الشريط العلوي -->

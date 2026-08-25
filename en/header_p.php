@@ -57,6 +57,12 @@ if (isset($_GET['lang'])) {
             <span class="sr-only">Loading...</span>
         </div>
     </div>
+    <script>
+        setTimeout(function () {
+            var spinner = document.getElementById('spinner');
+            if (spinner) spinner.classList.remove('show');
+        }, 2000);
+    </script>
     <!-- Spinner End -->
 
     <!-- Topbar Start -->
