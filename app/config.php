@@ -29,7 +29,7 @@ function appConfig($key = null)
     static $config;
     if ($config === null) {
         $config = [
-            'name' => envValue('APP_NAME', 'Rental Agency Manager'),
+            'name' => envValue('APP_NAME', 'Aurevo'),
             'environment' => envValue('APP_ENV', 'production'),
             'base_url' => rtrim((string) envValue('APP_BASE_URL', ''), '/'),
             'timezone' => envValue('APP_TIMEZONE', 'Africa/Casablanca'),

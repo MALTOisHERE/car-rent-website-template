@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project overview
 
-A procedural PHP/PDO car-rental agency management platform ("Rental Agency Manager"): a
+A procedural PHP/PDO car-rental agency management platform ("Aurevo"): a
 multilingual (EN/FR/AR, RTL-aware) public marketing site, a customer self-service portal, and a
 role-scoped professional back office covering fleet, reservations, contracts, checkout/check-in
 inspections, finance (payments/invoices/expenses/cash registers), maintenance, and reporting.

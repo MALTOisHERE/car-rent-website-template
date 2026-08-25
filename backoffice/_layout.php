@@ -27,6 +27,7 @@ function backofficeHeader($title, $active = '')
     ?><!doctype html><html lang="<?= e(language()) ?>" dir="<?= $rtl ? 'rtl' : 'ltr' ?>"><head>
     <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
     <title><?= e($title) ?> — <?= e(appConfig('name')) ?></title>
+    <link rel="icon" href="assets/img/aurevo-mark.png">
     <link rel="stylesheet" href="assets/app.css?v=<?= e(assetVersion('backoffice/assets/app.css')) ?>"><script src="assets/app.js?v=<?= e(assetVersion('backoffice/assets/app.js')) ?>" defer></script>
     <script>try{if(localStorage.getItem('sidebarCollapsed')==='1')document.documentElement.classList.add('sidebar-collapsed')}catch(e){}</script>
     </head><body data-table-label="<?= e(t('shell.data_table')) ?>">
@@ -34,7 +35,7 @@ function backofficeHeader($title, $active = '')
     <div class="app-shell">
       <div class="sidebar-backdrop" data-sidebar-backdrop hidden></div>
       <aside class="sidebar" id="app-sidebar" aria-label="<?= e(t('shell.primary_navigation')) ?>" data-sidebar>
-        <div class="sidebar-header"><a class="product-mark" href="index.php"><span class="product-logo" aria-hidden="true">R</span><span><strong><?= e(appConfig('name')) ?></strong><small><?= e(t('shell.agency_operations')) ?></small></span></a></div>
+        <div class="sidebar-header"><a class="product-mark" href="index.php"><img class="product-logo" src="assets/img/aurevo-mark.png" alt="" aria-hidden="true"><span><strong><?= e(appConfig('name')) ?></strong><small><?= e(t('shell.agency_operations')) ?></small></span></a></div>
         <nav class="sidebar-nav"><?= renderBackofficeNavigation($active) ?></nav>
       </aside>
       <div class="app-content">

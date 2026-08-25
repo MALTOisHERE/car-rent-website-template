@@ -1,4 +1,4 @@
-# Rental Agency Manager
+# Aurevo
 
 A procedural PHP/PDO rental-agency management application with a multilingual public site, customer portal, and role-scoped professional back office.
 
