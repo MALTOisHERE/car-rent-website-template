@@ -36,13 +36,23 @@ pageHeader('page.contract_detail.title','page.contract_detail.description',[
     'breadcrumbs'=>[['label'=>'nav.contracts','href'=>'contracts.php'],['label'=>$contract['contract_number']]],
     'secondary'=>['label'=>'common.back','href'=>'contracts.php'],
 ]);
+$cCurrency=strtoupper((string)$contract['currency']);
+$cRentalDays=null;
+if($contract['pickup_at']&&$contract['return_at']){
+    $cRentalDays=max(1,(int)ceil((strtotime($contract['return_at'])-strtotime($contract['pickup_at']))/86400));
+}
 ?>
+<section class="detail-hero"><div><div class="section-card-header"><h2><?=navigationIcon('rentals')?><?=isolatedValue($contract['contract_number'],'reference-value')?></h2></div><p><?=e($contract['agency_name'])?></p></div><?=statusBadge($contract['status'])?></section>
+<div class="stat-grid">
+<article class="stat-card"><span class="stat-icon"><?=navigationIcon('finance')?></span><div class="stat-body"><span><?=e(t('field.total'))?> (<?=e($cCurrency)?>)</span><strong><?=statMoney($contract['total_amount'],$contract['currency'])?></strong></div></article>
+<?php if($contract['deposit_amount']!==null):?><article class="stat-card"><span class="stat-icon warning"><?=navigationIcon('finance')?></span><div class="stat-body"><span><?=e(t('field.deposit'))?> (<?=e($cCurrency)?>)</span><strong><?=statMoney($contract['deposit_amount'],$contract['currency'])?></strong></div></article><?php endif;?>
+<?php if($cRentalDays!==null):?><article class="stat-card"><span class="stat-icon info"><?=navigationIcon('rentals')?></span><div class="stat-body"><span><?=e(t('field.rental_days'))?></span><strong><?=e($cRentalDays)?></strong></div></article><?php endif;?>
+<article class="stat-card"><span class="stat-icon neutral"><?=navigationIcon('rentals')?></span><div class="stat-body"><span><?=e(t('field.current_version'))?></span><strong><?=e($contract['current_version']?:t('common.none'))?></strong></div></article>
+</div>
 <div class="grid"><section class="card"><div class="section-card-header"><h2><?=navigationIcon('customers')?><?=e(t('section.contract_identity'))?></h2></div><dl class="detail-list">
 <div><dt><?=e(t('field.number'))?></dt><dd><?=isolatedValue($contract['contract_number'],'reference-value')?></dd></div>
 <div><dt><?=e(t('field.agency'))?></dt><dd><?=e($contract['agency_name'])?></dd></div>
 <div><dt><?=e(t('field.reservation'))?></dt><dd><a href="reservation_detail.php?id=<?=e($contract['reservation_id'])?>"><?=isolatedValue($contract['reference'],'reference-value')?></a></dd></div>
-<div><dt><?=e(t('common.status'))?></dt><dd><?=statusBadge($contract['status'])?></dd></div>
-<div><dt><?=e(t('field.current_version'))?></dt><dd><?=e($contract['current_version']?:t('common.none'))?><?php if($contract['current_version_id']):?> · <?=isolatedValue('#'.$contract['current_version_id'],'reference-value')?><?php endif;?></dd></div>
 <div><dt><?=e(t('field.issued'))?></dt><dd><?=formattedDateTime($contract['issued_at'])?></dd></div>
 <?php if($contract['signed_at']):?><div><dt><?=e(t('field.signed'))?></dt><dd><?=formattedDateTime($contract['signed_at'])?></dd></div><?php endif;?>
 <?php if($contract['cancelled_at']):?><div><dt><?=e(t('field.cancelled'))?></dt><dd><?=formattedDateTime($contract['cancelled_at'])?><br><?=e($contract['cancellation_reason'])?></dd></div><?php endif;?>
@@ -50,7 +60,6 @@ pageHeader('page.contract_detail.title','page.contract_detail.description',[
 <div><dt><?=e(t('field.customer'))?></dt><dd><?=e($contract['first_name'].' '.$contract['last_name'])?></dd></div>
 <div><dt><?=e(t('field.vehicle'))?></dt><dd><?=e(trim($contract['brand'].' '.$contract['model']))?> <?=isolatedValue($contract['registration_number'],'registration-value')?></dd></div>
 <div><dt><?=e(t('field.period'))?></dt><dd><?=formattedDateTime($contract['pickup_at'])?> — <?=formattedDateTime($contract['return_at'])?></dd></div>
-<div><dt><?=e(t('field.total'))?></dt><dd><?=money($contract['total_amount'],$contract['currency'])?></dd></div>
 </dl></section></div>
 <?php if(($contract['status']==='draft'&&can('contract.issue'))||(in_array($contract['status'],['draft','issued'],true)&&can('contract.cancel'))):?><section class="card"><div class="section-card-header"><h2><?=navigationIcon('rentals')?><?=e(t('section.allowed_actions'))?></h2></div><div class="inline-actions">
 <?php if($contract['status']==='draft'&&can('contract.issue')):?><form method="post"><?=csrfField()?><?=contractIdempotencyField('contract.issue')?><input type="hidden" name="contract_id" value="<?=e($id)?>"><input type="hidden" name="action" value="issue"><button class="btn primary" data-confirm="<?=e(t('confirm.issue_contract'))?>"><?=e(t('action.issue_contract'))?></button></form><?php endif;?>
