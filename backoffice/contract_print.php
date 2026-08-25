@@ -71,7 +71,7 @@ $currency=$data['currency']??'MAD';
 <div class="contract-signature"><?=e($tr('print.agency_signature'))?></div>
 </div>
 <footer class="document-footer">
-<p class="document-generated"><?=e($tr('print.generated_with'))?> <img src="assets/img/aurevo-mark.png" alt="<?=e(appConfig('name'))?>" class="document-generated-mark"></p>
+<p class="document-generated"><?=e($tr('print.generated_with'))?> <img src="assets/img/favicon.png" alt="<?=e(appConfig('name'))?>" class="document-generated-mark"></p>
 </footer>
 </div>
 </div>

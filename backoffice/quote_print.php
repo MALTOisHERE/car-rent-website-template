@@ -46,7 +46,7 @@ $dir=$lang==='ar'?'rtl':'ltr';
 </table></div>
 <p class="document-notes"><?=e(t('message.quote_disclaimer'))?></p>
 <footer class="document-footer">
-<p class="document-generated"><?=e(t('print.generated_with'))?> <img src="assets/img/aurevo-mark.png" alt="<?=e(appConfig('name'))?>" class="document-generated-mark"></p>
+<p class="document-generated"><?=e(t('print.generated_with'))?> <img src="assets/img/favicon.png" alt="<?=e(appConfig('name'))?>" class="document-generated-mark"></p>
 </footer>
 </div>
 </div>
