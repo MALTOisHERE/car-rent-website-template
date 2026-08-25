@@ -8,15 +8,15 @@ if (requestMethod() === 'POST') {
     $password = (string) ($_POST['password'] ?? '');
     $confirmation = (string) ($_POST['password_confirmation'] ?? '');
     try {
-        if ($password !== $confirmation) throw new InvalidArgumentException('Password confirmation does not match.');
-        if (!resetPasswordWithToken($token, $password)) throw new InvalidArgumentException('The reset link is invalid or expired.');
+        if ($password !== $confirmation) throw new InvalidArgumentException(t('auth.password_confirmation_mismatch'));
+        if (!resetPasswordWithToken($token, $password)) throw new InvalidArgumentException(t('auth.reset_link_invalid'));
         $success = true;
     } catch (InvalidArgumentException $exception) { $error = $exception->getMessage(); }
-    catch (Throwable $exception) { reportDatabaseError($exception, 'Password reset failed'); $error = 'Password reset is temporarily unavailable.'; }
+    catch (Throwable $exception) { reportDatabaseError($exception, 'Password reset failed'); $error = t('auth.reset_password_failed'); }
 }
 ?>
-<!doctype html><html lang="<?= e(language()) ?>" dir="<?= language() === 'ar' ? 'rtl' : 'ltr' ?>"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Choose a new password</title><link rel="stylesheet" href="../backoffice/assets/app.css"></head><body class="auth-page"><main class="auth-card"><h1>Choose a new password</h1>
-<?php if ($success): ?><div class="alert success">Your password has been changed. Existing sessions were invalidated.</div><a class="btn primary" href="login.php?lang=<?= e(language()) ?>">Sign in</a>
-<?php else: ?><?php if ($error): ?><div class="alert danger"><?= e($error) ?></div><?php endif; ?><form method="post"><?= csrfField() ?><input type="hidden" name="token" value="<?= e($token) ?>"><label>New password<input type="password" name="password" required autocomplete="new-password"></label><label>Confirm password<input type="password" name="password_confirmation" required autocomplete="new-password"></label><small>At least 12 characters with upper/lowercase, a number, and a symbol.</small><button class="btn primary" type="submit">Reset password</button></form><?php endif; ?>
+<!doctype html><html lang="<?= e(language()) ?>" dir="<?= language() === 'ar' ? 'rtl' : 'ltr' ?>"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title><?= e(t('auth.reset_password_title')) ?></title><link rel="stylesheet" href="../backoffice/assets/app.css?v=<?= e(assetVersion('backoffice/assets/app.css')) ?>"></head><body class="auth-page"><main class="auth-card"><h1><?= e(t('auth.reset_password_title')) ?></h1>
+<?php if ($success): ?><div class="alert success"><?= e(t('auth.reset_password_success')) ?></div><a class="btn primary" href="login.php?lang=<?= e(language()) ?>"><?= e(t('auth.sign_in')) ?></a>
+<?php else: ?><?php if ($error): ?><div class="alert danger"><?= e($error) ?></div><?php endif; ?><form method="post"><?= csrfField() ?><input type="hidden" name="token" value="<?= e($token) ?>"><label><?= e(t('auth.new_password')) ?><input type="password" name="password" required autocomplete="new-password"></label><label><?= e(t('auth.confirm_password')) ?><input type="password" name="password_confirmation" required autocomplete="new-password"></label><small><?= e(t('auth.password_requirements')) ?></small><button class="btn primary" type="submit"><?= e(t('auth.reset_password_button')) ?></button></form><?php endif; ?>
 </main></body></html>
 

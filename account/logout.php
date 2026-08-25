@@ -10,5 +10,5 @@ if (requestMethod() === 'POST') {
     safeRedirect('login.php');
 }
 ?>
-<!doctype html><html lang="<?=e(language())?>" dir="<?=language()==='ar'?'rtl':'ltr'?>"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title><?=e(t('auth.sign_out_title'))?></title><link rel="stylesheet" href="../backoffice/assets/app.css"></head><body class="auth-page"><main class="auth-card"><h1><?=e(t('auth.sign_out_title'))?></h1><p><?=e(t('auth.sign_out_prompt'))?></p><form method="post"><?= csrfField() ?><button class="btn danger" type="submit"><?=e(t('shell.sign_out'))?></button></form><a href="../"><?=e(t('common.cancel'))?></a></main></body></html>
+<!doctype html><html lang="<?=e(language())?>" dir="<?=language()==='ar'?'rtl':'ltr'?>"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title><?=e(t('auth.sign_out_title'))?></title><link rel="stylesheet" href="../backoffice/assets/app.css?v=<?= e(assetVersion('backoffice/assets/app.css')) ?>"></head><body class="auth-page"><main class="auth-card"><h1><?=e(t('auth.sign_out_title'))?></h1><p><?=e(t('auth.sign_out_prompt'))?></p><form method="post"><?= csrfField() ?><button class="btn danger" type="submit"><?=e(t('shell.sign_out'))?></button></form><a href="../"><?=e(t('common.cancel'))?></a></main></body></html>
 

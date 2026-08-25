@@ -32,9 +32,19 @@ pageHeader('page.dashboard.title', 'page.dashboard.description', [
     'breadcrumbs'=>[['label'=>'nav.overview'],['label'=>'nav.dashboard']],
     'metadata'=>t('shell.agency_context', ['id'=>$agencyId]),
 ]); ?>
-<section class="cards">
-<?php foreach ($metrics as $label=>$value): ?><article class="card metric"><span><?= e($label) ?></span><strong><?= money($value) ?></strong></article><?php endforeach; ?>
-<?php foreach ($vehicleCounts as $row): ?><article class="card metric"><span><?= e(translatedStatus($row['status']) . ' · ' . t('nav.vehicles')) ?></span><strong><?= e($row['total']) ?></strong></article><?php endforeach; ?>
-</section><div class="grid" style="margin-top:1rem"><section class="card"><h2><?=e(t('section.upcoming_operations'))?></h2><?php if (!$upcoming): ?><p class="empty"><?= e(t('empty.no_filtered_records')) ?></p><?php else: ?><div class="table-wrap"><table><tr><th><?=e(t('field.reference'))?></th><th><?=e(t('field.customer'))?></th><th><?=e(t('field.vehicle'))?></th><th><?=e(t('field.pickup'))?></th><th><?=e(t('field.return'))?></th><th><?=e(t('common.status'))?></th></tr><?php foreach($upcoming as $row): ?><tr><td><?= isolatedValue($row['reference'],'reference-value') ?></td><td><?= e($row['first_name'].' '.$row['last_name']) ?></td><td><?= isolatedValue($row['registration_number'],'registration-value') ?></td><td><?= formattedDateTime($row['pickup_at']) ?></td><td><?= formattedDateTime($row['return_at']) ?></td><td><?= statusBadge($row['status']) ?></td></tr><?php endforeach; ?></table></div><?php endif; ?></section>
-<section class="card"><h2><?=e(t('section.document_alerts'))?></h2><?php if(!$alerts): ?><p class="empty"><?=e(t('empty.no_expirations'))?></p><?php else:?><div class="table-wrap"><table><tr><th><?=e(t('field.vehicle'))?></th><th><?=e(t('field.documents'))?></th><th><?=e(t('field.expires'))?></th></tr><?php foreach($alerts as $row): ?><tr><td><?=isolatedValue($row['registration_number'],'registration-value')?></td><td><?=e(translatedStatus($row['document_type']))?></td><td><?=formattedDate($row['expires_at'])?></td></tr><?php endforeach;?></table></div><?php endif;?></section></div>
+<section class="stat-grid">
+<?php
+$financeIconByIndex = ['finance', 'commercial', 'finance'];
+$financeColorByIndex = ['', 'warning', 'info'];
+$metricIndex = 0;
+foreach ($metrics as $label=>$value):
+?><article class="stat-card"><span class="stat-icon <?= e($financeColorByIndex[$metricIndex] ?? '') ?>"><?= navigationIcon($financeIconByIndex[$metricIndex] ?? 'finance') ?></span><div class="stat-body"><span><?= e($label) ?></span><strong><?= money($value) ?></strong></div></article>
+<?php $metricIndex++; endforeach; ?>
+<?php
+$vehicleStatusColor = ['available'=>'success', 'reserved'=>'info', 'rented'=>'info', 'maintenance'=>'warning', 'damaged'=>'warning'];
+foreach ($vehicleCounts as $row):
+?><article class="stat-card"><span class="stat-icon <?= e($vehicleStatusColor[$row['status']] ?? 'neutral') ?>"><?= navigationIcon('fleet') ?></span><div class="stat-body"><span><?= e(translatedStatus($row['status']) . ' · ' . t('nav.vehicles')) ?></span><strong><?= e($row['total']) ?></strong></div></article>
+<?php endforeach; ?>
+</section><div class="grid"><section class="card"><div class="section-card-header"><h2><?= navigationIcon('rentals') ?><?=e(t('section.upcoming_operations'))?></h2></div><?php if (!$upcoming): ?><p class="empty"><?= e(t('empty.no_filtered_records')) ?></p><?php else: ?><div class="table-wrap"><table><tr><th><?=e(t('field.reference'))?></th><th><?=e(t('field.customer'))?></th><th><?=e(t('field.vehicle'))?></th><th><?=e(t('field.pickup'))?></th><th><?=e(t('field.return'))?></th><th><?=e(t('common.status'))?></th></tr><?php foreach($upcoming as $row): ?><tr><td><?= isolatedValue($row['reference'],'reference-value') ?></td><td><?= e($row['first_name'].' '.$row['last_name']) ?></td><td><?= isolatedValue($row['registration_number'],'registration-value') ?></td><td><?= formattedDateTime($row['pickup_at']) ?></td><td><?= formattedDateTime($row['return_at']) ?></td><td><?= statusBadge($row['status']) ?></td></tr><?php endforeach; ?></table></div><?php endif; ?></section>
+<section class="card"><div class="section-card-header"><h2><?= navigationIcon('document') ?><?=e(t('section.document_alerts'))?></h2></div><?php if(!$alerts): ?><p class="empty"><?=e(t('empty.no_expirations'))?></p><?php else:?><div class="table-wrap"><table><tr><th><?=e(t('field.vehicle'))?></th><th><?=e(t('field.documents'))?></th><th><?=e(t('field.expires'))?></th></tr><?php foreach($alerts as $row): ?><tr><td><?=isolatedValue($row['registration_number'],'registration-value')?></td><td><?=e(translatedStatus($row['document_type']))?></td><td><?=formattedDate($row['expires_at'])?></td></tr><?php endforeach;?></table></div><?php endif;?></section></div>
 <?php backofficeFooter();

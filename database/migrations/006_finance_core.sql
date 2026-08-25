@@ -204,8 +204,8 @@ SET @p5a_bad = (
     ) AND NOT (
         (e.table_name='invoices' AND e.column_name='invoice_number' AND LOWER(c.COLUMN_TYPE)='varchar(50)' AND c.IS_NULLABLE='NO' AND c.COLUMN_DEFAULT IS NULL)
         OR (e.table_name='invoices' AND e.column_name='issued_at' AND LOWER(c.COLUMN_TYPE)='datetime' AND c.IS_NULLABLE='NO' AND c.COLUMN_DEFAULT IS NULL)
-        OR (e.table_name='invoices' AND e.column_name IN ('created_at','updated_at') AND LOWER(c.COLUMN_TYPE)='datetime' AND c.IS_NULLABLE='NO' AND LOWER(TRIM(COALESCE(c.COLUMN_DEFAULT,'')))='current_timestamp' AND (e.column_name='created_at' OR LOWER(TRIM(COALESCE(c.EXTRA,'')))='on update current_timestamp'))
-        OR (e.table_name='deposits' AND e.column_name='updated_at' AND LOWER(c.COLUMN_TYPE)='datetime' AND c.IS_NULLABLE='NO' AND LOWER(TRIM(COALESCE(c.COLUMN_DEFAULT,'')))='current_timestamp' AND LOWER(TRIM(COALESCE(c.EXTRA,'')))='on update current_timestamp')
+        OR (e.table_name='invoices' AND e.column_name IN ('created_at','updated_at') AND LOWER(c.COLUMN_TYPE)='datetime' AND c.IS_NULLABLE='NO' AND REPLACE(LOWER(TRIM(COALESCE(c.COLUMN_DEFAULT,''))),'()','')='current_timestamp' AND (e.column_name='created_at' OR REPLACE(LOWER(TRIM(COALESCE(c.EXTRA,''))),'()','')='on update current_timestamp'))
+        OR (e.table_name='deposits' AND e.column_name='updated_at' AND LOWER(c.COLUMN_TYPE)='datetime' AND c.IS_NULLABLE='NO' AND REPLACE(LOWER(TRIM(COALESCE(c.COLUMN_DEFAULT,''))),'()','')='current_timestamp' AND REPLACE(LOWER(TRIM(COALESCE(c.EXTRA,''))),'()','')='on update current_timestamp')
     ))
 );
 SET @p5a_sql=IF(@p5a_bad=0,'DO 0','SIGNAL SQLSTATE ''45000'' SET MESSAGE_TEXT=''Phase 5A schema mismatch: incompatible column definition'''); EXECUTE IMMEDIATE @p5a_sql;

@@ -3,13 +3,14 @@
     const body = document.body;
     const sidebar = document.querySelector('[data-sidebar]');
     const sidebarOpen = document.querySelector('[data-sidebar-open]');
-    const sidebarClose = document.querySelector('[data-sidebar-close]');
     const sidebarBackdrop = document.querySelector('[data-sidebar-backdrop]');
     let returnFocus = null;
 
     function focusable(container) {
         return [...container.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])')];
     }
+    const desktopSidebarQuery = window.matchMedia('(min-width: 1051px)');
+
     function openSidebar() {
         if (!sidebar) return;
         returnFocus = document.activeElement; sidebar.classList.add('open'); sidebarBackdrop.hidden = false;
@@ -21,7 +22,18 @@
         sidebar.classList.remove('open'); sidebarBackdrop.hidden = true; body.classList.remove('navigation-open');
         sidebarOpen?.setAttribute('aria-expanded', 'false'); returnFocus?.focus();
     }
-    sidebarOpen?.addEventListener('click', openSidebar); sidebarClose?.addEventListener('click', closeSidebar); sidebarBackdrop?.addEventListener('click', closeSidebar);
+    function toggleDesktopSidebar() {
+        const collapsed = document.documentElement.classList.toggle('sidebar-collapsed');
+        try { localStorage.setItem('sidebarCollapsed', collapsed ? '1' : '0'); } catch (error) { /* storage unavailable */ }
+        sidebarOpen?.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+        sidebarOpen?.setAttribute('aria-label', collapsed ? sidebarOpen.dataset.labelExpand : sidebarOpen.dataset.labelCollapse);
+    }
+    sidebarOpen?.addEventListener('click', () => { desktopSidebarQuery.matches ? toggleDesktopSidebar() : openSidebar(); });
+    sidebarBackdrop?.addEventListener('click', closeSidebar);
+    if (sidebarOpen && document.documentElement.classList.contains('sidebar-collapsed')) {
+        sidebarOpen.setAttribute('aria-expanded', 'false');
+        sidebarOpen.setAttribute('aria-label', sidebarOpen.dataset.labelExpand);
+    }
 
     function closeMenus(exception) {
         document.querySelectorAll('[data-menu-button]').forEach(button => {

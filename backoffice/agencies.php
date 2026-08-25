@@ -45,14 +45,14 @@ pageHeader('page.agencies.title', 'page.agencies.description', [
 ?>
 <div class="grid">
 <?php if (canCreateAgency()): ?>
-<section class="card" id="new-agency"><h2><?=e(t('section.new_agency'))?></h2><form method="post"><?=csrfField()?>
+<section class="card" id="new-agency"><div class="section-card-header"><h2><?=navigationIcon('admin')?><?=e(t('section.new_agency'))?></h2></div><form method="post"><?=csrfField()?>
 <label><?=e(t('field.name'))?><input name="name" required></label><label><?=e(t('field.code'))?><input name="code" required pattern="[A-Za-z0-9_-]{2,30}"></label>
 <label><?=e(t('field.email'))?><input type="email" name="email"></label><label><?=e(t('field.phone'))?><input name="phone"></label><label><?=e(t('field.address'))?><input name="address"></label>
 <label><?=e(t('field.city'))?><input name="city"></label><label><?=e(t('field.country_code'))?><input name="country_code" value="MA" maxlength="2"></label>
 <label><?=e(t('field.currency'))?><input name="currency" value="MAD" maxlength="3"></label><label><?=e(t('field.timezone'))?><input name="timezone" value="Africa/Casablanca"></label>
 <button class="btn primary"><?=e(t('action.add_agency'))?></button></form></section>
 <?php endif; ?>
-<section class="card"><h2><?=e(t('section.agency_register'))?></h2><div class="table-wrap" role="region" aria-label="<?=e(t('section.agency_register'))?>" tabindex="0"><table>
+<section class="card"><div class="section-card-header"><h2><?=navigationIcon('admin')?><?=e(t('section.agency_register'))?></h2></div><div class="table-wrap" role="region" aria-label="<?=e(t('section.agency_register'))?>" tabindex="0"><table>
 <thead><tr><th scope="col"><?=e(t('field.code'))?></th><th scope="col"><?=e(t('field.name'))?></th><th scope="col"><?=e(t('field.city'))?></th><th scope="col"><?=e(t('nav.fleet'))?></th><th scope="col"><?=e(t('nav.users'))?></th><th scope="col"><?=e(t('common.status'))?></th></tr></thead><tbody>
 <?php foreach ($agencies as $agency): ?><tr><td><?=e($agency['code'])?></td><td><?=e($agency['name'])?></td><td><?=e($agency['city'])?></td><td><?=e($agency['vehicles'])?></td><td><?=e($agency['users'])?></td><td><?=statusBadge($agency['status'])?></td></tr><?php endforeach; ?>
 </tbody></table><?php if (!$agencies) echo emptyState('empty.no_agencies'); ?></div></section></div>

@@ -30,6 +30,15 @@ function e($value)
     return htmlspecialchars((string) $value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 }
 
+/** Cache-busting token for a static asset, so browsers refetch it after every edit instead of serving a stale cached copy. */
+function assetVersion($projectRelativePath)
+{
+    $path = dirname(__DIR__) . '/' . ltrim($projectRelativePath, '/');
+    $mtime = @filemtime($path);
+
+    return $mtime !== false ? (string) $mtime : '1';
+}
+
 function requestMethod()
 {
     return strtoupper((string) ($_SERVER['REQUEST_METHOD'] ?? 'GET'));
