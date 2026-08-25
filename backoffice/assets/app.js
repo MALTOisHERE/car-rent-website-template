@@ -117,6 +117,19 @@
     }));
     document.querySelector('[data-drawer-close]')?.addEventListener('click', closeDrawer); drawerBackdrop?.addEventListener('click', closeDrawer);
 
+    function syncHashNavigation() {
+        const hash = window.location.hash;
+        if (!hash) return;
+        const anchorLink = document.querySelector('.nav-group a[href$="' + hash + '"]');
+        if (!anchorLink) return;
+        document.querySelectorAll('.nav-group a.active').forEach(link => {
+            link.classList.remove('active'); link.removeAttribute('aria-current');
+        });
+        anchorLink.classList.add('active'); anchorLink.setAttribute('aria-current', 'page');
+    }
+    syncHashNavigation();
+    window.addEventListener('hashchange', syncHashNavigation);
+
     document.addEventListener('keydown', event => {
         if (event.key === 'Escape') { closeMenus(); if (sidebar?.classList.contains('open')) closeSidebar(); if (drawer?.classList.contains('open')) closeDrawer(); }
         if (event.key === 'Tab') {
