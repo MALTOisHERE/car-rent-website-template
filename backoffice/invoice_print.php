@@ -74,10 +74,9 @@ $balanceDue = max(0, (float) $i['total_amount'] - (float) $i['paid_amount']);
 </tbody>
 </table></div>
 <?php if ($i['notes']): ?><p class="document-notes"><strong><?= e($tr('field.notes')) ?>:</strong> <?= e($i['notes']) ?></p><?php endif; ?>
-<footer class="document-footer"><?= e($tr('print.thank_you', ['agency' => $i['agency_name']])) ?>
-<p class="document-generated"><?= e($tr('print.generated_with')) ?> <img src="assets/img/favicon.png" alt="<?= e(appConfig('name')) ?>" class="document-generated-mark"></p>
-</footer>
+<footer class="document-footer"><?= e($tr('print.thank_you', ['agency' => $i['agency_name']])) ?></footer>
 </div>
+<p class="document-generated"><?= e($tr('print.generated_with')) ?> <img src="assets/img/favicon.png" alt="<?= e(appConfig('name')) ?>" class="document-generated-mark"></p>
 </div>
 </body>
 </html>
