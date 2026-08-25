@@ -1,11 +1,28 @@
+# Environment
 .env
 .env.local
 .env.*
 !.env.example
+
+# Runtime/private storage (never committed; see storage/README.md)
 storage/uploads/
 storage/inspection-photo-private/
 storage/sess_*
 *.log
+
+# Dependency directories (this codebase has no framework/Composer dependency
+# today; ignored defensively in case a future service introduces one)
+/vendor/
+/node_modules/
+
+# OS and editor cruft
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# Session/scratch artifacts from working sessions
 phase*-review.txt
 phase*-tests.txt
 phase*-tree.txt
