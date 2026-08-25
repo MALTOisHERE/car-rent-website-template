@@ -167,9 +167,11 @@ if (isset($_GET['lang'])) {
                             <?php endif; ?>
 
                             <!-- Logout button for all logged-in users -->
-                            <a href="../account/logout.php" class="btn btn-danger rounded-pill py-2 px-4">
-                                <i class="fas fa-sign-out-alt me-2"></i> Logout
-                            </a>
+                            <form action="../account/logout.php" method="post" class="d-inline" onsubmit="return confirm('Are you sure you want to sign out?')"><?= csrfField() ?>
+                                <button type="submit" class="btn btn-danger rounded-pill py-2 px-4">
+                                    <i class="fas fa-sign-out-alt me-2"></i> Logout
+                                </button>
+                            </form>
                         </div>
                     <?php else: ?>
                         <!-- Display Login button if not logged in -->
