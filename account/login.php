@@ -29,7 +29,7 @@ $rtl = language() === 'ar';
 <!doctype html><html lang="<?= e(language()) ?>" dir="<?= $rtl ? 'rtl' : 'ltr' ?>"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title><?= e(appConfig('name')) ?> — <?=e(t('auth.sign_in'))?></title>
-<link rel="icon" href="../backoffice/assets/img/aurevo-mark.png">
+<link rel="icon" href="../backoffice/assets/img/favicon.png">
 <link rel="stylesheet" href="../backoffice/assets/app.css?v=<?= e(assetVersion('backoffice/assets/app.css')) ?>"><script src="../backoffice/assets/app.js?v=<?= e(assetVersion('backoffice/assets/app.js')) ?>" defer></script></head><body>
 <?php if (($_GET['reason'] ?? '') === 'session'): ?><div class="toast-stack" data-toast-stack aria-live="polite"><div class="alert alert-warning" role="status"><span><?= e(t('auth.session_expired')) ?></span><button type="button" class="alert-close icon-button" data-dismiss-alert aria-label="<?= e(t('shell.dismiss_alert')) ?>">&times;</button></div></div><?php endif; ?>
 <div class="auth-shell">
@@ -48,6 +48,7 @@ $rtl = language() === 'ar';
 <label class="auth-field"><?=e(t('auth.password'))?><input type="password" name="password" autocomplete="current-password" required></label>
 <button class="btn primary auth-submit" type="submit"><?=e(t('auth.sign_in'))?></button></form>
 <div class="auth-links"><a href="forgot_password.php?lang=<?= e(language()) ?>"><?=e(t('auth.forgot_password'))?></a><a href="../<?= e(language()) ?>/"><?=e(t('auth.public_website'))?></a></div>
+<p class="auth-switch"><?=e(t('auth.create_account_prompt'))?> <a href="signup.php?lang=<?= e(language()) ?>"><?=e(t('auth.create_account_button'))?></a></p>
 </div>
 </main>
 </div>
