@@ -35,7 +35,7 @@ function uiLabel($label)
         'Record incident'=>'action.add_incident','Add inspection'=>'action.add_inspection','Export CSV'=>'action.export_csv',
     ];
     if (isset($legacyKeys[$label])) return t($legacyKeys[$label]);
-    return hasTranslation($label) || hasTranslation($label, 'en') ? t($label) : $label;
+    return hasTranslation($label) || hasTranslation($label, 'en') ? t($label) : readableTranslationKey($label);
 }
 
 function isolatedValue($value, $class = '')
