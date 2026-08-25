@@ -82,8 +82,9 @@
 
     document.querySelectorAll('[data-dismiss-alert]').forEach(button => button.addEventListener('click', () => button.closest('.alert')?.remove()));
     document.querySelectorAll('[data-toast-stack] .alert').forEach(toast => {
-        const timer = setTimeout(() => toast.remove(), 6000);
+        let timer = setTimeout(() => toast.remove(), 6000);
         toast.addEventListener('mouseenter', () => clearTimeout(timer));
+        toast.addEventListener('mouseleave', () => { timer = setTimeout(() => toast.remove(), 6000); });
     });
     document.querySelectorAll('.table-wrap').forEach((wrapper, index) => {
         wrapper.setAttribute('role', wrapper.getAttribute('role') || 'region');
