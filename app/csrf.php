@@ -20,7 +20,7 @@ function verifyCsrfToken($token = null)
         if (!headers_sent()) {
             http_response_code(419);
         }
-        exit('Your session has expired. Please refresh the page and try again.');
+        renderGuardErrorPage(function_exists('t') ? t('auth.session_expired') : 'Your session has expired. Please sign in again.');
     }
 }
 

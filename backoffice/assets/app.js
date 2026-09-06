@@ -114,10 +114,12 @@
     }
 
     const drawer = document.querySelector('[data-drawer]'); const drawerBackdrop = document.querySelector('[data-drawer-backdrop]');
-    function closeDrawer() { if (!drawer) return; drawer.hidden = true; drawer.classList.remove('open'); drawerBackdrop.hidden = true; body.classList.remove('drawer-open'); returnFocus?.focus(); }
+    const drawerTitleDefault = drawer?.querySelector('#drawer-title')?.textContent ?? '';
+    function closeDrawer() { if (!drawer) return; drawer.hidden = true; drawer.classList.remove('open'); drawerBackdrop.hidden = true; body.classList.remove('drawer-open'); returnFocus?.focus(); const titleEl = drawer.querySelector('#drawer-title'); if (titleEl) titleEl.textContent = drawerTitleDefault; }
     document.querySelectorAll('[data-drawer-target]').forEach(button => button.addEventListener('click', () => {
         const source = document.querySelector(button.dataset.drawerTarget); if (!drawer || !source) return; returnFocus = button;
         drawer.querySelector('[data-drawer-body]').replaceChildren(source.content ? source.content.cloneNode(true) : source.cloneNode(true));
+        const titleEl = drawer.querySelector('#drawer-title'); if (titleEl) titleEl.textContent = button.dataset.drawerTitle || drawerTitleDefault;
         drawer.hidden = false; drawerBackdrop.hidden = false; body.classList.add('drawer-open'); requestAnimationFrame(() => drawer.classList.add('open')); focusable(drawer)[0]?.focus();
     }));
     document.querySelector('[data-drawer-close]')?.addEventListener('click', closeDrawer); drawerBackdrop?.addEventListener('click', closeDrawer);

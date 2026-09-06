@@ -97,6 +97,23 @@ function primaryAction($label, $href, array $attributes = [])
     return '<a href="' . e($href) . '"' . uiAttributes($attributes) . '>' . e(uiLabel($label)) . '</a>';
 }
 
+/**
+ * A small inline glyph for a link's own destination, not a section icon like
+ * navigationIcon(): 'external' marks a link leaving the app (new tab, another
+ * site), 'image' marks a link that opens a single file/photo rather than a
+ * page. Suffix these onto otherwise-plain-text links inside tables/lists so
+ * the link doesn't read as inert text.
+ */
+function actionIcon($name)
+{
+    $paths = [
+        'external' => 'M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14 21 3',
+        'image' => 'M21 19V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2ZM8.5 10a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3ZM21 15l-5-5L5 21',
+    ];
+    $path = $paths[$name] ?? $paths['external'];
+    return '<svg class="inline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="' . e($path) . '"/></svg>';
+}
+
 function secondaryAction($label, $href, array $attributes = [])
 {
     $attributes['class'] = trim('btn secondary ' . ($attributes['class'] ?? ''));
@@ -167,15 +184,44 @@ function pagination($page, $hasNext, $baseUrl, array $query = [])
     return $html . '</nav>';
 }
 
+/**
+ * The one row-actions control every table should use once a row has more
+ * than one action: a compact icon-button trigger (kebab dots) opening a
+ * dropdown of items, so the table itself never has to widen or grow a
+ * taller row to fit several buttons side by side. Each item is one of:
+ * - a plain link:      ['label'=>..., 'href'=>...]
+ * - a POST action:     ['label'=>..., 'form'=>['action'=>'x', 'id'=>1, ...]] (hidden fields)
+ * - a drawer popup:     ['label'=>..., 'drawer'=>'#template-id']
+ * All three accept 'permission' (hides the item when the viewer lacks it),
+ * 'danger' (red text), and 'confirm' (wires the existing data-confirm dialog).
+ * With zero eligible items this renders nothing; with exactly one, plain
+ * callers may still prefer a single visible button instead, for one-action
+ * rows where hiding the only action behind a click is worse UX than showing
+ * it outright, but using the menu even then is fine and keeps every table
+ * in the app behaving the same way.
+ */
 function actionMenu(array $items, $label = 'common.actions')
 {
+    $items = array_values(array_filter($items, fn($item) => !isset($item['permission']) || can($item['permission'])));
+    if (!$items) return '';
     static $counter = 0; $counter++;
     $id = 'action-menu-' . $counter;
     $html = '<div class="dropdown action-menu"><button class="btn icon-button" type="button" data-menu-button aria-expanded="false" aria-controls="' . e($id) . '" aria-label="' . e(uiLabel($label)) . '">&#8942;</button><div class="dropdown-menu" id="' . e($id) . '" data-menu hidden>';
     foreach ($items as $item) {
-        if (isset($item['permission']) && !can($item['permission'])) continue;
-        $class = !empty($item['danger']) ? ' dropdown-danger' : '';
-        $html .= '<a class="dropdown-item' . $class . '" href="' . e($item['href'] ?? '#') . '">' . e(uiLabel($item['label'] ?? '')) . '</a>';
+        $class = 'dropdown-item' . (!empty($item['danger']) ? ' dropdown-danger' : '');
+        $itemLabel = e(uiLabel($item['label'] ?? ''));
+        if (isset($item['drawer'])) {
+            $html .= '<button type="button" class="' . $class . '" data-drawer-target="' . e($item['drawer']) . '"' . (isset($item['drawer_title']) ? ' data-drawer-title="' . e(uiLabel($item['drawer_title'])) . '"' : '') . '>' . $itemLabel . '</button>';
+        } elseif (isset($item['form'])) {
+            $confirmAttribute = isset($item['confirm']) ? ' data-confirm="' . e(uiLabel($item['confirm'])) . '"' : '';
+            $html .= '<form method="post" class="dropdown-item-form"' . $confirmAttribute . '>' . csrfField();
+            foreach ($item['form'] as $field => $value) {
+                $html .= '<input type="hidden" name="' . e($field) . '" value="' . e($value) . '">';
+            }
+            $html .= '<button type="submit" class="' . $class . '">' . $itemLabel . '</button></form>';
+        } else {
+            $html .= '<a class="' . $class . '" href="' . e($item['href'] ?? '#') . '">' . $itemLabel . '</a>';
+        }
     }
     return $html . '</div></div>';
 }

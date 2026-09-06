@@ -160,3 +160,24 @@ input,select,textarea{width:100%;min-height:var(--control-height);padding:.65rem
 .lang-status-pill.filled .badge-dot{background:var(--success)}
 .lang-status-pill.current{outline:2px solid var(--focus);outline-offset:1px}
 @media(max-width:600px){.brand-color-grid{grid-template-columns:1fr}}
+
+/* Inline link affordance icons (actionIcon()) */
+.inline-icon{inline-size:.85rem;block-size:.85rem;flex:none;vertical-align:-.1rem;margin-inline-start:.3rem;opacity:.7}
+a:hover .inline-icon{opacity:1}
+/* A table cell's own value doubling as its "view details" link: same brand
+   color as any link, but with a trailing chevron (the same glyph the
+   breadcrumb separator already uses) so it doesn't read as inert text. */
+.detail-link{text-underline-offset:2px}
+.detail-link::after{content:"›";display:inline-block;margin-inline-start:.3rem;color:var(--text-muted);font-weight:700}
+[dir=rtl] .detail-link::after{content:"‹"}
+.detail-link:hover{text-decoration:underline}
+.detail-link:hover::after{color:var(--brand)}
+.photo-links{display:inline-flex;flex-wrap:wrap;gap:.4rem;margin-inline-start:.5rem}
+.photo-links a{display:inline-flex;align-items:center;gap:.25rem;padding:.15rem .5rem;border-radius:var(--radius-pill);background:var(--surface-strong);font-size:var(--font-xs);font-weight:650}
+.photo-links a:hover{background:var(--brand-soft)}
+.photo-links .inline-icon{margin-inline-start:0}
+/* actionMenu() items that submit a POST instead of navigating: the form is
+   a plain block wrapper so its button still fills the row like every other
+   dropdown item. */
+.dropdown-item-form{margin:0;padding:0}
+.dropdown-item-form .dropdown-item{width:100%;border:0;font:inherit;min-height:2.35rem}
