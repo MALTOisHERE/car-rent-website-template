@@ -71,6 +71,10 @@ if (requestMethod() === 'POST') {
 }
 
 $currentContent = agencyPageContent($agencyId, $sectionKey, $contentLanguage);
+$filledLanguages = array_column(
+    dbFetchAll('SELECT DISTINCT language_code FROM agency_page_content WHERE agency_id=:agency AND page=:page', ['agency' => $agencyId, 'page' => $sectionKey]),
+    'language_code'
+);
 
 backofficeHeader('nav.agencies', 'agency_branding.php');
 pageHeader('page.agency_branding.title', 'page.agency_branding.description', [
@@ -84,18 +88,48 @@ pageHeader('page.agency_branding.title', 'page.agency_branding.description', [
 <div class="grid">
 <section class="card">
     <div class="section-card-header"><h2><?= navigationIcon('admin') ?><?= e(t('section.agency_branding')) ?></h2></div>
-    <form method="post" enctype="multipart/form-data">
+
+    <div class="brand-preview" id="brandPreview" style="--preview-primary:<?= e($agency['primary_color'] ?: '#011468') ?>;--preview-secondary:<?= e($agency['secondary_color'] ?: '#011468') ?>;--preview-dark:<?= e($agency['accent_dark_color'] ?: '#00104f') ?>">
+        <p class="brand-preview-heading"><?= e(t('field.preview_heading')) ?></p>
+        <div class="brand-preview-row">
+            <span class="brand-preview-btn"><?= e(t('field.preview_button')) ?></span>
+            <span class="brand-preview-chip"><?= e(t('field.preview_badge')) ?></span>
+        </div>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" id="brandingForm">
         <?= csrfField() ?>
         <input type="hidden" name="form_action" value="branding">
-        <label><?= e(t('field.logo')) ?><input type="file" name="logo" accept="image/jpeg,image/png,image/webp"></label>
-        <?php if ($agency['logo_path']): ?>
-        <div class="page-metadata"><img src="../site/agency_logo.php?id=<?= e($agencyId) ?>" alt="" style="max-height:60px;max-width:200px;object-fit:contain;background:var(--surface-subtle);border-radius:var(--radius-sm);padding:.4rem"></div>
-        <?php endif; ?>
-        <div class="grid">
-            <label><?= e(t('field.primary_color')) ?><input type="color" name="primary_color" value="<?= e($agency['primary_color'] ?: '#011468') ?>"></label>
-            <label><?= e(t('field.secondary_color')) ?><input type="color" name="secondary_color" value="<?= e($agency['secondary_color'] ?: '#011468') ?>"></label>
-            <label><?= e(t('field.accent_dark_color')) ?><input type="color" name="accent_dark_color" value="<?= e($agency['accent_dark_color'] ?: '#00104f') ?>"></label>
+
+        <div class="logo-upload-row">
+            <div class="logo-preview<?= $agency['logo_path'] ? '' : ' empty' ?>" id="logoPreview">
+                <?php if ($agency['logo_path']): ?>
+                <img src="../site/agency_logo.php?id=<?= e($agencyId) ?>" alt="">
+                <?php else: ?>
+                <span><?= e(t('field.no_logo')) ?></span>
+                <?php endif; ?>
+            </div>
+            <label class="logo-upload-field"><?= e(t('field.logo')) ?>
+                <input type="file" name="logo" id="logoInput" accept="image/jpeg,image/png,image/webp">
+                <span class="field-hint"><?= e(t('field.logo_hint')) ?></span>
+            </label>
         </div>
+
+        <div class="brand-color-grid">
+            <label class="brand-color-field">
+                <input type="color" name="primary_color" id="primaryColor" value="<?= e($agency['primary_color'] ?: '#011468') ?>">
+                <span class="brand-color-copy"><span><?= e(t('field.primary_color')) ?></span><code id="primaryColorHex"><?= e(strtoupper($agency['primary_color'] ?: '#011468')) ?></code></span>
+            </label>
+            <label class="brand-color-field">
+                <input type="color" name="secondary_color" id="secondaryColor" value="<?= e($agency['secondary_color'] ?: '#011468') ?>">
+                <span class="brand-color-copy"><span><?= e(t('field.secondary_color')) ?></span><code id="secondaryColorHex"><?= e(strtoupper($agency['secondary_color'] ?: '#011468')) ?></code></span>
+            </label>
+            <label class="brand-color-field">
+                <input type="color" name="accent_dark_color" id="darkColor" value="<?= e($agency['accent_dark_color'] ?: '#00104f') ?>">
+                <span class="brand-color-copy"><span><?= e(t('field.accent_dark_color')) ?></span><code id="darkColorHex"><?= e(strtoupper($agency['accent_dark_color'] ?: '#00104f')) ?></code></span>
+            </label>
+        </div>
+
         <button class="btn primary"><?= e(t('common.save')) ?></button>
     </form>
 </section>
@@ -108,6 +142,14 @@ pageHeader('page.agency_branding.title', 'page.agency_branding.description', [
         <label><?= e(t('field.language')) ?><select name="content_lang" onchange="this.form.submit()"><?php foreach (supportedLanguages() as $lang): ?><option value="<?= e($lang) ?>" <?= $contentLanguage === $lang ? 'selected' : '' ?>><?= e(t('language.' . $lang)) ?></option><?php endforeach; ?></select></label>
         <noscript><button class="btn primary"><?= e(t('action.apply')) ?></button></noscript>
     </form>
+
+    <p class="help-subhead"><?= e(t('field.content_status')) ?></p>
+    <div class="lang-status-row">
+        <?php foreach (supportedLanguages() as $lang): $filled = in_array($lang, $filledLanguages, true); ?>
+        <span class="lang-status-pill<?= $filled ? ' filled' : '' ?><?= $lang === $contentLanguage ? ' current' : '' ?>"><span class="badge-dot"></span><?= e(t('language.' . $lang)) ?> - <?= e(t($filled ? 'field.content_status_filled' : 'field.content_status_empty')) ?></span>
+        <?php endforeach; ?>
+    </div>
+
     <form method="post" class="stack-top">
         <?= csrfField() ?>
         <input type="hidden" name="form_action" value="content">
@@ -126,4 +168,40 @@ pageHeader('page.agency_branding.title', 'page.agency_branding.description', [
     </form>
 </section>
 </div>
+
+<script>
+(function () {
+    var form = document.getElementById('brandingForm');
+    if (!form) return;
+    var swatches = [
+        ['primaryColor', 'primaryColorHex', '--preview-primary'],
+        ['secondaryColor', 'secondaryColorHex', '--preview-secondary'],
+        ['darkColor', 'darkColorHex', '--preview-dark']
+    ];
+    var preview = document.getElementById('brandPreview');
+    swatches.forEach(function (entry) {
+        var input = document.getElementById(entry[0]);
+        var hex = document.getElementById(entry[1]);
+        if (!input) return;
+        input.addEventListener('input', function () {
+            hex.textContent = input.value.toUpperCase();
+            if (preview) preview.style.setProperty(entry[2], input.value);
+        });
+    });
+    var logoInput = document.getElementById('logoInput');
+    var logoPreview = document.getElementById('logoPreview');
+    if (logoInput && logoPreview) {
+        logoInput.addEventListener('change', function () {
+            var file = logoInput.files && logoInput.files[0];
+            if (!file) return;
+            var reader = new FileReader();
+            reader.onload = function () {
+                logoPreview.classList.remove('empty');
+                logoPreview.innerHTML = '<img src="' + reader.result + '" alt="">';
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+})();
+</script>
 <?php backofficeFooter();
