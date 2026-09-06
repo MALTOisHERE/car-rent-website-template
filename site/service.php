@@ -5,11 +5,11 @@ include("header_p.php") ?>
 <!-- Header Start -->
 <div class="container-fluid bg-breadcrumb">
     <div class="container text-center py-5" style="max-width: 900px;">
-        <h4 class="text-white display-4 mb-4 wow fadeInDown" data-wow-delay="0.1s">Our Services</h4>
+        <h4 class="text-white display-4 mb-4 wow fadeInDown" data-wow-delay="0.1s"><?= e(t('public.service_page.title')) ?></h4>
         <ol class="breadcrumb d-flex justify-content-center mb-0 wow fadeInDown" data-wow-delay="0.3s">
-            <li class="breadcrumb-item"><a href="index.php">Home</a></li>
-            <li class="breadcrumb-item"><a href="#">Pages</a></li>
-            <li style="text-decoration: underline;" class="breadcrumb-item active text-white">Service</li>
+            <li class="breadcrumb-item"><a href="index.php"><?= e(t('public.breadcrumb.home')) ?></a></li>
+            <li class="breadcrumb-item"><a href="#"><?= e(t('public.breadcrumb.pages')) ?></a></li>
+            <li style="text-decoration: underline;" class="breadcrumb-item active text-white"><?= e(t('public.service_page.breadcrumb')) ?></li>
         </ol>
     </div>
 </div>
@@ -19,65 +19,31 @@ include("header_p.php") ?>
 <div class="container-fluid service py-5">
     <div class="container py-5">
         <div class="text-center mx-auto pb-5 wow fadeInUp" data-wow-delay="0.1s" style="max-width: 800px;">
-            <h1 class="display-5 text-capitalize mb-3">Aurevo <span class="text-secondary">Services</span></h1>
-            <p class="mb-0">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ut amet nemo expedita asperiores commodi accusantium at cum harum, excepturi, quia tempora cupiditate! Adipisci facilis modi quisquam quia distinctio,
-            </p>
+            <h1 class="display-5 text-capitalize mb-3"><?= e(t('public.service_page.heading')) ?></h1>
+            <p class="mb-0"><?= e(t('public.service_page.intro')) ?></p>
         </div>
         <div class="row g-4">
-            <div class="col-md-6 col-lg-4 wow fadeInUp" data-wow-delay="0.1s">
+            <?php
+            $items = [
+                ['icon' => 'fa-phone-alt', 'key' => 'item_1'],
+                ['icon' => 'fa-money-bill-alt', 'key' => 'item_2'],
+                ['icon' => 'fa-road', 'key' => 'item_3'],
+                ['icon' => 'fa-umbrella', 'key' => 'item_4'],
+                ['icon' => 'fa-building', 'key' => 'item_5'],
+                ['icon' => 'fa-car-alt', 'key' => 'item_6'],
+            ];
+            foreach ($items as $i => $item):
+            ?>
+            <div class="col-md-6 col-lg-4 wow fadeInUp" data-wow-delay="0.<?= ($i % 3) * 2 + 1 ?>s">
                 <div class="service-item p-4">
                     <div class="service-icon mb-4">
-                        <i class="fa fa-phone-alt fa-2x"></i>
+                        <i class="fa <?= e($item['icon']) ?> fa-2x"></i>
                     </div>
-                    <h5 class="mb-3">Phone Reservation</h5>
-                    <p class="mb-0">Lorem ipsum dolor sit amet consectetur adipisicing elit. Reprehenderit ipsam quasi quibusdam ipsa perferendis iusto?</p>
+                    <h5 class="mb-3"><?= e(t('public.service_page.' . $item['key'] . '_title')) ?></h5>
+                    <p class="mb-0"><?= e(t('public.service_page.' . $item['key'] . '_text')) ?></p>
                 </div>
             </div>
-            <div class="col-md-6 col-lg-4 wow fadeInUp" data-wow-delay="0.3s">
-                <div class="service-item p-4">
-                    <div class="service-icon mb-4">
-                        <i class="fa fa-money-bill-alt fa-2x"></i>
-                    </div>
-                    <h5 class="mb-3">Special Rates</h5>
-                    <p class="mb-0">Lorem ipsum dolor sit amet consectetur adipisicing elit. Reprehenderit ipsam quasi quibusdam ipsa perferendis iusto?</p>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-4 wow fadeInUp" data-wow-delay="0.5s">
-                <div class="service-item p-4">
-                    <div class="service-icon mb-4">
-                        <i class="fa fa-road fa-2x"></i>
-                    </div>
-                    <h5 class="mb-3">One Way Rental</h5>
-                    <p class="mb-0">Lorem ipsum dolor sit amet consectetur adipisicing elit. Reprehenderit ipsam quasi quibusdam ipsa perferendis iusto?</p>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-4 wow fadeInUp" data-wow-delay="0.1s">
-                <div class="service-item p-4">
-                    <div class="service-icon mb-4">
-                        <i class="fa fa-umbrella fa-2x"></i>
-                    </div>
-                    <h5 class="mb-3">Life Insurance</h5>
-                    <p class="mb-0">Lorem ipsum dolor sit amet consectetur adipisicing elit. Reprehenderit ipsam quasi quibusdam ipsa perferendis iusto?</p>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-4 wow fadeInUp" data-wow-delay="0.3s">
-                <div class="service-item p-4">
-                    <div class="service-icon mb-4">
-                        <i class="fa fa-building fa-2x"></i>
-                    </div>
-                    <h5 class="mb-3">City to City</h5>
-                    <p class="mb-0">Lorem ipsum dolor sit amet consectetur adipisicing elit. Reprehenderit ipsam quasi quibusdam ipsa perferendis iusto?</p>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-4 wow fadeInUp" data-wow-delay="0.5s">
-                <div class="service-item p-4">
-                    <div class="service-icon mb-4">
-                        <i class="fa fa-car-alt fa-2x"></i>
-                    </div>
-                    <h5 class="mb-3">Free Rides</h5>
-                    <p class="mb-0">Lorem ipsum dolor sit amet consectetur adipisicing elit. Reprehenderit ipsam quasi quibusdam ipsa perferendis iusto?</p>
-                </div>
-            </div>
+            <?php endforeach; ?>
         </div>
     </div>
 </div>
@@ -96,7 +62,7 @@ include("header_p.php") ?>
                         <span class="text-white fs-2 fw-bold" data-toggle="counter-up">829</span>
                         <span class="h1 fw-bold text-white">+</span>
                     </div>
-                    <h4 class="text-white mb-0">Happy Clients</h4>
+                    <h4 class="text-white mb-0"><?= e(t('public.shared_counter.happy_clients')) ?></h4>
                 </div>
             </div>
             <div class="col-md-6 col-lg-6 col-xl-3 wow fadeInUp" data-wow-delay="0.3s">
@@ -108,7 +74,7 @@ include("header_p.php") ?>
                         <span class="text-white fs-2 fw-bold" data-toggle="counter-up">56</span>
                         <span class="h1 fw-bold text-white">+</span>
                     </div>
-                    <h4 class="text-white mb-0">Number of Cars</h4>
+                    <h4 class="text-white mb-0"><?= e(t('public.shared_counter.number_of_cars')) ?></h4>
                 </div>
             </div>
             <div class="col-md-6 col-lg-6 col-xl-3 wow fadeInUp" data-wow-delay="0.5s">
@@ -120,7 +86,7 @@ include("header_p.php") ?>
                         <span class="text-white fs-2 fw-bold" data-toggle="counter-up">127</span>
                         <span class="h1 fw-bold text-white">+</span>
                     </div>
-                    <h4 class="text-white mb-0">Car Center</h4>
+                    <h4 class="text-white mb-0"><?= e(t('public.shared_counter.car_center')) ?></h4>
                 </div>
             </div>
             <div class="col-md-6 col-lg-6 col-xl-3 wow fadeInUp" data-wow-delay="0.7s">
@@ -132,7 +98,7 @@ include("header_p.php") ?>
                         <span class="text-white fs-2 fw-bold" data-toggle="counter-up">589</span>
                         <span class="h1 fw-bold text-white">+</span>
                     </div>
-                    <h4 class="text-white mb-0">Total kilometers</h4>
+                    <h4 class="text-white mb-0"><?= e(t('public.shared_counter.total_kilometers')) ?></h4>
                 </div>
             </div>
         </div>
@@ -150,11 +116,8 @@ include("header_p.php") ?>
 <div class="container-fluid testimonial pb-5">
     <div class="container pb-5">
         <div class="text-center mx-auto pb-5 wow fadeInUp" data-wow-delay="0.1s" style="max-width: 800px;">
-            <h1 class="display-5 text-capitalize mb-3">Our Clients<span class="text-secondary"> Riviews</span></h1>
-            <p class="mb-0">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ut amet nemo expedita
-                asperiores commodi accusantium at cum harum, excepturi, quia tempora cupiditate! Adipisci facilis
-                modi quisquam quia distinctio,
-            </p>
+            <h1 class="display-5 text-capitalize mb-3"><?= e(t('public.shared_testimonials.title')) ?></h1>
+            <p class="mb-0"><?= e(t('public.shared_testimonials.intro')) ?></p>
         </div>
         <style>
             .d-flex.text-primary i {
@@ -168,72 +131,27 @@ include("header_p.php") ?>
             }
         </style>
         <div class="owl-carousel testimonial-carousel wow fadeInUp" data-wow-delay="0.1s">
+            <?php $stars = [5, 3, 2]; foreach ($stars as $i => $filled): ?>
             <div class="testimonial-item">
                 <div class="testimonial-quote"><i class="fa fa-quote-right fa-2x"></i>
                 </div>
                 <div class="testimonial-inner p-4">
-                    <img src="img/testimonial-1.jpg" class="img-fluid" alt="">
+                    <img src="img/testimonial-<?= $i + 1 ?>.jpg" class="img-fluid" alt="">
                     <div class="ms-4">
-                        <h4>Person Name</h4>
-                        <p>Profession</p>
+                        <h4><?= e(t('public.shared_testimonials.name')) ?></h4>
+                        <p><?= e(t('public.shared_testimonials.role')) ?></p>
                         <div class="d-flex text-primary">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star text-body"></i>
+                            <?php for ($s = 1; $s <= 5; $s++): ?>
+                            <i class="fas fa-star<?= $s > $filled ? ' text-body' : '' ?>"></i>
+                            <?php endfor; ?>
                         </div>
                     </div>
                 </div>
                 <div class="border-top rounded-bottom p-4">
-                    <p class="mb-0">Lorem ipsum dolor sit amet consectetur adipisicing elit. Quam soluta neque ab
-                        repudiandae reprehenderit ipsum eos cumque esse repellendus impedit.</p>
+                    <p class="mb-0"><?= e(t('public.shared_testimonials.text')) ?></p>
                 </div>
             </div>
-            <div class="testimonial-item">
-                <div class="testimonial-quote"><i class="fa fa-quote-right fa-2x"></i>
-                </div>
-                <div class="testimonial-inner p-4">
-                    <img src="img/testimonial-2.jpg" class="img-fluid" alt="">
-                    <div class="ms-4">
-                        <h4>Person Name</h4>
-                        <p>Profession</p>
-                        <div class="d-flex text-primary">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star text-body"></i>
-                            <i class="fas fa-star text-body"></i>
-                        </div>
-                    </div>
-                </div>
-                <div class="border-top rounded-bottom p-4">
-                    <p class="mb-0">Lorem ipsum dolor sit amet consectetur adipisicing elit. Quam soluta neque ab
-                        repudiandae reprehenderit ipsum eos cumque esse repellendus impedit.</p>
-                </div>
-            </div>
-            <div class="testimonial-item">
-                <div class="testimonial-quote"><i class="fa fa-quote-right fa-2x"></i>
-                </div>
-                <div class="testimonial-inner p-4">
-                    <img src="img/testimonial-3.jpg" class="img-fluid" alt="">
-                    <div class="ms-4">
-                        <h4>Person Name</h4>
-                        <p>Profession</p>
-                        <div class="d-flex text-primary">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star text-body"></i>
-                            <i class="fas fa-star text-body"></i>
-                            <i class="fas fa-star text-body"></i>
-                        </div>
-                    </div>
-                </div>
-                <div class="border-top rounded-bottom p-4">
-                    <p class="mb-0">Lorem ipsum dolor sit amet consectetur adipisicing elit. Quam soluta neque ab
-                        repudiandae reprehenderit ipsum eos cumque esse repellendus impedit.</p>
-                </div>
-            </div>
+            <?php endforeach; ?>
         </div>
     </div>
 </div>

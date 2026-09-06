@@ -5,11 +5,11 @@ include("header_p.php") ?>
 <!-- Header Start -->
 <div class="container-fluid bg-breadcrumb">
     <div class="container text-center py-5" style="max-width: 900px;">
-        <h4 class="text-white display-4 mb-4 wow fadeInDown" data-wow-delay="0.1s">About Us</h4>
+        <h4 class="text-white display-4 mb-4 wow fadeInDown" data-wow-delay="0.1s"><?= e(t('public.about_page.title')) ?></h4>
         <ol class="breadcrumb d-flex justify-content-center mb-0 wow fadeInDown" data-wow-delay="0.3s">
-            <li class="breadcrumb-item"><a href="index.php">Home</a></li>
-            <li class="breadcrumb-item"><a href="#">Pages</a></li>
-            <li style="text-decoration: underline;" class="breadcrumb-item active text-white">About</li>
+            <li class="breadcrumb-item"><a href="index.php"><?= e(t('public.breadcrumb.home')) ?></a></li>
+            <li class="breadcrumb-item"><a href="#"><?= e(t('public.breadcrumb.pages')) ?></a></li>
+            <li style="text-decoration: underline;" class="breadcrumb-item active text-white"><?= e(t('public.about_page.breadcrumb')) ?></li>
         </ol>
     </div>
 </div>
@@ -22,11 +22,8 @@ include("header_p.php") ?>
             <div class="col-xl-6 wow fadeInLeft" data-wow-delay="0.2s">
                 <div class="about-item">
                     <div class="pb-5">
-                        <h1 style="color: <?= e($brandColors['primary']) ?>;" class="display-5 text-capitalize">Aurevo About</h1>
-                        <p class="mb-0">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ut amet nemo
-                            expedita asperiores commodi accusantium at cum harum, excepturi, quia tempora
-                            cupiditate! Adipisci facilis modi quisquam quia distinctio,
-                        </p>
+                        <h1 style="color: <?= e($brandColors['primary']) ?>;" class="display-5 text-capitalize"><?= e(t('public.about_page.heading')) ?></h1>
+                        <p class="mb-0"><?= e(t('public.about_page.intro')) ?></p>
                     </div>
                     <div class="row g-4">
                         <div class="col-lg-6">
@@ -34,8 +31,8 @@ include("header_p.php") ?>
                                 <div class="about-icon mb-4">
                                     <img src="img/about-icon-1.png" class="img-fluid w-50 h-50" alt="Icon">
                                 </div>
-                                <h5 class="mb-3">Our Vision</h5>
-                                <p class="mb-0">Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
+                                <h5 class="mb-3"><?= e(t('public.about_page.vision_title')) ?></h5>
+                                <p class="mb-0"><?= e(t('public.about_page.vision_text')) ?></p>
                             </div>
                         </div>
                         <div class="col-lg-6">
@@ -43,36 +40,29 @@ include("header_p.php") ?>
                                 <div class="about-icon mb-4">
                                     <img src="img/about-icon-2.png" class="img-fluid h-50 w-50" alt="Icon">
                                 </div>
-                                <h5 class="mb-3">Our Mision</h5>
-                                <p class="mb-0">Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
+                                <h5 class="mb-3"><?= e(t('public.about_page.mission_title')) ?></h5>
+                                <p class="mb-0"><?= e(t('public.about_page.mission_text')) ?></p>
                             </div>
                         </div>
                     </div>
-                    <p class="text-item my-4">Lorem, ipsum dolor sit amet consectetur adipisicing elit. Beatae,
-                        aliquam ipsum. Sed suscipit dolorem libero sequi aut natus debitis reprehenderit facilis
-                        quaerat similique, est at in eum. Quo, obcaecati in!
-                    </p>
+                    <p class="text-item my-4"><?= e(t('public.about_page.extra_text')) ?></p>
                     <div class="row g-4">
                         <div class="col-lg-6">
                             <div class="text-center rounded bg-custom-secondary p-4">
                                 <h1 class="display-6 text-white">17</h1>
-                                <h5 class="text-light mb-0">Years Of Experience</h5>
+                                <h5 class="text-light mb-0"><?= e(t('public.about_page.years_experience_label')) ?></h5>
                             </div>
                         </div>
                         <div class="col-lg-6">
                             <div class="rounded">
-                                <p class="mb-2"><i class="fa fa-check-circle text-secondary me-1"></i> Morbi tristique
-                                    senectus</p>
-                                <p class="mb-2"><i class="fa fa-check-circle text-secondary me-1"></i> A scelerisque
-                                    purus</p>
-                                <p class="mb-2"><i class="fa fa-check-circle text-secondary me-1"></i> Dictumst
-                                    vestibulum</p>
-                                <p class="mb-0"><i class="fa fa-check-circle text-secondary me-1"></i> dio aenean sed
-                                    adipiscing</p>
+                                <p class="mb-2"><i class="fa fa-check-circle text-secondary me-1"></i> <?= e(t('public.about_page.bullet_1')) ?></p>
+                                <p class="mb-2"><i class="fa fa-check-circle text-secondary me-1"></i> <?= e(t('public.about_page.bullet_2')) ?></p>
+                                <p class="mb-2"><i class="fa fa-check-circle text-secondary me-1"></i> <?= e(t('public.about_page.bullet_3')) ?></p>
+                                <p class="mb-0"><i class="fa fa-check-circle text-secondary me-1"></i> <?= e(t('public.about_page.bullet_4')) ?></p>
                             </div>
                         </div>
                         <div class="col-lg-5 d-flex align-items-center">
-                            <a href="#" class="btn btn-secondary rounded py-3 px-5">More About Us</a>
+                            <a href="#" class="btn btn-secondary rounded py-3 px-5"><?= e(t('public.about_page.cta_button')) ?></a>
                         </div>
                         <style>
                             .btn-secondary {
@@ -100,8 +90,8 @@ include("header_p.php") ?>
                                     class="img-fluid rounded-circle border border-4 border-secondary"
                                     style="width: 100px; height: 100px;" alt="Image">
                                 <div class="ms-4">
-                                    <h4>William Burgess</h4>
-                                    <p class="mb-0">Carveo Founder</p>
+                                    <h4><?= e(t('public.about_page.founder_name')) ?></h4>
+                                    <p class="mb-0"><?= e(t('public.about_page.founder_title')) ?></p>
                                 </div>
                             </div>
                         </div>
@@ -142,7 +132,7 @@ include("header_p.php") ?>
                         <span class="text-white fs-2 fw-bold" data-toggle="counter-up">829</span>
                         <span class="h1 fw-bold text-white">+</span>
                     </div>
-                    <h4 class="text-white mb-0">Happy Clients</h4>
+                    <h4 class="text-white mb-0"><?= e(t('public.shared_counter.happy_clients')) ?></h4>
                 </div>
             </div>
             <div class="col-md-6 col-lg-6 col-xl-3 wow fadeInUp" data-wow-delay="0.3s">
@@ -154,7 +144,7 @@ include("header_p.php") ?>
                         <span class="text-white fs-2 fw-bold" data-toggle="counter-up">56</span>
                         <span class="h1 fw-bold text-white">+</span>
                     </div>
-                    <h4 class="text-white mb-0">Number of Cars</h4>
+                    <h4 class="text-white mb-0"><?= e(t('public.shared_counter.number_of_cars')) ?></h4>
                 </div>
             </div>
             <div class="col-md-6 col-lg-6 col-xl-3 wow fadeInUp" data-wow-delay="0.5s">
@@ -166,7 +156,7 @@ include("header_p.php") ?>
                         <span class="text-white fs-2 fw-bold" data-toggle="counter-up">127</span>
                         <span class="h1 fw-bold text-white">+</span>
                     </div>
-                    <h4 class="text-white mb-0">Car Center</h4>
+                    <h4 class="text-white mb-0"><?= e(t('public.shared_counter.car_center')) ?></h4>
                 </div>
             </div>
             <div class="col-md-6 col-lg-6 col-xl-3 wow fadeInUp" data-wow-delay="0.7s">
@@ -178,7 +168,7 @@ include("header_p.php") ?>
                         <span class="text-white fs-2 fw-bold" data-toggle="counter-up">589</span>
                         <span class="h1 fw-bold text-white">+</span>
                     </div>
-                    <h4 class="text-white mb-0">Total kilometers</h4>
+                    <h4 class="text-white mb-0"><?= e(t('public.shared_counter.total_kilometers')) ?></h4>
                 </div>
             </div>
         </div>
@@ -190,11 +180,8 @@ include("header_p.php") ?>
 <div class="container-fluid feature py-5">
     <div class="container py-5">
         <div class="text-center mx-auto pb-5 wow fadeInUp" data-wow-delay="0.1s" style="max-width: 800px;">
-            <h1 style="color:<?= e($brandColors['primary']) ?>;" class="display-5 text-capitalize mb-3">Aurevo Features</h1>
-            <p class="mb-0">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ut amet nemo expedita
-                asperiores commodi accusantium at cum harum, excepturi, quia tempora cupiditate! Adipisci facilis
-                modi quisquam quia distinctio,
-            </p>
+            <h1 style="color:<?= e($brandColors['primary']) ?>;" class="display-5 text-capitalize mb-3"><?= e(t('public.about_page.features_title')) ?></h1>
+            <p class="mb-0"><?= e(t('public.about_page.features_intro')) ?></p>
         </div>
         <div class="row g-4 align-items-center">
             <div class="col-xl-4">
@@ -205,9 +192,8 @@ include("header_p.php") ?>
                                 <span class="fa fa-trophy fa-2x"></span>
                             </div>
                             <div class="ms-4">
-                                <h5 class="mb-3">First Class services</h5>
-                                <p class="mb-0">Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                                    Consectetur, in illum aperiam ullam magni eligendi?</p>
+                                <h5 class="mb-3"><?= e(t('public.about_page.feature_1_title')) ?></h5>
+                                <p class="mb-0"><?= e(t('public.about_page.feature_1_text')) ?></p>
                             </div>
                         </div>
                     </div>
@@ -217,9 +203,8 @@ include("header_p.php") ?>
                                 <span class="fa fa-road fa-2x"></span>
                             </div>
                             <div class="ms-4">
-                                <h5 class="mb-3">24/7 road assistance</h5>
-                                <p class="mb-0">Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                                    Consectetur, in illum aperiam ullam magni eligendi?</p>
+                                <h5 class="mb-3"><?= e(t('public.about_page.feature_2_title')) ?></h5>
+                                <p class="mb-0"><?= e(t('public.about_page.feature_2_text')) ?></p>
                             </div>
                         </div>
                     </div>
@@ -233,9 +218,8 @@ include("header_p.php") ?>
                     <div class="col-12 wow fadeInUp" data-wow-delay="0.1s">
                         <div class="feature-item justify-content-end">
                             <div class="text-end me-4">
-                                <h5 class="mb-3">Quality at Minimum</h5>
-                                <p class="mb-0">Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                                    Consectetur, in illum aperiam ullam magni eligendi?</p>
+                                <h5 class="mb-3"><?= e(t('public.about_page.feature_3_title')) ?></h5>
+                                <p class="mb-0"><?= e(t('public.about_page.feature_3_text')) ?></p>
                             </div>
                             <div class="feature-icon">
                                 <span class="fa fa-tag fa-2x"></span>
@@ -245,9 +229,8 @@ include("header_p.php") ?>
                     <div class="col-12 wow fadeInUp" data-wow-delay="0.3s">
                         <div class="feature-item justify-content-end">
                             <div class="text-end me-4">
-                                <h5 class="mb-3">Free Pick-Up & Drop-Off</h5>
-                                <p class="mb-0">Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                                    Consectetur, in illum aperiam ullam magni eligendi?</p>
+                                <h5 class="mb-3"><?= e(t('public.about_page.feature_4_title')) ?></h5>
+                                <p class="mb-0"><?= e(t('public.about_page.feature_4_text')) ?></p>
                             </div>
                             <div class="feature-icon">
                                 <span class="fa fa-map-pin fa-2x"></span>
@@ -265,29 +248,28 @@ include("header_p.php") ?>
 <div class="container-fluid steps py-5">
     <div class="container py-5">
         <div class="text-center mx-auto pb-5 wow fadeInUp" data-wow-delay="0.1s" style="max-width: 800px;">
-            <h1 class="display-5 text-capitalize text-white mb-3">Aurevo<span class="text-white"> Process</span></h1>
-            <p class="mb-0 text-white">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ut amet nemo expedita asperiores commodi accusantium at cum harum, excepturi, quia tempora cupiditate! Adipisci facilis modi quisquam quia distinctio,
-            </p>
+            <h1 class="display-5 text-capitalize text-white mb-3"><?= e(t('public.about_page.process_title')) ?></h1>
+            <p class="mb-0 text-white"><?= e(t('public.about_page.process_intro')) ?></p>
         </div>
         <div class="row g-4">
             <div class="col-lg-4 wow fadeInUp" data-wow-delay="0.1s">
                 <div class="steps-item p-4 mb-4">
-                    <h4>Come In Contact</h4>
-                    <p class="mb-0">Lorem ipsum dolor sit amet consectetur adipisicing elit. Ad, dolorem!</p>
+                    <h4><?= e(t('public.about_page.step_1_title')) ?></h4>
+                    <p class="mb-0"><?= e(t('public.about_page.step_1_text')) ?></p>
                     <div class="setps-number">01.</div>
                 </div>
             </div>
             <div class="col-lg-4 wow fadeInUp" data-wow-delay="0.3s">
                 <div class="steps-item p-4 mb-4">
-                    <h4>Choose A Car</h4>
-                    <p class="mb-0">Lorem ipsum dolor sit amet consectetur adipisicing elit. Ad, dolorem!</p>
+                    <h4><?= e(t('public.about_page.step_2_title')) ?></h4>
+                    <p class="mb-0"><?= e(t('public.about_page.step_2_text')) ?></p>
                     <div class="setps-number">02.</div>
                 </div>
             </div>
             <div class="col-lg-4 wow fadeInUp" data-wow-delay="0.5s">
                 <div class="steps-item p-4 mb-4">
-                    <h4>Enjoy Driving</h4>
-                    <p class="mb-0">Lorem ipsum dolor sit amet consectetur adipisicing elit. Ad, dolorem!</p>
+                    <h4><?= e(t('public.about_page.step_3_title')) ?></h4>
+                    <p class="mb-0"><?= e(t('public.about_page.step_3_text')) ?></p>
                     <div class="setps-number">03.</div>
                 </div>
             </div>
@@ -300,19 +282,19 @@ include("header_p.php") ?>
 <div class="container-fluid team py-5">
     <div class="container py-5">
         <div class="text-center mx-auto pb-5 wow fadeInUp" data-wow-delay="0.1s" style="max-width: 800px;">
-            <h1 class="display-5 text-capitalize mb-3">Customer<span class="text-scondary"> Suport</span> Center</h1>
-            <p class="mb-0">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ut amet nemo expedita asperiores commodi accusantium at cum harum, excepturi, quia tempora cupiditate! Adipisci facilis modi quisquam quia distinctio,
-            </p>
+            <h1 class="display-5 text-capitalize mb-3"><?= e(t('public.shared_team.title')) ?></h1>
+            <p class="mb-0"><?= e(t('public.shared_team.intro')) ?></p>
         </div>
         <div class="row g-4">
-            <div class="col-md-6 col-lg-6 col-xl-3 wow fadeInUp" data-wow-delay="0.1s">
+            <?php for ($i = 1; $i <= 4; $i++): ?>
+            <div class="col-md-6 col-lg-6 col-xl-3 wow fadeInUp" data-wow-delay="0.<?= $i * 2 - 1 ?>s">
                 <div class="team-item p-4 pt-0">
                     <div class="team-img">
-                        <img src="img/team-1.jpg" class="img-fluid rounded w-100" alt="Image">
+                        <img src="img/team-<?= $i ?>.jpg" class="img-fluid rounded w-100" alt="Image">
                     </div>
                     <div class="team-content pt-4">
-                        <h4>MARTIN DOE</h4>
-                        <p>Profession</p>
+                        <h4><?= e(t('public.shared_team.member_name')) ?></h4>
+                        <p><?= e(t('public.shared_team.member_role')) ?></p>
                         <div class="team-icon d-flex justify-content-center">
                             <a class="btn btn-square btn-light rounded-circle mx-1" href=""><i class="fab fa-facebook-f"></i></a>
                             <a class="btn btn-square btn-light rounded-circle mx-1" href=""><i class="fab fa-twitter"></i></a>
@@ -322,57 +304,7 @@ include("header_p.php") ?>
                     </div>
                 </div>
             </div>
-            <div class="col-md-6 col-lg-6 col-xl-3 wow fadeInUp" data-wow-delay="0.3s">
-                <div class="team-item p-4 pt-0">
-                    <div class="team-img">
-                        <img src="img/team-2.jpg" class="img-fluid rounded w-100" alt="Image">
-                    </div>
-                    <div class="team-content pt-4">
-                        <h4>MARTIN DOE</h4>
-                        <p>Profession</p>
-                        <div class="team-icon d-flex justify-content-center">
-                            <a class="btn btn-square btn-light rounded-circle mx-1" href=""><i class="fab fa-facebook-f"></i></a>
-                            <a class="btn btn-square btn-light rounded-circle mx-1" href=""><i class="fab fa-twitter"></i></a>
-                            <a class="btn btn-square btn-light rounded-circle mx-1" href=""><i class="fab fa-instagram"></i></a>
-                            <a class="btn btn-square btn-light rounded-circle mx-1" href=""><i class="fab fa-linkedin-in"></i></a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-6 col-xl-3 wow fadeInUp" data-wow-delay="0.5s">
-                <div class="team-item p-4 pt-0">
-                    <div class="team-img">
-                        <img src="img/team-3.jpg" class="img-fluid rounded w-100" alt="Image">
-                    </div>
-                    <div class="team-content pt-4">
-                        <h4>MARTIN DOE</h4>
-                        <p>Profession</p>
-                        <div class="team-icon d-flex justify-content-center">
-                            <a class="btn btn-square btn-light rounded-circle mx-1" href=""><i class="fab fa-facebook-f"></i></a>
-                            <a class="btn btn-square btn-light rounded-circle mx-1" href=""><i class="fab fa-twitter"></i></a>
-                            <a class="btn btn-square btn-light rounded-circle mx-1" href=""><i class="fab fa-instagram"></i></a>
-                            <a class="btn btn-square btn-light rounded-circle mx-1" href=""><i class="fab fa-linkedin-in"></i></a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6 col-lg-6 col-xl-3 wow fadeInUp" data-wow-delay="0.7s">
-                <div class="team-item p-4 pt-0">
-                    <div class="team-img">
-                        <img src="img/team-4.jpg" class="img-fluid rounded w-100" alt="Image">
-                    </div>
-                    <div class="team-content pt-4">
-                        <h4>MARTIN DOE</h4>
-                        <p>Profession</p>
-                        <div class="team-icon d-flex justify-content-center">
-                            <a class="btn btn-square btn-light rounded-circle mx-1" href=""><i class="fab fa-facebook-f"></i></a>
-                            <a class="btn btn-square btn-light rounded-circle mx-1" href=""><i class="fab fa-twitter"></i></a>
-                            <a class="btn btn-square btn-light rounded-circle mx-1" href=""><i class="fab fa-instagram"></i></a>
-                            <a class="btn btn-square btn-light rounded-circle mx-1" href=""><i class="fab fa-linkedin-in"></i></a>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <?php endfor; ?>
         </div>
     </div>
 </div>
