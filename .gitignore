@@ -22,6 +22,10 @@ Thumbs.db
 .vscode/
 *.swp
 
+# Disposable session storage for local smoke-test servers
+# (php -d session.save_path=tests/storage_* -S ... bin/dev_router.php)
+tests/storage_*/
+
 # Session/scratch artifacts from working sessions
 phase*-review.txt
 phase*-tests.txt
