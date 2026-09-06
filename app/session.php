@@ -11,6 +11,11 @@ function startSecureSession()
     ini_set('session.use_strict_mode', '1');
     ini_set('session.cookie_httponly', '1');
     ini_set('session.cookie_samesite', 'Lax');
+    // Longer, higher-entropy session IDs than PHP's default (32 chars / 128
+    // bits): 48 chars at 6 bits/char = 288 bits, making the session
+    // identifier dramatically harder to guess or brute-force.
+    ini_set('session.sid_length', '48');
+    ini_set('session.sid_bits_per_character', '6');
     if (requestIsHttps()) {
         ini_set('session.cookie_secure', '1');
     }

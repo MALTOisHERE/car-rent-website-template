@@ -47,7 +47,7 @@ $rtl = language() === 'ar';
 <label class="auth-field"><?=e(t('auth.email'))?><input type="email" name="email" autocomplete="username" required value="<?= e($_POST['email'] ?? '') ?>"></label>
 <label class="auth-field"><?=e(t('auth.password'))?><input type="password" name="password" autocomplete="current-password" required></label>
 <button class="btn primary auth-submit" type="submit"><?=e(t('auth.sign_in'))?></button></form>
-<div class="auth-links"><a href="forgot_password.php?lang=<?= e(language()) ?>"><?=e(t('auth.forgot_password'))?></a><a href="../<?= e(language()) ?>/"><?=e(t('auth.public_website'))?></a></div>
+<div class="auth-links"><a href="forgot_password.php?lang=<?= e(language()) ?>"><?=e(t('auth.forgot_password'))?></a><a href="../"><?=e(t('auth.public_website'))?></a></div>
 <p class="auth-switch"><?=e(t('auth.create_account_prompt'))?> <a href="signup.php?lang=<?= e(language()) ?>"><?=e(t('auth.create_account_button'))?></a></p>
 </div>
 </main>

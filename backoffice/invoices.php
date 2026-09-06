@@ -7,7 +7,7 @@ $invoices = dbFetchAll("SELECT i.*,c.first_name,c.last_name,c.company_name,r.ref
 backofficeHeader(t('page.invoices.title'), 'invoices.php');
 pageHeader('page.invoices.title', 'page.invoices.description', [
     'breadcrumbs'=>[['label'=>'nav.finance'],['label'=>'nav.invoices']],
-    'primary'=>['label'=>'action.create_invoice','href'=>'finance.php#record-payment'],
+    'primary'=>['label'=>'action.create_invoice','href'=>'invoice_draft_form.php'],
 ]);
 ?>
 <div class="table-wrap" role="region" aria-label="<?=e(t('page.invoices.title'))?>" tabindex="0"><table><thead><tr>

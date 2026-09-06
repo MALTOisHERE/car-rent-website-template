@@ -9,6 +9,13 @@
     function focusable(container) {
         return [...container.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])')];
     }
+    // Every navigation is a full page load, so the sidebar (a plain scrolling
+    // box) always redraws scrolled to its top -- even when the link you just
+    // clicked, and its "active" highlight, are further down the list. Jump
+    // straight to wherever the active item actually is instead of forcing a
+    // re-scroll on every click. "nearest" + no smooth-scroll keeps this a
+    // silent correction rather than a visible animation.
+    sidebar?.querySelector('a.active')?.scrollIntoView({ block: 'nearest' });
     const desktopSidebarQuery = window.matchMedia('(min-width: 1051px)');
 
     function openSidebar() {
@@ -35,16 +42,56 @@
         sidebarOpen.setAttribute('aria-label', sidebarOpen.dataset.labelExpand);
     }
 
+    // A dropdown-menu positioned inside a scrolling .table-wrap gets clipped
+    // by that ancestor's overflow (needed for horizontal scroll on wide
+    // tables) no matter what position value the menu itself uses -- overflow
+    // clipping applies to descendants regardless of position: absolute/fixed.
+    // The only real fix is a portal: temporarily reparent the open menu to
+    // <body> as position:fixed, placed from the trigger button's own
+    // coordinates, and move it back where it lived when closed.
+    const menuOrigin = new WeakMap();
+    function positionMenu(button, menu) {
+        if (!menuOrigin.has(menu)) menuOrigin.set(menu, { parent: menu.parentNode, next: menu.nextSibling });
+        document.body.appendChild(menu);
+        menu.style.position = 'fixed';
+        menu.style.insetInlineStart = 'auto';
+        menu.style.insetInlineEnd = 'auto';
+        menu.style.right = 'auto';
+        menu.style.zIndex = '150';
+        const rect = button.getBoundingClientRect();
+        const menuWidth = menu.offsetWidth || 208;
+        const viewportWidth = document.documentElement.clientWidth;
+        const rtl = document.documentElement.dir === 'rtl';
+        let left = rtl ? rect.left : rect.right - menuWidth;
+        left = Math.max(8, Math.min(left, viewportWidth - menuWidth - 8));
+        const viewportHeight = document.documentElement.clientHeight;
+        const menuHeight = menu.offsetHeight || 0;
+        const top = (rect.bottom + 8 + menuHeight > viewportHeight) ? Math.max(8, rect.top - menuHeight - 8) : rect.bottom + 8;
+        menu.style.top = top + 'px';
+        menu.style.left = left + 'px';
+    }
+    function restoreMenu(menu) {
+        const origin = menuOrigin.get(menu);
+        if (origin && menu.parentNode === document.body) {
+            if (origin.next && origin.next.parentNode === origin.parent) origin.parent.insertBefore(menu, origin.next);
+            else origin.parent.appendChild(menu);
+        }
+        menu.style.position = ''; menu.style.top = ''; menu.style.left = ''; menu.style.right = '';
+        menu.style.insetInlineStart = ''; menu.style.insetInlineEnd = ''; menu.style.zIndex = '';
+    }
     function closeMenus(exception) {
         document.querySelectorAll('[data-menu-button]').forEach(button => {
             const menu = document.getElementById(button.getAttribute('aria-controls'));
             if (button === exception) return;
-            button.setAttribute('aria-expanded', 'false'); if (menu) menu.hidden = true;
+            button.setAttribute('aria-expanded', 'false');
+            if (menu) { menu.hidden = true; restoreMenu(menu); }
         });
     }
+    document.addEventListener('scroll', () => closeMenus(), true);
+    window.addEventListener('resize', () => closeMenus());
     document.querySelectorAll('[data-menu-button]').forEach(button => button.addEventListener('click', event => {
         event.stopPropagation(); const menu = document.getElementById(button.getAttribute('aria-controls')); const opening = menu?.hidden;
-        closeMenus(button); if (menu) menu.hidden = !opening; button.setAttribute('aria-expanded', opening ? 'true' : 'false');
+        closeMenus(button); if (menu) { menu.hidden = !opening; if (opening) positionMenu(button, menu); } button.setAttribute('aria-expanded', opening ? 'true' : 'false');
         if (opening) focusable(menu)[0]?.focus();
     }));
     document.addEventListener('click', () => closeMenus());

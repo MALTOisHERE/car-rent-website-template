@@ -19,7 +19,7 @@ if(requestMethod()==='POST'){verifyCsrfToken();try{$name=trim((string)($_POST['f
 <label class="auth-field"><?=e(t('auth.password'))?><input type="password" name="password" required autocomplete="new-password"></label>
 <label class="auth-field"><?=e(t('auth.confirm_password'))?><input type="password" name="password_confirmation" required autocomplete="new-password"><small class="field-hint"><?=e(t('auth.password_requirements'))?></small></label>
 <button class="btn primary auth-submit"><?=e(t('auth.create_account_button'))?></button></form>
-<div class="auth-links"><a href="login.php?lang=<?=e(language())?>"><?=e(t('auth.already_registered'))?></a><a href="../<?=e(language())?>/"><?=e(t('auth.public_website'))?></a></div>
+<div class="auth-links"><a href="login.php?lang=<?=e(language())?>"><?=e(t('auth.already_registered'))?></a><a href="../"><?=e(t('auth.public_website'))?></a></div>
 </div>
 </main>
 </div>

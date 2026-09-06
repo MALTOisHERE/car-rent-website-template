@@ -202,7 +202,7 @@ function pagination($page, $hasNext, $baseUrl, array $query = [])
  */
 function actionMenu(array $items, $label = 'common.actions')
 {
-    $items = array_values(array_filter($items, fn($item) => !isset($item['permission']) || can($item['permission'])));
+    $items = array_values(array_filter($items, fn($item) => is_array($item) && (!isset($item['permission']) || can($item['permission']))));
     if (!$items) return '';
     static $counter = 0; $counter++;
     $id = 'action-menu-' . $counter;
