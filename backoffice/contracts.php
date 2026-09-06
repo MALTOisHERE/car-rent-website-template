@@ -40,7 +40,7 @@ pageHeader('page.contracts.title','page.contracts.description',['breadcrumbs'=>[
 ?>
 <?php if(can('contract.create')):?><section class="card" id="new-contract"><div class="section-card-header"><h2><?=navigationIcon('rentals')?><?=e(t('section.create_contract'))?></h2></div>
 <?php if($eligible):?><form method="post"><?=csrfField()?><?=contractIdempotencyField('contract.create')?><input type="hidden" name="action" value="create">
-<label><?=e(t('field.reservation'))?><select name="reservation_id" required><?php foreach($eligible as$row):?><option value="<?=e($row['id'])?>"><?=e($row['reference'].' — '.$row['first_name'].' '.$row['last_name'])?></option><?php endforeach;?></select></label>
+<label><?=e(t('field.reservation'))?><select name="reservation_id" required><?php foreach($eligible as$row):?><option value="<?=e($row['id'])?>"><?=e($row['reference'].' - '.$row['first_name'].' '.$row['last_name'])?></option><?php endforeach;?></select></label>
 <button class="btn primary"><?=e(t('action.create_contract'))?></button></form>
 <?php else:?><?=emptyState('empty.no_eligible_reservations','message.contract_eligibility_help')?><?php endif;?></section><?php endif;?>
 <form class="filters" method="get"><label><?=e(t('common.status'))?><select name="status"><option value=""><?=e(t('common.all'))?></option><?php foreach(contractLifecycleStatuses()as$status):?><option value="<?=e($status)?>" <?=$filters['status']===$status?'selected':''?>><?=e(translatedStatus($status))?></option><?php endforeach;?></select></label><button class="btn secondary"><?=e(t('common.filter'))?></button><a class="btn ghost" href="contracts.php"><?=e(t('common.reset'))?></a></form>

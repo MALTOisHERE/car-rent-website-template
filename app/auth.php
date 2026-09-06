@@ -51,7 +51,7 @@ function logoutUser()
     clearSession();
 }
 
-function requireAuthentication($loginPath = '../en/login.php')
+function requireAuthentication($loginPath = '/account/login.php')
 {
     if (!isAuthenticated()) {
         safeRedirect($loginPath);

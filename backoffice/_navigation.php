@@ -60,6 +60,7 @@ function backofficeNavigation()
         ]],
         ['label'=>'nav.administration','icon'=>'admin','items'=>[
             ['label'=>'nav.agencies','href'=>'agencies.php','permission'=>'agencies.view'],
+            ['label'=>'page.agency_branding.title','href'=>'agency_branding.php','permission'=>'agencies.view'],
             ['label'=>'nav.users','href'=>'users.php','permission'=>'users.manage'],
         ]],
     ];

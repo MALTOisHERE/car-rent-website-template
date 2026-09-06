@@ -41,9 +41,9 @@ No Git history was rewritten and no package, framework, commit, or push was intr
 
 ## Migrations
 
-1. `001_authoritative_schema.sql` — full additive domain schema.
-2. `002_import_legacy_data.sql` — maps usable legacy users, cars, and reservations without dropping originals.
-3. `003_operational_extensions.sql` — portal requests, cash registers, and multilingual notification templates.
+1. `001_authoritative_schema.sql` - full additive domain schema.
+2. `002_import_legacy_data.sql` - maps usable legacy users, cars, and reservations without dropping originals.
+3. `003_operational_extensions.sql` - portal requests, cash registers, and multilingual notification templates.
 
 Back up first, configure the environment, then run `php bin/migrate.php`. Review protected server logs on failure and restore the backup before retrying.
 
@@ -110,7 +110,7 @@ php -S 127.0.0.1:8000
 
 See `docs/DEMO.md`. The seeder refuses `APP_ENV=production` and requires a strong `DEMO_PASSWORD` environment variable.
 
-## Product Phase 4 — customer and reservation redesign (2026-07-22)
+## Product Phase 4 - customer and reservation redesign (2026-07-22)
 
 ### Delivered architecture
 
@@ -132,7 +132,7 @@ All Phase 4 UI keys are present in EN, FR, and AR with identical order and catal
 
 ### Verification classification
 
-**AUTOMATED — EXECUTED**
+**AUTOMATED - EXECUTED**
 
 - `php bin/php_syntax_check.php`: 156 PHP files, 0 failures before the final documentation-only update; rerun in the final gate below.
 - `php tests/business_rules.php`: passed, including roles, translations, safe language switching, deterministic preserved-term pricing, legacy NULL-tax guard, and strict percentage boundaries.
@@ -143,19 +143,19 @@ All Phase 4 UI keys are present in EN, FR, and AR with identical order and catal
 - `node --check backoffice/assets/app.js`: passed.
 - `git diff --check`: passed.
 
-**HTTP/SECURITY — EXECUTED**
+**HTTP/SECURITY - EXECUTED**
 
 - `php tests/phase4_http_smoke.php`: passed for role routes, prohibited routes, login sessions, customer/staff document IDOR, generic archived 404, private download headers, rental-agent sensitive-action 403s, manager legacy-tax remediation, out-of-range tax rejection, cross-agency denial, EN/FR LTR, AR RTL, runtime error scanning, and cleanup.
 - Protected containment was exercised with a real NTFS junction from inside the upload root to a file outside it; the protected route returned the generic 404 and did not serve the file.
 - Runtime logs contained no warning, fatal error, SQLSTATE, PDO exception, unhandled exception, password-hash marker, session identifier, or database-password marker.
 
-**MANUAL — EXECUTED WITH EVIDENCE**
+**MANUAL - EXECUTED WITH EVIDENCE**
 
 - Source/diff review confirmed Phase 4 is confined to customer/reservation services and routes, planning, protected customer documents, translations, tests, and documentation; no Phase 5 module redesign was introduced.
 - Rendered HTTP responses were inspected programmatically for expected route ownership, status, direction, protected headers, uniform not-found bodies, absent raw storage paths, and absent sensitive manager controls for rental agents.
 - Migration 005 was executed against the existing Phase 3 database, then rerun. The current final verification returned `SKIP` for 001–005 and `Migrations complete.` with exit code 0. No credential value was printed or stored.
 
-**MANUAL — PENDING USER ACCEPTANCE**
+**MANUAL - PENDING USER ACCEPTANCE**
 
 - Two-browser human concurrency behavior and conflict messaging.
 - Real desktop/tablet/mobile visual review, including planning scrolling/cards and pixel-level regressions.
@@ -183,7 +183,7 @@ The review identified five narrow correctness gaps. Migration 005 could add an u
 
 Migration identifier recovery now classifies the live `id` and primary-key state before repairing anything. A missing identifier and primary key are added in one MariaDB-compatible `ALTER`; a compatible existing identifier is upgraded together with its missing primary key where required; an exact complete definition is skipped; and incompatible identifier types, nullability, or primary keys fail closed before the remaining partial-table repair. No recovery branch drops a structure or deletes or rewrites a history row.
 
-Each Phase 4 history foreign key now derives a complete descriptor from `TABLE_CONSTRAINTS`, `KEY_COLUMN_USAGE`, and `REFERENTIAL_CONSTRAINTS`: local table, ordered local columns, referenced schema/table, ordered referenced columns, and normalized non-cascading update/delete rules. Exact matches skip, absent names are created, and same-named incompatible definitions—including cascade rules, different schemas, or different order—signal a schema mismatch without dropping the production constraint. Each CHECK now uses `CHECK_CONSTRAINTS.CHECK_CLAUSE`; normalization removes only identifier quoting and whitespace, preserving literals and operators. The four exact approved expressions are compared conservatively, so permissive, unrelated, or unverifiable same-named checks fail closed.
+Each Phase 4 history foreign key now derives a complete descriptor from `TABLE_CONSTRAINTS`, `KEY_COLUMN_USAGE`, and `REFERENTIAL_CONSTRAINTS`: local table, ordered local columns, referenced schema/table, ordered referenced columns, and normalized non-cascading update/delete rules. Exact matches skip, absent names are created, and same-named incompatible definitions - including cascade rules, different schemas, or different order - signal a schema mismatch without dropping the production constraint. Each CHECK now uses `CHECK_CONSTRAINTS.CHECK_CLAUSE`; normalization removes only identifier quoting and whitespace, preserving literals and operators. The four exact approved expressions are compared conservatively, so permissive, unrelated, or unverifiable same-named checks fail closed.
 
 Reservation replacement continues to lock the scoped reservation first, then locks the unique current/requested vehicle IDs with one ascending `ORDER BY id ASC FOR UPDATE` query. Both locked rows must belong to the origin agency. A changed target must be unarchived and exactly `available`; invalid operational states are rejected; overlap and maintenance checks run after the locks; and reserved/rented state transfers use conditional updates whose affected row must equal one. A bounded retry handles transient MariaDB serialization/deadlock victims without exposing database details; exhaustion becomes the translated safe conflict error. Any failed check or mutation rolls back the reservation and both vehicle states.
 
@@ -218,7 +218,7 @@ The implementation is complete within Phase 4’s application scope. Reserves ar
 
 **Phase 4 verdict: IMPLEMENTATION COMPLETE WITH RESERVES.**
 
-## Back-office SaaS foundation — Phase 1 (2026-07-12)
+## Back-office SaaS foundation - Phase 1 (2026-07-12)
 
 ### Objective and starting state
 
@@ -318,7 +318,7 @@ Phase 1 intentionally leaves deep module redesign for later. `actionMenu()` supp
 
 The translation and RTL correction work identified here was implemented in the Phase 2 section below. Deep module redesign, the vehicle-detail/gallery project, and native-browser visual QA remain outside this phase.
 
-## Back-office internationalization foundation — Phase 2 (2026-07-18)
+## Back-office internationalization foundation - Phase 2 (2026-07-18)
 
 ### Objective and architecture
 
@@ -370,7 +370,7 @@ No WCAG compliance or pixel-perfect RTL claim is made. Browser screenshot compar
 
 During verification, an initial temporary-login harness failed while restoring its in-memory password snapshots because its cleanup statement supplied extra PDO bindings. Recovery was then completed explicitly and transactionally for exactly the five isolated `.demo@example.test` staff accounts using the configured User-scope `DEMO_PASSWORD`. No password or hash was displayed or written to tracked evidence. Real credential login subsequently passed for OWNER, AGENCY_MANAGER, RENTAL_AGENT, ACCOUNTANT, and FLEET_AGENT, followed by the complete 1,326-check matrix. Login-state fields were restored, smoke-specific authentication audit rows were removed, and temporary cookies, sessions, server logs, and runners were cleaned.
 
-## Vehicle workspace and protected gallery — Phase 3 (2026-07-20)
+## Vehicle workspace and protected gallery - Phase 3 (2026-07-20)
 
 ### Delivered architecture
 
@@ -460,7 +460,7 @@ No commit or push was performed, and Phase 4 was not started.
 - The legacy `vehicles.primary_image_path` mirror remains intentionally until all public/portal consumers migrate to protected media IDs.
 - Automated HTML, direction, RBAC, and interaction contracts passed; pixel-level browser comparison, real-device Arabic typography, keyboard walkthrough, and screen-reader testing remain manual acceptance work.
 
-## Phase 5A — Finance Core (2026-07-22)
+## Phase 5A - Finance Core (2026-07-22)
 
 Phase 5A introduces a single finance write boundary in `app/finance_service.php`. Payment,
 adjustment, excess allocation, deposit, invoice/credit-note, expense, cash-register, cash
@@ -505,13 +505,13 @@ finance-specific; FLEET_AGENT and CUSTOMER have no Phase 5A back-office access.
 
 ### Phase 5A verification classification
 
-- AUTOMATED — EXECUTED: PHP syntax (169 files, 0 failures), business rules, Phase 3 vehicle integration, Phase 4 customer/reservation integration, Phase 5A finance integration, JavaScript syntax, migration reruns, and Git diff validation.
-- AUTOMATED — EXECUTED: nine real independent-process concurrency races passed: duplicate payment, competing balance, refund/refund, refund/close, payment/close, invoice target, numbering, expense decision, and deposit terminal event.
-- HTTP/SECURITY — EXECUTED: role access, crafted-action denial, agency IDOR, protected evidence, EN/FR/AR direction and invoice print, runtime-log scan, and test cleanup passed.
-- AUTOMATED — EXECUTED: cleanup audit reported zero `P5A_TEST` users, agencies, allocations, and artifacts.
-- PRIVILEGED MIGRATION — PENDING: structural recovery assertions passed, but the configured account cannot create disposable databases; fresh and partial-DDL scenarios exited 2 and are not claimed as passed.
-- MANUAL — EXECUTED WITH EVIDENCE: none.
-- MANUAL — PENDING USER ACCEPTANCE: real-browser responsive/Arabic visual review, keyboard and screen-reader walkthrough, and production-like privileged migration rehearsal.
+- AUTOMATED - EXECUTED: PHP syntax (169 files, 0 failures), business rules, Phase 3 vehicle integration, Phase 4 customer/reservation integration, Phase 5A finance integration, JavaScript syntax, migration reruns, and Git diff validation.
+- AUTOMATED - EXECUTED: nine real independent-process concurrency races passed: duplicate payment, competing balance, refund/refund, refund/close, payment/close, invoice target, numbering, expense decision, and deposit terminal event.
+- HTTP/SECURITY - EXECUTED: role access, crafted-action denial, agency IDOR, protected evidence, EN/FR/AR direction and invoice print, runtime-log scan, and test cleanup passed.
+- AUTOMATED - EXECUTED: cleanup audit reported zero `P5A_TEST` users, agencies, allocations, and artifacts.
+- PRIVILEGED MIGRATION - PENDING: structural recovery assertions passed, but the configured account cannot create disposable databases; fresh and partial-DDL scenarios exited 2 and are not claimed as passed.
+- MANUAL - EXECUTED WITH EVIDENCE: none.
+- MANUAL - PENDING USER ACCEPTANCE: real-browser responsive/Arabic visual review, keyboard and screen-reader walkthrough, and production-like privileged migration rehearsal.
 
 The finance cutover is deliberately fail-closed. Migration 006 must exist before new
 writes. After any Phase 5A ledger activity, old mutable finance controllers must never be

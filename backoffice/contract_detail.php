@@ -59,7 +59,7 @@ if($contract['pickup_at']&&$contract['return_at']){
 </dl></section><section class="card"><div class="section-card-header"><h2><?=navigationIcon('rentals')?><?=e(t('section.rental_summary'))?></h2></div><dl class="detail-list">
 <div><dt><?=e(t('field.customer'))?></dt><dd><?=e($contract['first_name'].' '.$contract['last_name'])?></dd></div>
 <div><dt><?=e(t('field.vehicle'))?></dt><dd><?=e(trim($contract['brand'].' '.$contract['model']))?> <?=isolatedValue($contract['registration_number'],'registration-value')?></dd></div>
-<div><dt><?=e(t('field.period'))?></dt><dd><?=formattedDateTime($contract['pickup_at'])?> — <?=formattedDateTime($contract['return_at'])?></dd></div>
+<div><dt><?=e(t('field.period'))?></dt><dd><?=formattedDateTime($contract['pickup_at'])?> - <?=formattedDateTime($contract['return_at'])?></dd></div>
 </dl></section></div>
 <?php if(($contract['status']==='draft'&&can('contract.issue'))||(in_array($contract['status'],['draft','issued'],true)&&can('contract.cancel'))):?><section class="card"><div class="section-card-header"><h2><?=navigationIcon('rentals')?><?=e(t('section.allowed_actions'))?></h2></div><div class="inline-actions">
 <?php if($contract['status']==='draft'&&can('contract.issue')):?><form method="post"><?=csrfField()?><?=contractIdempotencyField('contract.issue')?><input type="hidden" name="contract_id" value="<?=e($id)?>"><input type="hidden" name="action" value="issue"><button class="btn primary" data-confirm="<?=e(t('confirm.issue_contract'))?>"><?=e(t('action.issue_contract'))?></button></form><?php endif;?>

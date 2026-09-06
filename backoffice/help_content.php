@@ -4,7 +4,7 @@
  * Content for the backoffice "field guide" (help.php): what every status, column
  * and button in the app means, in plain language, per module. Status labels and
  * field/action labels themselves are pulled live from app/translations/*.php via
- * t() in help.php — only the explanatory sentences below are hand-written, once
+ * t() in help.php - only the explanatory sentences below are hand-written, once
  * per supported language, since they're documentation prose rather than reusable
  * UI strings.
  */
@@ -677,6 +677,30 @@ function helpGlossaryModules()
                     'en' => 'The branch/location records themselves: name, code, currency, and timezone, the unit everything else (vehicles, staff, reservations) is scoped to.',
                     'fr' => 'Les fiches des agences/succursales elles-mêmes : nom, code, devise et fuseau horaire, l\'unité à laquelle tout le reste (véhicules, personnel, réservations) est rattaché.',
                     'ar' => 'سجلات الفروع/المواقع نفسها: الاسم والرمز والعملة والمنطقة الزمنية، وهي الوحدة التي يرتبط بها كل شيء آخر (المركبات، الموظفون، الحجوزات).',
+                ]],
+            ],
+        ],
+        [
+            'id' => 'agency_branding',
+            'icon' => 'admin',
+            'group' => 'nav.administration',
+            'item' => 'page.agency_branding.title',
+            'statuses' => [],
+            'terms' => [
+                ['label' => 'field.subdomain', 'note' => [
+                    'en' => 'The web address this agency\'s own public storefront is reachable at (agencyname.yourdomain.com). While developing locally without real subdomains, add ?agency=that-slug to any public-site URL to preview it.',
+                    'fr' => 'L\'adresse web à laquelle la vitrine publique de cette agence est accessible (agencyname.yourdomain.com). En développement local sans sous-domaines réels, ajoutez ?agency=ce-slug à n\'importe quelle URL du site public pour la prévisualiser.',
+                    'ar' => 'عنوان الويب الذي يمكن من خلاله الوصول إلى الواجهة العامة لهذه الوكالة (agencyname.yourdomain.com). عند التطوير محلياً بدون نطاقات فرعية حقيقية، أضف ?agency=المعرّف إلى أي رابط في الموقع العام لمعاينته.',
+                ]],
+                ['label' => 'section.agency_branding', 'note' => [
+                    'en' => 'Upload this agency\'s logo and set its three brand colors (primary, secondary, dark accent); every public page for this agency picks them up automatically, no template editing required.',
+                    'fr' => 'Téléversez le logo de cette agence et définissez ses trois couleurs de marque (principale, secondaire, accent foncé) ; chaque page publique de cette agence les applique automatiquement, sans modification de modèle.',
+                    'ar' => 'ارفع شعار هذه الوكالة وحدّد ألوان علامتها الثلاثة (أساسي، ثانوي، داكن مميز)؛ تعتمدها كل صفحة عامة لهذه الوكالة تلقائياً دون الحاجة لتعديل أي قالب.',
+                ]],
+                ['label' => 'section.agency_content', 'note' => [
+                    'en' => 'Edit the actual wording shown on this agency\'s public pages (homepage, about, services, team, and more), section by section and language by language, instead of the shared placeholder copy.',
+                    'fr' => 'Modifiez le texte réellement affiché sur les pages publiques de cette agence (accueil, à propos, services, équipe, etc.), section par section et langue par langue, au lieu du contenu générique partagé.',
+                    'ar' => 'عدّل النص الفعلي الظاهر على الصفحات العامة لهذه الوكالة (الرئيسية، من نحن، الخدمات، الفريق، وغيرها)، قسماً بقسم ولغة بلغة، بدلاً من المحتوى الافتراضي المشترك.',
                 ]],
             ],
         ],

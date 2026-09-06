@@ -5,6 +5,7 @@ require_once __DIR__ . '/../app/http.php';
 require_once __DIR__ . '/../app/validation.php';
 require_once __DIR__ . '/../app/auth.php';
 require_once __DIR__ . '/../app/domain.php';
+require_once __DIR__ . '/../app/tenant.php';
 require_once __DIR__ . '/../app/i18n.php';
 require_once __DIR__ . '/../app/vehicle_service.php';
 require_once __DIR__ . '/../app/customer_service.php';
@@ -200,8 +201,71 @@ $unsafeSwitch = languageSwitchUrl('fr', '../evil.php', ['page'=>'-1','agency_id'
 $assert(str_starts_with($unsafeSwitch, 'evil.php?') && !str_contains($unsafeSwitch, 'script'), 'Language switch did not reject invalid filter values');
 unset($_SESSION['lang']);
 
+$assert(agencySlugCandidate('Agadir Cars') === 'agadir-cars', 'Agency slug did not lowercase and hyphenate a normal name');
+$assert(agencySlugCandidate('  Multi   Space -- Name!! ') === 'multi-space-name', 'Agency slug did not collapse punctuation and whitespace');
+$assert(agencySlugCandidate('Agence Étoile') === 'agence-toile', 'Agency slug handling of accented characters changed unexpectedly');
+$assert(agencySlugCandidate('***') === 'agency', 'Agency slug did not fall back for a name with no alphanumerics');
+$assert(strlen(agencySlugCandidate(str_repeat('a', 100))) === 63, 'Agency slug did not enforce the 63-character DNS label limit');
+
+$assert(agencyCodeCandidate('Agadir Cars') === 'AGADIR-CARS', 'Agency code did not uppercase and hyphenate a normal name');
+$assert(agencyCodeCandidate('  Multi   Space -- Name!! ') === 'MULTI-SPACE-NAME', 'Agency code did not collapse punctuation and whitespace');
+$assert(agencyCodeCandidate('***') === 'AGENCY', 'Agency code did not fall back for a name with no alphanumerics');
+$assert(strlen(agencyCodeCandidate(str_repeat('a', 100))) === 30, 'Agency code did not enforce the 30-character column limit');
+
+$assert(agencyCodeFromId(14, 'Agadir Cars') === '14-AGADIR-CARS', 'Agency code did not embed the real database id and name');
+$assert(agencyCodeFromId(1, 'Agadir Cars') !== agencyCodeFromId(2, 'Agadir Cars'), 'Two different agency ids produced the same code for the same name');
+$assert(strlen(agencyCodeFromId(123456789, str_repeat('a', 100))) === 30, 'Agency code from id did not enforce the 30-character column limit');
+$assert(str_starts_with(agencyCodeFromId(123456789, str_repeat('a', 100)), '123456789-'), 'Agency code from id truncated the id prefix instead of the name');
+
+$assert(classifyTenantHost('yourplatform.test', 'yourplatform.test') === ['type'=>'bare'], 'Bare platform domain was not classified as bare');
+$assert(classifyTenantHost('www.yourplatform.test', 'yourplatform.test') === ['type'=>'bare'], 'www of the bare platform domain was not classified as bare');
+$assert(classifyTenantHost('agadir-cars.yourplatform.test', 'yourplatform.test') === ['type'=>'subdomain','slug'=>'agadir-cars'], 'Agency subdomain was not classified correctly');
+$assert(classifyTenantHost('AGADIR-CARS.YourPlatform.Test', 'yourplatform.test') === ['type'=>'subdomain','slug'=>'agadir-cars'], 'Host classification was not case-insensitive');
+$assert(classifyTenantHost('agadir-cars.yourplatform.test:8000', 'yourplatform.test') === ['type'=>'subdomain','slug'=>'agadir-cars'], 'Host classification did not strip a port number');
+$assert(classifyTenantHost('rentals.theiragency.test', 'yourplatform.test') === ['type'=>'custom_domain','host'=>'rentals.theiragency.test'], 'Unrelated host was not classified as a custom domain candidate');
+$assert(classifyTenantHost('a.b.agadir-cars.yourplatform.test', 'yourplatform.test') === ['type'=>'bare'], 'A subdomain slug containing an embedded dot was accepted');
+$assert(classifyTenantHost('www.yourplatform.test', '') === ['type'=>'bare'], 'Host classification with no configured base domain did not fail safe to bare');
+$assert(classifyTenantHost("evil.test\r\nX-Injected: 1", 'yourplatform.test') === ['type'=>'bare'], 'A Host header with injected control characters was not rejected');
+
+$assert(isValidAgencySlugFormat('agadir-cars') === true, 'A well-formed slug was rejected');
+$assert(isValidAgencySlugFormat('Agadir-Cars') === false, 'An uppercase slug was accepted (slugs are always lowercase)');
+$assert(isValidAgencySlugFormat('agadir cars') === false, 'A slug containing a space was accepted');
+$assert(isValidAgencySlugFormat('') === false, 'An empty slug was accepted');
+$assert(isValidAgencySlugFormat(str_repeat('a', 64)) === false, 'A 64-character slug exceeding the DNS label limit was accepted');
+unset($_GET['agency']);
+$assert(resolveDevTenantOverride('production') === false, 'The dev tenant override activated outside APP_ENV=development');
+$assert(resolveDevTenantOverride('development') === false, 'The dev tenant override activated with no ?agency parameter present');
+$_GET['agency'] = 'Not A Valid Slug!!';
+$assert(resolveDevTenantOverride('production') === false, 'The dev tenant override activated outside APP_ENV=development even with ?agency present');
+$assert(resolveDevTenantOverride('development') === null, 'An invalid ?agency slug did not resolve to no agency');
+unset($_GET['agency']);
+
+$tempEnvPath = sys_get_temp_dir() . '/aurevo_test_' . bin2hex(random_bytes(4)) . '.env';
+putenv('AUREVO_TEST_EXISTING_VAR=original');
+file_put_contents($tempEnvPath, implode("\n", [
+    '# a comment line, and the next line is blank',
+    '',
+    'AUREVO_TEST_SIMPLE_VAR=hello world',
+    'AUREVO_TEST_QUOTED_VAR="quoted value"',
+    "AUREVO_TEST_SINGLE_QUOTED='single value'",
+    'AUREVO_TEST_EXISTING_VAR=overridden',
+    'MALFORMED LINE WITHOUT EQUALS',
+    'INVALID-NAME=skip',
+    '',
+]));
+loadEnvFile($tempEnvPath);
+$assert(getenv('AUREVO_TEST_SIMPLE_VAR') === 'hello world', '.env loader did not parse a simple KEY=VALUE line');
+$assert(getenv('AUREVO_TEST_QUOTED_VAR') === 'quoted value', '.env loader did not strip double quotes');
+$assert(getenv('AUREVO_TEST_SINGLE_QUOTED') === 'single value', '.env loader did not strip single quotes');
+$assert(getenv('AUREVO_TEST_EXISTING_VAR') === 'overridden', '.env loader did not override an already-set environment variable');
+$assert(getenv('INVALID-NAME') === false, '.env loader accepted an invalid variable name');
+$assert(getenv('MALFORMED') === false, '.env loader mis-parsed a line with no equals sign');
+unlink($tempEnvPath);
+foreach (['AUREVO_TEST_SIMPLE_VAR', 'AUREVO_TEST_QUOTED_VAR', 'AUREVO_TEST_SINGLE_QUOTED', 'AUREVO_TEST_EXISTING_VAR'] as $name) putenv($name);
+loadEnvFile(sys_get_temp_dir() . '/aurevo_test_nonexistent_' . bin2hex(random_bytes(4)) . '.env'); // must not throw/warn for a missing file
+
 if ($failures) {
     foreach ($failures as $failure) fwrite(STDERR, "FAIL: $failure\n");
     exit(1);
 }
-echo "Business rule tests passed: domain rules, role permissions, visibility, translations, localization, and safe language switching.\n";
+echo "Business rule tests passed: domain rules, role permissions, visibility, translations, localization, safe language switching, tenant/subdomain resolution, and .env loading.\n";

@@ -1,5 +1,57 @@
 <?php
 
+/**
+ * Loads KEY=VALUE pairs from a .env file into the real process environment.
+ * A value in the file always wins over one already set in the environment --
+ * chosen deliberately so editing .env takes effect immediately without also
+ * having to touch system/OS environment variables. This means a leftover
+ * .env file on a production host WOULD override real production values, so
+ * production deployments must never ship one (it's .gitignore'd here for
+ * exactly that reason). No framework/Composer dependency exists in this
+ * codebase, so this is a small purpose-built parser rather than a vendored
+ * library. Silently does nothing if the file doesn't exist.
+ */
+function loadEnvFile($path)
+{
+    if (!is_file($path) || !is_readable($path)) {
+        return;
+    }
+
+    $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    if ($lines === false) {
+        return;
+    }
+
+    foreach ($lines as $line) {
+        $line = trim($line);
+        if ($line === '' || str_starts_with($line, '#') || !str_contains($line, '=')) {
+            continue;
+        }
+
+        [$name, $value] = explode('=', $line, 2);
+        $name = trim($name);
+        $value = trim($value);
+
+        if (strlen($value) >= 2) {
+            $first = $value[0];
+            $last = substr($value, -1);
+            if (($first === '"' && $last === '"') || ($first === "'" && $last === "'")) {
+                $value = substr($value, 1, -1);
+            }
+        }
+
+        if ($name === '' || !preg_match('/^[A-Za-z_][A-Za-z0-9_]*$/', $name)) {
+            continue;
+        }
+
+        putenv($name . '=' . $value);
+        $_ENV[$name] = $value;
+        $_SERVER[$name] = $value;
+    }
+}
+
+loadEnvFile(dirname(__DIR__) . '/.env');
+
 function envValue($name, $default = null)
 {
     $value = getenv($name);
@@ -32,6 +84,7 @@ function appConfig($key = null)
             'name' => envValue('APP_NAME', 'Aurevo'),
             'environment' => envValue('APP_ENV', 'production'),
             'base_url' => rtrim((string) envValue('APP_BASE_URL', ''), '/'),
+            'platform_base_domain' => strtolower(trim((string) envValue('PLATFORM_BASE_DOMAIN', ''))),
             'timezone' => envValue('APP_TIMEZONE', 'Africa/Casablanca'),
             'currency' => envValue('APP_CURRENCY', 'MAD'),
             'session_idle_timeout' => envInt('SESSION_IDLE_TIMEOUT', 1800, 300, 86400),

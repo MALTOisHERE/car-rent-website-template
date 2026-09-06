@@ -10,7 +10,7 @@ if (requestMethod() === 'POST') {
     safeRedirect('login.php');
 }
 ?>
-<!doctype html><html lang="<?=e(language())?>" dir="<?=language()==='ar'?'rtl':'ltr'?>"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title><?=e(appConfig('name'))?> — <?=e(t('auth.sign_out_title'))?></title><link rel="icon" href="../backoffice/assets/img/favicon.png"><link rel="stylesheet" href="../backoffice/assets/app.css?v=<?= e(assetVersion('backoffice/assets/app.css')) ?>"></head><body>
+<!doctype html><html lang="<?=e(language())?>" dir="<?=language()==='ar'?'rtl':'ltr'?>"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title><?=e(appConfig('name'))?> - <?=e(t('auth.sign_out_title'))?></title><link rel="icon" href="../backoffice/assets/img/favicon.png"><link rel="stylesheet" href="../backoffice/assets/app.css?v=<?= e(assetVersion('backoffice/assets/app.css')) ?>"></head><body>
 <div class="auth-shell">
 <aside class="auth-brand-panel" aria-hidden="true">
 <div class="auth-brand-mark"><img class="auth-brand-logo" src="../backoffice/assets/img/aurevo-logo.png" alt="<?=e(appConfig('name'))?>"></div>

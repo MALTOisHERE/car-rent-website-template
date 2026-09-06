@@ -47,13 +47,13 @@ pageHeader('page.reservation_planning.title', 'page.reservation_planning.descrip
     <label><?=e(t('field.view'))?><select name="view"><option value="day" <?=$view==='day'?'selected':''?>><?=e(t('option.day'))?></option><option value="week" <?=$view==='week'?'selected':''?>><?=e(t('option.week'))?></option></select></label>
     <label><?=e(t('field.date'))?><input type="date" name="date" value="<?=e($date->format('Y-m-d'))?>"></label>
     <label><?=e(t('field.category'))?><select name="category_id"><option value=""><?=e(t('common.all'))?></option><?php foreach($categories as $category):?><option value="<?=e($category['id'])?>" <?=$categoryId===(int)$category['id']?'selected':''?>><?=e($category['name'])?></option><?php endforeach;?></select></label>
-    <label><?=e(t('field.vehicle'))?><select name="vehicle_id"><option value=""><?=e(t('common.all'))?></option><?php foreach($vehicles as $vehicle):?><option value="<?=e($vehicle['id'])?>" <?=$vehicleId===(int)$vehicle['id']?'selected':''?>><?=e($vehicle['registration_number'].' — '.$vehicle['brand'].' '.$vehicle['model'])?></option><?php endforeach;?></select></label>
+    <label><?=e(t('field.vehicle'))?><select name="vehicle_id"><option value=""><?=e(t('common.all'))?></option><?php foreach($vehicles as $vehicle):?><option value="<?=e($vehicle['id'])?>" <?=$vehicleId===(int)$vehicle['id']?'selected':''?>><?=e($vehicle['registration_number'].' - '.$vehicle['brand'].' '.$vehicle['model'])?></option><?php endforeach;?></select></label>
     <button class="btn secondary"><?=e(t('common.filter'))?></button>
 </form>
 <div class="planning-nav">
     <a class="btn secondary" href="?agency_id=<?=e($agencyId)?>&view=<?=$view?>&date=<?=$previous?>&category_id=<?=e($categoryId)?>&vehicle_id=<?=e($vehicleId)?>"><?=e(t('common.previous'))?></a>
     <a class="btn ghost" href="?agency_id=<?=e($agencyId)?>&view=<?=$view?>&date=<?=$today->format('Y-m-d')?>"><?=e(t('action.today'))?></a>
-    <strong><?=formattedDate($from->format('Y-m-d'))?> — <?=formattedDate($to->modify('-1 second')->format('Y-m-d'))?></strong>
+    <strong><?=formattedDate($from->format('Y-m-d'))?> - <?=formattedDate($to->modify('-1 second')->format('Y-m-d'))?></strong>
     <a class="btn secondary" href="?agency_id=<?=e($agencyId)?>&view=<?=$view?>&date=<?=$next?>&category_id=<?=e($categoryId)?>&vehicle_id=<?=e($vehicleId)?>"><?=e(t('common.next'))?></a>
 </div>
 <section class="card planning-board" data-planning-board>
@@ -71,8 +71,8 @@ pageHeader('page.reservation_planning.title', 'page.reservation_planning.descrip
         <div class="planning-vehicle"><strong><?=isolatedValue($vehicle['registration_number'],'registration-value')?></strong><small><?=e($vehicle['brand'].' '.$vehicle['model'].' · '.$vehicle['category_name'])?></small></div>
         <div class="planning-track" role="list" aria-label="<?=e($vehicle['registration_number'])?>">
             <?php if($unavailable):?><span role="listitem" class="planning-block unavailable-block" style="inset-inline-start:0;inline-size:100%" aria-label="<?=e(translatedStatus($vehicle['status']))?>"><?=e(translatedStatus($vehicle['status']))?></span><?php endif;?>
-            <?php foreach($reservations as $item):[$left,$width]=$position($item['pickup_at'],$item['return_at']);?><a role="listitem" class="planning-block reservation-block" style="inset-inline-start:<?=$left?>%;inline-size:<?=$width?>%" href="reservation_detail.php?id=<?=e($item['id'])?>" aria-label="<?=e($item['reference'].' — '.$item['first_name'].' '.$item['last_name'].' — '.$item['pickup_at'].' — '.$item['return_at'].' — '.translatedStatus($item['status']))?>"><bdi><?=e($item['reference'])?></bdi><small><?=e($item['first_name'].' '.$item['last_name'])?></small></a><?php endforeach;?>
-            <?php foreach($maintenance as $item):[$left,$width]=$position($item['starts_at'],$item['ends_at']);?><span role="listitem" class="planning-block maintenance-block" style="inset-inline-start:<?=$left?>%;inline-size:<?=$width?>%" aria-label="<?=e(t('nav.maintenance').' — '.$item['maintenance_type'].' — '.$item['starts_at'].' — '.$item['ends_at'])?>"><?=e(t('nav.maintenance'))?></span><?php endforeach;?>
+            <?php foreach($reservations as $item):[$left,$width]=$position($item['pickup_at'],$item['return_at']);?><a role="listitem" class="planning-block reservation-block" style="inset-inline-start:<?=$left?>%;inline-size:<?=$width?>%" href="reservation_detail.php?id=<?=e($item['id'])?>" aria-label="<?=e($item['reference'].' - '.$item['first_name'].' '.$item['last_name'].' - '.$item['pickup_at'].' - '.$item['return_at'].' - '.translatedStatus($item['status']))?>"><bdi><?=e($item['reference'])?></bdi><small><?=e($item['first_name'].' '.$item['last_name'])?></small></a><?php endforeach;?>
+            <?php foreach($maintenance as $item):[$left,$width]=$position($item['starts_at'],$item['ends_at']);?><span role="listitem" class="planning-block maintenance-block" style="inset-inline-start:<?=$left?>%;inline-size:<?=$width?>%" aria-label="<?=e(t('nav.maintenance').' - '.$item['maintenance_type'].' - '.$item['starts_at'].' - '.$item['ends_at'])?>"><?=e(t('nav.maintenance'))?></span><?php endforeach;?>
         </div>
         <div class="planning-mobile-list">
             <?php if($unavailable):?><span><?=e(translatedStatus($vehicle['status']))?></span><?php endif;?>

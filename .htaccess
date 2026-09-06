@@ -7,6 +7,12 @@ Options -Indexes
 <IfModule mod_rewrite.c>
     RewriteEngine On
     RewriteRule ^(?:storage|database|app)/ - [F,L]
+
+    RewriteRule ^$ site/index.php [L]
+
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^([A-Za-z0-9_-]+\.php)$ site/$1 [L]
 </IfModule>
 
 <IfModule mod_headers.c>

@@ -1,6 +1,38 @@
 # Agency subdomains and custom domains: implementation plan
 
-Status: **planning only, not started**. Written 2026-08-25 as a reference for a future session. Nothing described here has been implemented yet.
+Status: **Phase 1 (schema + resolution layer) implemented 2026-09-06.** Phases 2
+(storefront rewrite) and 3 (custom domain settings UI) below are still not
+started. Originally written 2026-08-25 as a reference for a future session.
+
+## Phase 1 - what exists now
+
+- Migration `database/migrations/009_agency_subdomains.sql` adds
+  `agencies.subdomain` (unique, backfilled for any pre-existing rows),
+  `agencies.custom_domain` (unique, nullable), and
+  `agencies.custom_domain_verified_at`. **Deviation from the original plan text
+  below:** `subdomain` is nullable rather than `NOT NULL` - several existing
+  DB-backed test fixtures under `tests/` insert into `agencies` without a
+  subdomain, and rewriting all of them was out of scope for this pass. A NULL
+  subdomain simply never matches in `resolveTenantAgency()`'s exact-match
+  lookup, so this has no behavioral effect on real agencies (which always get
+  a generated slug via `backoffice/agencies.php`).
+- `app/tenant.php`: `classifyTenantHost($host, $baseDomain)` is the pure Host-header
+  parser (unit tested in `tests/business_rules.php`, no DB needed); `resolveTenantAgency()`
+  wraps it with the actual `agencies` lookup. Loaded from `app/bootstrap.php`, so it's
+  available on every request (public site included) via `require_once`, but **nothing
+  calls `resolveTenantAgency()` yet** - that's Phase 2's job. No visible behavior change today.
+- `app/domain.php`: `agencySlugCandidate($name)` (pure) and `generateUniqueAgencySlug($name)`
+  (DB collision-check loop) generate the slug.
+- `backoffice/agencies.php`: agency creation now generates and stores a slug, and the
+  success flash shows the resulting subdomain (as a full URL once `PLATFORM_BASE_DOMAIN` is
+  set, otherwise just the slug - see `.env.example`). The agency table also lists each
+  agency's subdomain. Editing an existing agency's subdomain is **not** built yet (the plan's
+  "allow one edit before any bookings exist" behavior from item 4 below is still open).
+- New env var: `PLATFORM_BASE_DOMAIN` (blank by default; nothing reads it besides
+  `resolveTenantAgency()`'s bare-domain check and the agencies.php flash message, so leaving
+  it blank in local dev is safe and just means `classifyTenantHost()` always resolves to `bare`).
+
+Everything below this point is still the original planning document for phases 2–3.
 
 ## The idea
 
@@ -65,7 +97,7 @@ None of this is code we write in this repo, it's hosting configuration that has 
 
 ## Suggested phase order
 
-1. **Schema + resolution layer only.** Add the migration, add `app/tenant.php`, wire agency creation to generate a slug. No visible behavior change yet for existing pages, this is groundwork.
+1. **Schema + resolution layer only. Done (2026-09-06), see "Phase 1 - what exists now" above.**
 2. **Storefront rewrite.** Rebuild the car browsing/booking pages to be agency-scoped and read real fleet data. This is the biggest chunk of work and the first phase with real user-visible payoff, an agency's subdomain now shows their actual cars.
 3. **Custom domain settings UI + verification flow.** Comes last since it depends on phases 1-2 already working, and needs the infra piece (wildcard cert/reverse proxy) to exist in whatever environment this eventually deploys to, before it's testable end-to-end.
 

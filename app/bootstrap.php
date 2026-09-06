@@ -5,6 +5,7 @@ require_once __DIR__ . '/http.php';
 require_once __DIR__ . '/session.php';
 require_once __DIR__ . '/csrf.php';
 require_once __DIR__ . '/auth.php';
+require_once __DIR__ . '/tenant.php';
 
 ini_set('display_errors', '0');
 ini_set('log_errors', '1');

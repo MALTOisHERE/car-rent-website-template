@@ -38,6 +38,45 @@ function generateBusinessReference($prefix)
     return strtoupper($prefix) . '-' . date('Ymd') . '-' . strtoupper(bin2hex(random_bytes(4)));
 }
 
+/** Pure slug derivation from an agency name: lowercase, non-alphanumerics collapsed to single hyphens, trimmed. */
+function agencySlugCandidate($name)
+{
+    $slug = strtolower(trim((string) $name));
+    $slug = (string) preg_replace('/[^a-z0-9]+/', '-', $slug);
+    $slug = trim($slug, '-');
+    return $slug !== '' ? substr($slug, 0, 63) : 'agency';
+}
+
+/** Appends a numeric suffix until the slug doesn't collide with an existing agency's subdomain. */
+function generateUniqueAgencySlug($name)
+{
+    $base = agencySlugCandidate($name);
+    $slug = $base;
+    $suffix = 2;
+    while (dbFetchOne('SELECT id FROM agencies WHERE subdomain = :slug', ['slug' => $slug])) {
+        $slug = substr($base, 0, 63 - strlen('-' . $suffix)) . '-' . $suffix;
+        $suffix++;
+    }
+    return $slug;
+}
+
+/** Pure code derivation from an agency name: uppercase, non-alphanumerics collapsed to single hyphens, trimmed, capped at the column's 30-character limit. */
+function agencyCodeCandidate($name)
+{
+    $code = strtoupper(trim((string) $name));
+    $code = (string) preg_replace('/[^A-Z0-9]+/', '-', $code);
+    $code = trim($code, '-');
+    return $code !== '' ? substr($code, 0, 30) : 'AGENCY';
+}
+
+/** Builds a deterministic, always-unique agency code from its real database id and name: "{id}-{NAME-SLUG}", truncated to the column's 30-character limit. The id alone already guarantees uniqueness, so no collision loop is needed. */
+function agencyCodeFromId($id, $name)
+{
+    $prefix = ((int) $id) . '-';
+    $available = max(1, 30 - strlen($prefix));
+    return $prefix . substr(agencyCodeCandidate($name), 0, $available);
+}
+
 function calculateRentalPrice(array $input)
 {
     $pickup = $input['pickup_at'];
