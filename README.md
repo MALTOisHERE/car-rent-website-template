@@ -20,7 +20,7 @@ A procedural PHP/PDO rental-agency management application with a multilingual pu
 
 For a fictional demonstration, set `APP_ENV=development` and a strong `DEMO_PASSWORD`, then run `php bin/seed_demo.php`.
 
-See `IMPLEMENTATION_REPORT.md` and `docs/` for migration, testing, security, and demonstration instructions.
+See `.docs/IMPLEMENTATION_REPORT.md` and `.docs/` for migration, testing, security, and demonstration instructions.
 
 ## Public site and per-agency branding
 

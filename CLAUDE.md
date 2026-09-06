@@ -13,11 +13,11 @@ No framework and no Composer - reusable logic lives in plain functions under `ap
 (`feature/professional-car-rental-platform`, ~15,000 lines across 19 build phases) into `main`;
 see "History" at the bottom before assuming a from-scratch OOP refactor exists here.
 
-**`IMPLEMENTATION_REPORT.md` is the authoritative, extremely detailed build log** - phase by
-phase architecture, migrations, verification evidence, and known limitations. `ROADMAP.md` is
+**`.docs/IMPLEMENTATION_REPORT.md` is the authoritative, extremely detailed build log** - phase by
+phase architecture, migrations, verification evidence, and known limitations. `.docs/ROADMAP.md` is
 the authoritative *product*-phase roadmap (distinct numbering from the implementation report's
 internal Phase 0–19 history - don't confuse the two). Read the relevant section of
-`IMPLEMENTATION_REPORT.md` before touching a module you don't already understand; don't try to
+`.docs/IMPLEMENTATION_REPORT.md` before touching a module you don't already understand; don't try to
 hold the whole 650+ line file in context for unrelated work.
 
 ## Running the site
@@ -56,13 +56,13 @@ php tests/business_rules.php          # DB-independent domain/permission/i18n ru
 php tests/customer_reservation_phase4.php   # DB-backed integration (needs a real migrated DB)
 php tests/finance_phase5a.php
 php tests/finance_phase5a_concurrency.php   # real concurrent-process race tests
-# ...and the other tests/*.php files, one per feature slice - check IMPLEMENTATION_REPORT.md
+# ...and the other tests/*.php files, one per feature slice - check .docs/IMPLEMENTATION_REPORT.md
 # for which ones are DB-backed vs. pure-logic before running them against a real database.
 ```
 
-Then `docs/SMOKE_TEST.md` and `docs/SECURITY_CHECKLIST.md` for manual/HTTP verification.
+Then `.docs/SMOKE_TEST.md` and `.docs/SECURITY_CHECKLIST.md` for manual/HTTP verification.
 **Don't claim a feature works from reading the code alone** - this project's own convention
-(see `IMPLEMENTATION_REPORT.md` throughout) is to actually run the syntax check, business-rule
+(see `.docs/IMPLEMENTATION_REPORT.md` throughout) is to actually run the syntax check, business-rule
 tests, and relevant HTTP smoke checks before calling something verified.
 
 ## Architecture
@@ -85,7 +85,7 @@ checks against path traversal/symlink escape), and one `*_service.php` per domai
 `rental_checkin_service.php`, `inspection_photo_service.php`, `vehicle_damage_service.php`).
 Each service is the single authoritative mutation boundary for its module - controllers should
 delegate to a service, not inline SQL/business rules directly (this is the one architectural
-rule this codebase is strict about; see `IMPLEMENTATION_REPORT.md`'s "Important technical
+rule this codebase is strict about; see `.docs/IMPLEMENTATION_REPORT.md`'s "Important technical
 decisions").
 
 ### Route directories
@@ -127,7 +127,7 @@ legacy tables. Money is `DECIMAL`, computed server-side, stored as snapshots (no
 live from mutable pricing rules). Concurrency-sensitive operations (reservation allocation,
 finance ledger writes) use transactions + row locks (`FOR UPDATE`) + overlap rechecks at every
 allocation-changing transition, not just at creation - follow that pattern for any new
-concurrent-write code; see the Phase 5A concurrency remediation in `IMPLEMENTATION_REPORT.md`
+concurrent-write code; see the Phase 5A concurrency remediation in `.docs/IMPLEMENTATION_REPORT.md`
 for a worked example of why (a real repeatable-read race was found and fixed this way).
 
 ### i18n / RTL

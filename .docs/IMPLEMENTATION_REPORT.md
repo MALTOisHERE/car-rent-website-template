@@ -60,7 +60,7 @@ php bin/php_syntax_check.php
 php tests/business_rules.php
 ```
 
-Then follow `docs/SMOKE_TEST.md` and `docs/SECURITY_CHECKLIST.md`. Runtime success must not be claimed until these execute in an environment with PHP and a migrated test database.
+Then follow `SMOKE_TEST.md` and `SECURITY_CHECKLIST.md`. Runtime success must not be claimed until these execute in an environment with PHP and a migrated test database.
 
 ## Local migration and runtime verification (2026-07-12)
 
@@ -108,7 +108,7 @@ php -S 127.0.0.1:8000
 
 ## Demo instructions
 
-See `docs/DEMO.md`. The seeder refuses `APP_ENV=production` and requires a strong `DEMO_PASSWORD` environment variable.
+See `DEMO.md`. The seeder refuses `APP_ENV=production` and requires a strong `DEMO_PASSWORD` environment variable.
 
 ## Product Phase 4 - customer and reservation redesign (2026-07-22)
 
@@ -543,7 +543,7 @@ compatibility result after a replay.
 The remediation is confined to `database/migrations/006_finance_core.sql`,
 `app/finance_service.php`, `tests/migration_phase5a_recovery.php`,
 `tests/finance_phase5a.php`, `tests/finance_phase5a_concurrency.php`, this report,
-and `docs/SMOKE_TEST.md`.
+and `SMOKE_TEST.md`.
 
 Migration 006 now keeps expected column, index, foreign-key, CHECK, engine, and
 collation descriptors and compares existing information-schema metadata before

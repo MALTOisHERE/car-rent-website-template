@@ -2,7 +2,7 @@
 
 /**
  * Tenant resolution for the public site: which agency (if any) a request's Host
- * header belongs to. Phase 1 of AGENCY_SUBDOMAINS_PLAN.md -- defined here and
+ * header belongs to. Phase 1 of .docs/AGENCY_SUBDOMAINS_PLAN.md -- defined here and
  * loaded on every request via bootstrap.php, but not yet called from any page;
  * the storefront rewrite (Phase 2) is what actually branches on this.
  *
@@ -83,7 +83,7 @@ function resolveDevTenantOverride($environment = null)
  * Resolves the current request's Host header to an active agency row, or
  * null for the bare platform domain / an unrecognized host. A custom domain
  * only matches once its ownership has been verified (custom_domain_verified_at
- * set) -- see AGENCY_SUBDOMAINS_PLAN.md's domain verification step.
+ * set) -- see .docs/AGENCY_SUBDOMAINS_PLAN.md's domain verification step.
  */
 function resolveTenantAgency()
 {

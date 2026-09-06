@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Per-agency landing-page branding and content overrides (AGENCY_SUBDOMAINS_PLAN.md
+ * Per-agency landing-page branding and content overrides (.docs/AGENCY_SUBDOMAINS_PLAN.md
  * Phase 2 follow-on: white-label storefronts). Content is one JSON blob per
  * (agency, page, language) in agency_page_content -- see migration 010 for why
  * a JSON blob rather than one column/table per field.
