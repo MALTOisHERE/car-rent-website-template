@@ -19,7 +19,7 @@ try{
     $port=(int)substr(strrchr($name,':'),1);$root=dirname(__DIR__,2);
     $matrixLogs=[tempnam($root.'/storage','p5b3-matrix-out-'),tempnam($root.'/storage','p5b3-matrix-err-')];
     $matrixProcess=proc_open(
-        [PHP_BINARY,'-d','session.save_path='.$root.'/storage','-S','127.0.0.1:'.$port,'dev_router.php'],
+        [PHP_BINARY,'-d','session.save_path='.$root.'/storage','-S','127.0.0.1:'.$port,'bin/dev_router.php'],
         [['pipe','r'],['file',$matrixLogs[0],'a'],['file',$matrixLogs[1],'a']],$pipes,$root
     );
     if(!is_resource($matrixProcess))throw new RuntimeException('matrix server');

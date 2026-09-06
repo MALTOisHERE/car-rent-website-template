@@ -46,7 +46,7 @@ The target model: every agency created in the backoffice automatically gets its 
 - `vehicles` has `agency_id`, this is the real per-agency fleet data the storefront should read from instead of the legacy `car` table.
 - The public site has no tenant-resolution concept at all: every visitor sees the same pages regardless of Host header.
 - `backoffice/agencies.php` creates agencies but has no slug/domain step.
-- No reverse proxy, wildcard DNS, or SSL automation exists in this repo. The local dev workflow is plain `php -S 127.0.0.1:8000 dev_router.php`, which cannot serve real subdomains.
+- No reverse proxy, wildcard DNS, or SSL automation exists in this repo. The local dev workflow is plain `php -S 127.0.0.1:8000 bin/dev_router.php`, which cannot serve real subdomains.
 
 ## Proposed architecture
 

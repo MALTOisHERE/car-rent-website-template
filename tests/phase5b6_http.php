@@ -40,7 +40,7 @@ try{
 
     $socket=stream_socket_server('tcp://127.0.0.1:0',$errno,$error);if(!$socket)throw new RuntimeException($error);$name=(string)stream_socket_get_name($socket,false);fclose($socket);$port=(int)substr(strrchr($name,':'),1);$base='http://127.0.0.1:'.$port;
     $logs=[tempnam($root.'/storage','p5b6-http-out-'),tempnam($root.'/storage','p5b6-http-err-')];
-    $server=proc_open([PHP_BINARY,'-d','session.save_path='.$root.'/storage','-S','127.0.0.1:'.$port,'dev_router.php'],[['pipe','r'],['file',$logs[0],'a'],['file',$logs[1],'a']],$pipes,$root);if(!is_resource($server))throw new RuntimeException('Phase 5B.6 HTTP server did not start.');fclose($pipes[0]);
+    $server=proc_open([PHP_BINARY,'-d','session.save_path='.$root.'/storage','-S','127.0.0.1:'.$port,'bin/dev_router.php'],[['pipe','r'],['file',$logs[0],'a'],['file',$logs[1],'a']],$pipes,$root);if(!is_resource($server))throw new RuntimeException('Phase 5B.6 HTTP server did not start.');fclose($pipes[0]);
     $ready=false;for($attempt=0;$attempt<30;$attempt++){$probe=p5b6HttpRequest($base.'/backoffice/contracts.php',$sessions['manager']);if($probe['body']!==''){$ready=true;break;}usleep(100000);}if(!$ready)throw new RuntimeException('Phase 5B.6 HTTP server did not become ready: '.trim((string)@file_get_contents($logs[1])));
 
     $routes=[

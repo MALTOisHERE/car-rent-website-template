@@ -15,7 +15,7 @@ A procedural PHP/PDO rental-agency management application with a multilingual pu
 2. Create an empty database and import the legacy `rental_car.sql` only when upgrading the original prototype.
 3. Back up the database.
 4. Run `php bin/migrate.php`.
-5. Start locally with `php -S 127.0.0.1:8000 dev_router.php`; the router denies direct storage requests, including private inspection-photo staging/final files, and transparently maps the public site's pages (see below) so their URLs stay at the project root.
+5. Start locally with `php -S 127.0.0.1:8000 bin/dev_router.php`; the router denies direct storage requests, including private inspection-photo staging/final files, and transparently maps the public site's pages (see below) so their URLs stay at the project root.
 6. Open `/` (public site), `/account/login.php`, `/backoffice/`, or `/portal/`.
 
 For a fictional demonstration, set `APP_ENV=development` and a strong `DEMO_PASSWORD`, then run `php bin/seed_demo.php`.
@@ -24,7 +24,7 @@ See `.docs/IMPLEMENTATION_REPORT.md` and `.docs/` for migration, testing, securi
 
 ## Public site and per-agency branding
 
-Every public marketing page (`site/index.php`, `cars.php`, `selection.php`, `about.php`, and the rest) lives once under `site/`, not once per language - language is resolved dynamically via `?lang=`/session state rather than a `en/`/`fr`/`ar/` URL folder. `dev_router.php` (locally) and `.htaccess` (in production) transparently map bare top-level requests like `/cars.php` and `/` to their file under `site/`, so the URLs seen by visitors never change.
+Every public marketing page (`site/index.php`, `cars.php`, `selection.php`, `about.php`, and the rest) lives once under `site/`, not once per language - language is resolved dynamically via `?lang=`/session state rather than a `en/`/`fr`/`ar/` URL folder. `bin/dev_router.php` (locally) and `.htaccess` (in production) transparently map bare top-level requests like `/cars.php` and `/` to their file under `site/`, so the URLs seen by visitors never change.
 
 Each agency can customize its own public storefront from `/backoffice/agency_branding.php`: a logo, a three-color brand palette (primary, secondary, dark accent), and the actual wording shown on its public pages, section by section and per language. The resolved agency for a request comes from the subdomain in the `Host` header in production, or from a `?agency=your-agency-slug` query parameter while `APP_ENV=development` (see `app/tenant.php`), so branding can be previewed locally without configuring real subdomains.
 

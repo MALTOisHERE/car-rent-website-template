@@ -18,7 +18,7 @@ This session made the inconsistency worse in one specific way worth naming hones
 - Confirmed today: the static assets (`css/`, `js/`, `lib/`) are byte-identical across all three folders (`diff -rq` shows zero differences; same file counts: 2 CSS files, 1 JS file, 26 lib files each). These are pure duplication with zero divergence, the safest, highest-confidence part of this plan to execute first.
 - The PHP templates are *not* uniformly translated: `fr/index.php` and `ar/index.php` are genuinely translated (real French/Arabic copy), but `fr/cars.php`, `ar/cars.php`, `fr/selection.php`, `ar/selection.php` (and likely others, not fully audited) are literally the English placeholder text copy-pasted with only code comments translated. Any consolidation has to treat these two cases differently, one is "move existing correct translations into the catalog," the other is "there is no French/Arabic copy yet, only English, decide whether to machine-translate, leave in English, or flag for human translation."
 - `header_p.php`/`footer_p.php` are now triplicated *and* each carries today's session's new logic (`resolveTenantAgency()`, `agencyColorPalette()`, `agencyColorStyleBlock()`) copy-pasted three times, another reason to merge sooner rather than later, so future changes to that logic don't need to be applied three times by hand (this already happened once today, and a fourth `header_p.php` clone was avoided by luck, not design).
-- No routing layer exists for the public site at all beyond physical folders. `dev_router.php` just maps URL path to file path directly.
+- No routing layer exists for the public site at all beyond physical folders. `bin/dev_router.php` just maps URL path to file path directly.
 
 ## Proposed architecture
 

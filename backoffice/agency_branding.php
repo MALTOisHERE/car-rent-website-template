@@ -89,7 +89,7 @@ pageHeader('page.agency_branding.title', 'page.agency_branding.description', [
         <input type="hidden" name="form_action" value="branding">
         <label><?= e(t('field.logo')) ?><input type="file" name="logo" accept="image/jpeg,image/png,image/webp"></label>
         <?php if ($agency['logo_path']): ?>
-        <div class="page-metadata"><img src="../agency_logo.php?id=<?= e($agencyId) ?>" alt="" style="max-height:60px;max-width:200px;object-fit:contain;background:var(--surface-subtle);border-radius:var(--radius-sm);padding:.4rem"></div>
+        <div class="page-metadata"><img src="../site/agency_logo.php?id=<?= e($agencyId) ?>" alt="" style="max-height:60px;max-width:200px;object-fit:contain;background:var(--surface-subtle);border-radius:var(--radius-sm);padding:.4rem"></div>
         <?php endif; ?>
         <div class="grid">
             <label><?= e(t('field.primary_color')) ?><input type="color" name="primary_color" value="<?= e($agency['primary_color'] ?: '#011468') ?>"></label>

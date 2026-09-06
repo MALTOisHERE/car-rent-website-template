@@ -37,8 +37,8 @@ MySQL), no Composer/npm needed.
    `database/migrations/*.sql` in order, idempotently (already-applied versions print `SKIP`).
    Legacy `user`/`car`/`reservation` tables are **not dropped**; migration `002` imports them
    into the new authoritative schema when present.
-3. Serve with `php -S 127.0.0.1:8000 dev_router.php` (not plain `php -S ...` - the router in
-   `dev_router.php` blocks direct access to `/storage`, including private inspection-photo
+3. Serve with `php -S 127.0.0.1:8000 bin/dev_router.php` (not plain `php -S ...` - the router in
+   `bin/dev_router.php` blocks direct access to `/storage`, including private inspection-photo
    files; using the bare built-in server without it exposes protected uploads).
 4. Entry points: `/` (public site, served from `site/index.php` - language is chosen dynamically
    via `?lang=`/session state, not a URL folder), `/account/login.php` (staff + customer login),
@@ -92,16 +92,17 @@ decisions").
 
 - **`site/`** - the public marketing site (car browsing/booking, static pages): `index.php`,
   `cars.php`, `selection.php`, `about.php`, `service.php`, `contact.php`, `team.php`,
-  `testimonial.php`, `blog.php`, `feature.php`, `reserve.php`, `404.php`, plus the shared
-  `header_p.php`/`footer_p.php` shell. One copy of each page, not one per language - language is
-  resolved dynamically via `t()`/`language()` and `?lang=`, not a `en/`/`fr`/`ar/` URL folder
-  (those folders were removed; every page lives at the site root, e.g. `/cars.php`, and
-  `dev_router.php`/`.htaccess` transparently map bare top-level `*.php` requests and `/` to
-  `site/`). Shared static assets live in `assets/public/{css,js,lib}`. Still template-heavy
-  procedural PHP, deliberately not redesigned ("static public marketing pages remain
-  template-heavy; core agency workflows were prioritized" - see report). `agency_logo.php` and
-  `logout.php` stay at the true project root (referenced from `backoffice/` and elsewhere via
-  relative paths), not inside `site/`.
+  `testimonial.php`, `blog.php`, `feature.php`, `reserve.php`, `404.php`, `agency_logo.php`
+  (public unauthenticated logo delivery), `logout.php` (legacy redirect shim for old bookmarks),
+  plus the shared `header_p.php`/`footer_p.php` shell. One copy of each page, not one per
+  language - language is resolved dynamically via `t()`/`language()` and `?lang=`, not a
+  `en/`/`fr`/`ar/` URL folder (those folders were removed; every page lives at the site root,
+  e.g. `/cars.php`, and `bin/dev_router.php`/`.htaccess` transparently map bare top-level
+  `*.php` requests and `/` to `site/`). Shared static assets live in `assets/public/{css,js,lib}`.
+  Still template-heavy procedural PHP, deliberately not redesigned ("static public marketing
+  pages remain template-heavy; core agency workflows were prioritized" - see report). No PHP
+  file lives at the true project root at all; the local dev server's router
+  (`bin/dev_router.php`) lives in `bin/` alongside the other CLI scripts, not at root.
 - **`account/`** - consolidated login/signup/logout/password-reset for both staff and
   customers, `require_once`-ing `app/application.php` directly (not the legacy per-language
   connect files).

@@ -27,8 +27,8 @@ The least controversial part, and the connection code already assumes a remote h
 
 ### 2. Docker for the app itself
 
-A PHP-FPM or `php:8.2-apache`-based image, with `dev_router.php`'s logic replaced by real webserver routing in production (the router script exists specifically for the *built-in dev server*; a production Nginx/Apache config plays the same "block direct /storage access, resolve directory indexes" role natively and more efficiently). Needs:
-- A production webserver config (Nginx + php-fpm, most likely) that mirrors `dev_router.php`'s two security rules: never serve `/storage/*` directly, and block path traversal (`..`) in the URL.
+A PHP-FPM or `php:8.2-apache`-based image, with `bin/dev_router.php`'s logic replaced by real webserver routing in production (the router script exists specifically for the *built-in dev server*; a production Nginx/Apache config plays the same "block direct /storage access, resolve directory indexes" role natively and more efficiently). Needs:
+- A production webserver config (Nginx + php-fpm, most likely) that mirrors `bin/dev_router.php`'s two security rules: never serve `/storage/*` directly, and block path traversal (`..`) in the URL.
 - The `.env.example` variable list becomes real container environment variables (or Docker secrets for `DB_PASSWORD` and similar).
 - `bin/migrate.php` and `bin/seed_demo.php` (guarded by `APP_ENV=production` refusal, already in place) become one-off `docker compose run` commands or an init container, not something that runs on every boot.
 

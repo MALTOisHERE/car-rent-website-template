@@ -12,7 +12,7 @@
  * every other protected/served-file route in this codebase.
  */
 
-require_once __DIR__ . '/app/application.php';
+require_once __DIR__ . '/../app/application.php';
 
 function agencyLogoNotFound()
 {
